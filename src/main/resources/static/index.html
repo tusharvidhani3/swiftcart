@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - SwiftCart</title>
+    <link rel="stylesheet" href="css/index.css">
+    <script src="js/index.js" defer></script>
+</head>
+<body>
+    <main>
+        <form action="/api/products">
+            <input type="search" name="keyword" placeholder="Search for products">
+            <button><img src="assets/icons/search.svg" alt="search button"></button>
+        </form>
+        <div class="search-summary">
+            <p>Showing <span class="range-start"></span> - <span class="range-end"></span> of <span class="results-count"></span> results</p>
+            <p>for &quot;<span class="search-keyword"></span>&quot;</p>
+        </div>
+        <div class="products-container">
+            <div class="product-card">
+                <img alt="product image" class="product-image">
+                <h1 class="product-title"></h1>
+                <h2 class="product-price"></h2>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Product Listing</title>
+    <link rel="stylesheet" href="css/create-product-listing.css">
+</head>
+
+<body>
+    <header></header>
+    <main>
+        <form action="/api/seller/products" method="post">
+            <div>
+            <label for="file-upload" class="btn-image-upload">
+                <img src="assets/images/product-upload.svg" alt="product upload image">
+                <h2>Upload Product Image</h2>
+            </label>
+            <input type="file" id="file-upload" hidden />
+            </div>
+            <div>
+                <label for="product-title">Product Title</label>
+                <input type="text" id="product-title" name="productName">
+            </div>
+            <div>
+                <label for="price">Price</label>
+                <input type="text" id="price" name="price">
+            </div>
+            <div>
+                <label for="category">Category</label>
+                <input type="text" id="category" name="category">
+            </div>
+            <button>List Product</button>
+        </form>
+    </main>
+</body>
+
+</html>

@@ -1,0 +1,136 @@
+@import url(global.css);
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Inter", sans-serif;
+}
+
+main {
+    background-color: var(--bg-color);
+    max-width: 480px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-block: 80px;
+    gap: 24px;
+}
+
+main > section {
+    width: 90%;
+}
+
+h2 {
+    font-size: 20px;
+    margin: 12px;
+}
+
+h3 {
+    font-size: 18px;
+}
+
+.order-details {
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    background-color: white;
+}
+
+.order-details > div {
+    display: flex;
+    justify-content: space-between;
+}
+
+.products-ordered {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.products-ordered > div {
+    display: flex;
+    flex-direction: column;
+    padding: 8px;
+}
+
+.order-item {
+    display: flex;
+    background-color: white;
+    align-items: center;
+    gap: 12px;
+}
+
+.order-item img {
+    width: 128px;
+}
+
+.product-title {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.item-total {
+    font-size: 18px;
+    margin-block: 8px;
+    font-weight: 600;
+}
+
+.product-qty {
+    font-weight: 600;
+    color: gray;
+}
+
+.item-actions {
+    display: flex;
+}
+
+.item-actions > button {
+    flex-basis: 50%;
+    background-color: white;
+    height: 40px;
+    font-size: 16px;
+    font-weight: 600;
+    border: 1px solid rgba(128, 128, 128, 0.5);
+    cursor: pointer;
+    font-family: "Inter";
+}
+
+.payment-info {
+    background-color: white;
+    padding: 12px;
+}
+
+.payment-info h3, .payment-info p {
+    margin: 8px;
+}
+
+.ship-to {
+    background-color: white;
+    padding: 12px;
+}
+
+.price-details {
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+}
+
+.price-details > div {
+    display: flex;
+    justify-content: space-between;
+}
+
+.order-summary-total {
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.ship-to p {
+    margin: 0;
+}
+
+.order-total {
+    color: #BD0F0F;
+}

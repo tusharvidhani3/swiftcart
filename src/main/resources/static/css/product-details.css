@@ -1,0 +1,59 @@
+@import url(global.css);
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Inter", sans-serif;
+}
+
+main {
+    max-width: 480px;
+    margin: auto;
+    background-color: var(--bg-color);
+}
+
+.product-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.product-details h1 {
+    font-weight: 500;
+    font-size: 16px;
+    margin: 12px 16px;
+}
+
+.product-details h2 {
+    font-weight: 600;
+    font-size: 20px;
+    margin: 8px 16px;
+}
+
+.product-details img {
+    width: 100%;
+}
+
+.product-actions {
+    position: absolute;
+    display: flex;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+}
+
+.btn-product-action {
+    flex-basis: 50%;
+    border: 0;
+    height: 40px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.btn-add-to-cart {
+    background-color: white;
+}
+
+.btn-buy-now {
+    background-color: var(--accent-color);
+}

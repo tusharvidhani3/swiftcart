@@ -1,0 +1,93 @@
+@import url(global.css);
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Inter", sans-serif;
+}
+
+main {
+    background-color: var(--bg-color);
+    max-width: 480px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-block: 80px;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+.addresses-container {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    font-size: 16px;
+    font-weight: 600;
+    gap: 16px;
+}
+
+.address-card {
+    background-color: white;
+    border-radius: 24px;
+    padding: 12px 16px;
+    position: relative;
+    height: 100px;
+    display: flex;
+    align-items: center;
+}
+
+.address {
+    width: 80%;
+}
+
+.three-dots-menu {
+    position: absolute;
+    top: 16px;
+    right: 12px;
+    cursor: pointer;
+}
+
+.open .options {
+    display: flex;
+}
+
+.options {
+    display: none;
+    list-style: none;
+    background-color: white;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-inline: 8px;
+    gap: 4px;
+    font-size: 14px;
+    position: absolute;
+    right: 40%;
+    top: -50%;
+    box-shadow: 0 2px 4px 2px rgba(128, 128, 128, 0.5);
+}
+
+.options li {
+    width: max-content;
+    height: 20px;
+    margin-block: 4px;
+}
+
+.options li:hover {
+    color: blue;
+    /* background-color: rgba(0, 0, 255, 0.116); */
+}
+
+.btn-add-new-address {
+    position: fixed;
+    bottom: 12px;
+    border: 0;
+    border-radius: 25px;
+    height: 50px;
+    cursor: pointer;
+    background-color: var(--accent-color);
+    font-size: 20px;
+    font-weight: 700;
+    width: 80%;
+    max-width: 420px;
+}

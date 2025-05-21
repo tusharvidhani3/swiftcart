@@ -1,0 +1,154 @@
+@import url(global.css);
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Inter", sans-serif;
+}
+
+main {
+    background-color: var(--bg-color);
+    max-width: 480px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-block: 80px;
+    gap: 24px;
+}
+
+.address-preview {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 24px;
+    background-color: white;
+}
+
+.change-address {
+    color: #3206C3;
+    border: 1px solid gray;
+    background-color: rgba(red, green, blue, 1);
+    padding: 8px;
+    cursor: pointer;
+}
+
+.cart-items-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+}
+
+.cart-item {
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    background-color: white;
+    gap: 12px;
+}
+
+.product-preview {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+}
+
+.product-title {
+    font-size: 16px;
+    margin: 8px;
+    font-weight: 500;
+}
+
+.product-price {
+    font-size: 20px;
+    margin: 8px;
+    font-weight: 600;
+}
+
+.cart-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    height: 24px;
+    margin-inline: 4px;
+}
+
+button {
+    background-color: white;
+}
+
+.btn-qty {
+    padding: 0;
+    width: 24px;
+    border: 0;
+    height: 100%;
+    cursor: pointer;
+}
+
+.btn-qty img {
+    width: 100%;
+    height: 100%;
+}
+
+.btn-delete {
+    border-radius: 16px;
+    border: 1.5px solid gray;
+    height: 100%;
+    width: 64px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.price-details {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    padding: 12px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.price-details h2 {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.price-details > div {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.cart-checkout {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    background-color: white;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 12px;
+    height: 60px;
+    max-width: 480px;
+}
+
+.btn-pay {
+    background-color: var(--accent-color);
+    border: 0;
+    border-radius: 4px;
+    height: 100%;
+    font-size: 18px;
+    font-weight: 700;
+    padding-inline: 12px;
+}
+
+.price-to-pay {
+    font-size: 20px;
+    margin: 0;
+}

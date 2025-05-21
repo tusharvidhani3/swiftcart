@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="css/login.css">
+    <script src="js/login.js" defer></script>
+</head>
+<body>
+    <header>
+        <nav>
+
+        </nav>
+
+        <img src="assets/icons/profile.svg" alt="profile icon">
+        <img src="assets/icons/cart.svg" alt="cart icon">
+    </header>
+
+    <main>
+        <form action="/api/auth/login" method="post">
+            <div>
+                <label for="mobile-number">Enter mobile number</label>
+                <div class="mobile-number"><span class="country-code">+91</span> <input type="text" id="mobile-number" name="mobileNumber"></div>
+            </div>
+            <div>
+                <label for="password">Enter password</label>
+                <input type="password" id="password" name="password">
+            </div>
+                <a href="./register.html">New User&quest; Click Here to Register</a>
+                <a href="./register.html">New Seller&quest; Click Here to Start Selling</a>
+            <button class="btn-login">Login</button>
+        </form>
+    </main>
+</body>
+</html>

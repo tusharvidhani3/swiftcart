@@ -1,0 +1,5 @@
+{"properties": [{
+  "name": "product.images.directory",
+  "type": "java.lang.String",
+  "description": "A description for 'product.images.directory'"
+}]}
