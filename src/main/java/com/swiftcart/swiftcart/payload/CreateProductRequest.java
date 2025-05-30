@@ -13,8 +13,14 @@ public class CreateProductRequest {
     private String productName;
     
     @Min(value = 1, message = "Price of a product cannot be less than 1 rupee")
-    private Double price;
+    private double price;
 
     @Size(min = 3, max = 50, message = "Category name must be between 3 and 50 characters")
     private String category;
+
+    @Size(min = 10, max = 1000, message = "Description must be between 10 & 1000 characters")
+    private String description;
+
+    @Min(value = 0, message = "Stock quantity cannot be less than 0")
+    private int stock;
 }

@@ -21,7 +21,4 @@ public class Cart {
     @JoinColumn(name = "user_id", nullable=false)
     @Setter
     private User user;
-
-    @Setter
-    private Double totalPrice;
 }

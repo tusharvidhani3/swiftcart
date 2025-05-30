@@ -32,9 +32,4 @@ public class CartItem {
     @Setter
     private int quantity;
 
-    public CartItem(Product product, int quantity, Cart cart){
-        this.product=product;
-        this.quantity=quantity;
-        this.cart=cart;
-    }
 }

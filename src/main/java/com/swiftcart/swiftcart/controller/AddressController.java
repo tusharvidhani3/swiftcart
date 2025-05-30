@@ -4,14 +4,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.swiftcart.swiftcart.payload.AddressDTO;
-import com.swiftcart.swiftcart.security.entity.UserDetailsImpl;
+import com.swiftcart.swiftcart.security.UserDetailsImpl;
 import com.swiftcart.swiftcart.service.AddressService;
+
+import jakarta.validation.Valid;
 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/api/addresses")
+@PreAuthorize("hasRole('CUSTOMER') or hasRole('SELLER')")
 public class AddressController {
 
     @Autowired
@@ -30,11 +34,11 @@ public class AddressController {
 
     @GetMapping
     public ResponseEntity<List<AddressDTO>> getLoggedInUserAddresses(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        return ResponseEntity.ok(addressService.getLoggedInUserAddresses(userDetailsImpl.getUser().getUserId()));
+        return ResponseEntity.ok(addressService.getAddressesForLoggedInUser(userDetailsImpl.getUser().getUserId()));
     }
     
     @PostMapping
-    public ResponseEntity<AddressDTO> addAddress(AddressDTO addressDTO, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
+    public ResponseEntity<AddressDTO> addAddress(@Valid @RequestBody AddressDTO addressDTO, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
         return new ResponseEntity<>(addressService.addAddress(addressDTO, userDetailsImpl.getUser()), HttpStatus.CREATED);
     }
 
@@ -50,13 +54,20 @@ public class AddressController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping
-    public ResponseEntity<AddressDTO> updateAddress(@RequestBody AddressDTO addressDTO, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
+    @PutMapping("/{addressId}")
+    public ResponseEntity<AddressDTO> updateAddress(@PathVariable Long addressId, @RequestBody @Valid AddressDTO addressDTO, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
         return new ResponseEntity<>(addressService.updateAddress(addressDTO, userDetailsImpl.getUser()), HttpStatus.OK);
     }
 
     @PutMapping("/{addressId}/default")
-    public ResponseEntity<Void> changeDefaultAddress(@PathVariable Long addressId, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        return ResponseEntity.ok().build();
+    @PreAuthorize("hasRole('CUSTOMER')")
+    public ResponseEntity<AddressDTO> changeDefaultAddress(@PathVariable Long addressId, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
+        return ResponseEntity.ok(addressService.changeDefaultAddress(addressId, userDetailsImpl.getUser().getUserId()));
+    }
+
+    @GetMapping("/default")
+    @PreAuthorize("hasRole('CUSTOMER')")
+    public ResponseEntity<AddressDTO> getDefaultAddress(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
+        return ResponseEntity.ok(addressService.getDefaultAddressForUser(userDetailsImpl.getUser().getUserId()));
     }
 }

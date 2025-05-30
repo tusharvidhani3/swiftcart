@@ -1,62 +1,59 @@
 package com.swiftcart.swiftcart.controller;
 
-import java.net.URI;
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.swiftcart.swiftcart.payload.AddToCartRequest;
 import com.swiftcart.swiftcart.payload.BuyNowPreview;
-import com.swiftcart.swiftcart.payload.CartItemDTO;
-import com.swiftcart.swiftcart.security.entity.UserDetailsImpl;
+import com.swiftcart.swiftcart.payload.CartResponse;
+import com.swiftcart.swiftcart.payload.UpdateCartItemQtyRequest;
+import com.swiftcart.swiftcart.security.UserDetailsImpl;
 import com.swiftcart.swiftcart.service.CartService;
 
+import jakarta.validation.Valid;
+
 @RestController
-@RequestMapping("/api/customer/cart")
+@RequestMapping("/api/cart")
+@PreAuthorize("hasRole('CUSTOMER')")
 public class CartController {
 
     @Autowired
     CartService cartService;
 
     @GetMapping
-    public List<CartItemDTO> getCartItems(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        return cartService.getCartItems(userDetailsImpl.getUser().getUserId());
+    public CartResponse getCart(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
+        return cartService.getCartResponse(userDetailsImpl.getUser().getUserId());
     }
     
-    @PostMapping("/products/{productId}")
-    public ResponseEntity<CartItemDTO> addProductToCart(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @PathVariable Long productId) {
-        CartItemDTO cartItemDTO=cartService.addProductToCart(userDetailsImpl.getUser(), productId);
-        return ResponseEntity.created(URI.create("/customer/cart/items/"+cartItemDTO.getCartItemId())).body(cartItemDTO);
+    @PostMapping("/items")
+    public ResponseEntity<CartResponse> addProductToCart(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @RequestBody @Valid AddToCartRequest addToCartRequest) {
+        CartResponse cartResponse=cartService.addProductToCart(userDetailsImpl.getUser(), addToCartRequest.getProductId(), addToCartRequest.getQuantity());
+        return ResponseEntity.status(HttpStatus.CREATED).body(cartResponse);
     }
 
-    @PutMapping("/{cartItemId}/inc-qty")
-    public ResponseEntity<Integer> incrementQty(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @PathVariable Long cartItemId){
-        return ResponseEntity.ok(cartService.incrementQuantity(userDetailsImpl.getUser().getUserId(), cartItemId));
+    @PutMapping("/items/{cartItemId}")
+    public ResponseEntity<CartResponse> updateQty(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @PathVariable Long cartItemId, @RequestBody @Valid UpdateCartItemQtyRequest req){
+        return ResponseEntity.ok(cartService.updateQuantity(userDetailsImpl.getUser().getUserId(), cartItemId, req.getQuantity()));
     }
 
-    @PutMapping("/{cartItemId}/dec-qty")
-    public ResponseEntity<Integer> decrementQty(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @PathVariable Long cartItemId){
-        return ResponseEntity.ok(cartService.decrementQuantity(userDetailsImpl.getUser().getUserId(), cartItemId));
+    @DeleteMapping("/items/{cartItemId}")
+    public ResponseEntity<CartResponse> removeProductFromCart(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @PathVariable Long cartItemId) {
+        CartResponse cartResponse = cartService.removeProductFromCart(userDetailsImpl.getUser().getUserId(), cartItemId);
+        return ResponseEntity.ok(cartResponse);
     }
 
-    @DeleteMapping("/{cartItemId}")
-    public ResponseEntity<?> removeProductFromCart(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @PathVariable Long cartItemId) {
-        if(cartService.removeProductFromCart(userDetailsImpl.getUser().getUserId(), cartItemId))
-        return ResponseEntity.noContent().build();
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", "Product not found in cart"));
-    }
-
-    @PostMapping("/checkout/buy-now/{productId}")
+    @PostMapping("/checkout/buy-now/product/{productId}")
     public ResponseEntity<BuyNowPreview> buyNow(@PathVariable Long productId, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
         BuyNowPreview buyNowPreview = cartService.createBuyNowPreview(productId, userDetailsImpl.getUser());
         return new ResponseEntity<>(buyNowPreview, HttpStatus.OK);

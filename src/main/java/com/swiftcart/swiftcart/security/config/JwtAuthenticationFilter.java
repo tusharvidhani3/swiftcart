@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,6 +16,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.swiftcart.swiftcart.security.service.JwtService;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,23 +34,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        final String authHeader = request.getHeader("Authorization");
-        final String jwtToken;
-        final String username;
-
-        // Check if header is missing or doesn't start with Bearer
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        final String jwtToken = jwtService.extractJwtFromCookies(request);
+        if (jwtToken == null) {
             filterChain.doFilter(request, response);
             return;
         }
-
-        // Extract token from header
-        jwtToken = authHeader.substring(7); // skip "Bearer "
-        username = jwtService.extractUsername(jwtToken);
+        String username = null;
+        try {
+            username = jwtService.extractUsername(jwtToken);
+        } catch (ExpiredJwtException ex) {
+            ResponseCookie cookie = ResponseCookie.from("jwt", null)
+                    .httpOnly(true)
+                    .secure(true)
+                    .path("/")
+                    .maxAge(0)
+                    .sameSite("Strict")
+                    .build();
+            response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        }
 
         // If user is not yet authenticated in this context
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.context.getBean("userDetailsService", UserDetailsService.class).loadUserByUsername(username);
+            UserDetails userDetails = this.context.getBean("userDetailsService", UserDetailsService.class)
+                    .loadUserByUsername(username);
             if (jwtService.isTokenValid(jwtToken, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,

@@ -5,37 +5,40 @@ const rangeStart = searchSummary.querySelector(".range-start")
 const rangeEnd = searchSummary.querySelector(".range-end")
 const resultsCount = searchSummary.querySelector(".results-count")
 const searchKeyword = searchSummary.querySelector(".search-keyword")
-let productCard = document.querySelector(".product-card")
+const productTemplate = document.getElementById("product-template")
+
 function getProducts(keyword = "") {
-    productsContainer.innerHTML=""
+    productsContainer.innerHTML = ""
     fetch(`/api/products?keyword=${keyword}`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json"
         }
     })
-    .then(res => res.json())
-    .then(products => {
-        if(keyword) {
-        rangeStart.textContent = products.number*products.size+products.numberOfElements?1:0
-        rangeEnd.textContent = products.number*products.size+products.numberOfElements
-        resultsCount.textContent = products.totalElements
-        searchKeyword.textContent = keyword
-        searchSummary.classList.add("open")
-        }
-        products.content.forEach(product => {
-        productCard = productCard.cloneNode(true)
-        const productImage = productCard.querySelector(".product-image");
-        productImage.setAttribute("src", product.image)
-        const productTitle = productCard.querySelector(".product-title")
-        productTitle.textContent = product.productName
-        const productPrice = productCard.querySelector(".product-price")
-        productPrice.textContent = "₹ "+product.price
-        productsContainer.append(productCard)
-        productCard.setAttribute("data-product-id", product.productId)
-        productCard.setAttribute("data-category", product.category)
+        .then(res => res.json())
+        .then(products => {
+            if (keyword) {
+                rangeStart.textContent = products.number * products.size + products.numberOfElements ? 1 : 0
+                rangeEnd.textContent = products.number * products.size + products.numberOfElements
+                resultsCount.textContent = products.totalElements
+                searchKeyword.textContent = keyword
+                searchSummary.classList.add("open")
+            }
+            const productsFragment = document.createDocumentFragment()
+            products.content.forEach(product => {
+                const productCard = productTemplate.content.children[0].cloneNode(true)
+                const productImage = productCard.querySelector(".product-image")
+                productImage.setAttribute("src", product.image)
+                const productTitle = productCard.querySelector(".product-title")
+                productTitle.textContent = product.productName
+                const productPrice = productCard.querySelector(".product-price")
+                productPrice.textContent = "₹ " + product.price
+                productsFragment.append(productCard)
+                productCard.setAttribute("data-product-id", product.productId)
+                productCard.setAttribute("data-category", product.category)
+            })
+            productsContainer.append(productsFragment)
         })
-    })
 }
 getProducts()
 searchForm.addEventListener('submit', (e) => {
@@ -46,8 +49,44 @@ searchForm.addEventListener('submit', (e) => {
 
 productsContainer.addEventListener('click', (e) => {
     e.stopPropagation()
-    if(e.target != productsContainer) {
-    const productId = e.target.closest(".product-card").getAttribute("data-product-id")
-    window.open(`./product-details.html?productId=${parseInt(productId)}`)
+    if (e.target != productsContainer) {
+        const productId = e.target.closest(".product-card").getAttribute("data-product-id")
+        window.open(`./product-details.html?productId=${parseInt(productId)}`)
     }
 })
+
+function setupHeader() {
+
+    const profileBtn = document.querySelector(".btn-profile")
+    const header = document.querySelector("header")
+
+    profileBtn.addEventListener("click", () => {
+        window.location.href = "./login.html"
+    })
+
+    let isLoggedIn
+    fetch("/api/auth/me", {
+        method: "GET",
+        credentials: "include"
+    })
+        .then((response) => {
+            if (response.ok) {
+                header.classList.add("logged-in")
+                profileBtn.addEventListener("click", () => {
+                    window.location.href = "./profile.html"
+                })
+                return response.json()
+            }
+        })
+        .then((res) => {
+            if (res) {
+                const profileBtnTxt = document.querySelector(".btn-profile-txt")
+                if (res.firstName) {
+                    profileBtnTxt.textContent = res.firstName
+                }
+                else
+                    profileBtnTxt.textContent = "User"
+            }
+        })
+}
+setupHeader()

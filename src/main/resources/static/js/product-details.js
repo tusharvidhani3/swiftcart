@@ -27,9 +27,22 @@ const addToCartBtn = document.querySelector(".btn-add-to-cart")
 
 buyNowBtn.addEventListener('click', (e) => {
     e.stopPropagation()
-
+    fetch(`/api/customer/cart/checkout/buy-now/${productId}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
+    .then(response => response.json())
+    .then(cartItem => )
 })
 
 addToCartBtn.addEventListener('click', (e) => {
-
+    e.stopPropagation()
+    fetch(`/api/customer/cart/products/${productId}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
 })

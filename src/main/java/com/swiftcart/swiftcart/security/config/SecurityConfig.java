@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -19,6 +20,7 @@ import com.swiftcart.swiftcart.security.service.UserDetailsServiceImpl;
 
 @EnableWebSecurity
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Autowired
@@ -29,8 +31,9 @@ public class SecurityConfig {
         return http.csrf(csrf -> csrf.disable())
         .authorizeHttpRequests(authorize -> authorize.requestMatchers("/api/auth/**").permitAll()
         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-        .requestMatchers("/api/customer/**").hasRole("CUSTOMER")
-        .requestMatchers("/api/seller/**").hasRole("SELLER")
+        .requestMatchers("/api/orders/**").authenticated()
+        .requestMatchers("/api/cart/**").authenticated()
+        .requestMatchers("/api/addresses/**").authenticated()
         .anyRequest().permitAll())
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .httpBasic(Customizer.withDefaults())

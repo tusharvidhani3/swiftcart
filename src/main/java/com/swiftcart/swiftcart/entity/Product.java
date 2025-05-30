@@ -17,9 +17,15 @@ public class Product {
     @Setter
     private String productName;
     @Setter
-    private Double price;
+    private double price;
     @Setter
     private String image;
     @Setter
     private String category;
+    @Setter
+    private String description;
+    @Setter
+    private Integer stock;
+
+    // private Integer minimumOrderQty;
 }

@@ -5,12 +5,13 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.swiftcart.swiftcart.entity.Address;
 import com.swiftcart.swiftcart.entity.User;
-import com.swiftcart.swiftcart.exception.AccessDeniedException;
+import com.swiftcart.swiftcart.exception.ResourceNotFoundException;
 import com.swiftcart.swiftcart.payload.AddressDTO;
 import com.swiftcart.swiftcart.repository.AddressRepo;
 
@@ -24,9 +25,11 @@ public class AddressServiceImpl implements AddressService {
     ModelMapper modelMapper;
 
     @Override
+    @Transactional
     public AddressDTO addAddress(AddressDTO addressDTO, User user) {
         Address address=modelMapper.map(addressDTO, Address.class);
         address.setUser(user);
+        user.getRoles().stream().anyMatch(role -> role.getName().equals("ROLE_CUSTOMER"));
         if(addressRepo.countByUser_UserId(user.getUserId()) == 0)
         address.setIsDefaultShipping(true);
         address=addressRepo.save(address);
@@ -34,39 +37,59 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public List<AddressDTO> getLoggedInUserAddresses(Long userId) {
+    public List<AddressDTO> getAddressesForLoggedInUser(Long userId) {
         List<Address> userAddresses = addressRepo.findAllByUser_UserId(userId);
         return userAddresses.stream().map(address -> modelMapper.map(address, AddressDTO.class)).collect(Collectors.toList());
     }
 
     @Override
-    @PreAuthorize("#userId == principal.user.userId")
     public AddressDTO getAddress(Long addressId, Long userId) {
-        Address address = addressRepo.findByAddressId(addressId);
+        Address address = addressRepo.findByAddressId(addressId)
+        .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
+        if (address.getUser().getUserId().equals(userId))
+            throw new AccessDeniedException("Unauthorized access to this address");
         return modelMapper.map(address, AddressDTO.class);
     }
 
     @Override
-    @PreAuthorize("#userId == principal.user.userId")
+    @Transactional
     public void deleteAddress(Long addressId, Long userId) {
+        Address address = addressRepo.findByAddressId(addressId)
+        .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
+        if (address.getUser().getUserId().equals(userId))
+            throw new AccessDeniedException("Unauthorized access to this address");
+        if(address.getIsDefaultShipping())
+        throw new IllegalStateException("Cannot delete the default shipping address");
         addressRepo.deleteById(addressId);
     }
 
     @Override
-    @PreAuthorize("#user.userId == principal.user.userId")
+    @Transactional
     public AddressDTO updateAddress(AddressDTO addressDTO, User user) {
         Address address = modelMapper.map(addressDTO, Address.class);
+        if (address.getUser().getUserId().equals(user.getUserId()))
+            throw new AccessDeniedException("Unauthorized access to this address");
         address.setUser(user);
         return modelMapper.map(addressRepo.save(address), AddressDTO.class);
     }
 
     @Override
-    public void changeDefaultAddress(Long addressId, Long userId) {
-        Address address = addressRepo.findByAddressId(addressId);
+    @Transactional
+    public AddressDTO changeDefaultAddress(Long addressId, Long userId) {
+        Address address = addressRepo.findByAddressId(addressId)
+        .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
         if(address.getUser().getUserId() != userId)
         throw new AccessDeniedException("Access denied: This address does not belong to you");
         addressRepo.unsetDefaultShipping(userId);
         addressRepo.setDefaultShipping(addressId);
+        return modelMapper.map(address, AddressDTO.class);
+    }
+
+    @Override
+    public AddressDTO getDefaultAddressForUser(Long userId) {
+        Address address = addressRepo.findDefaultShippingAddress(userId)
+        .orElseThrow(() -> new ResourceNotFoundException("No address added"));
+        return modelMapper.map(address, AddressDTO.class);
     }
 
 }

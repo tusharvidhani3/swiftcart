@@ -15,6 +15,8 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class JwtService {
@@ -30,12 +32,12 @@ public class JwtService {
         claims.put("mobileNumber", userDetails.getUsername());
         claims.put("roles", userDetails.getAuthorities());
         return Jwts.builder()
-                   .claims(claims)
-                   .subject(userDetails.getUsername())
-                   .issuedAt(new Date(System.currentTimeMillis()))
-                   .expiration(new Date(System.currentTimeMillis()+expiration))
-                   .signWith(getSignInKey())
-                   .compact();
+                .claims(claims)
+                .subject(userDetails.getUsername())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(getSignInKey())
+                .compact();
     }
 
     public String extractUsername(String token) {
@@ -43,16 +45,16 @@ public class JwtService {
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimResolver) {
-        final Claims claims=extractAllClaims(token);
+        final Claims claims = extractAllClaims(token);
         return claimResolver.apply(claims);
     }
 
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
-                   .verifyWith(getSignInKey())
-                   .build()
-                   .parseSignedClaims(token)
-                   .getPayload();
+                .verifyWith(getSignInKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
@@ -68,6 +70,17 @@ public class JwtService {
     private SecretKey getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public String extractJwtFromCookies(HttpServletRequest request) {
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("jwt".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
     }
 
 }

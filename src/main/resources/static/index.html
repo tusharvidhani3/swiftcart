@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,23 +8,40 @@
     <link rel="stylesheet" href="css/index.css">
     <script src="js/index.js" defer></script>
 </head>
+
 <body>
+    <header>
+        <div>
+            <img src="assets/icons/hamburger.svg" alt="hamburger menu" class="hamburger">
+            <nav></nav>
+        </div>
+        <div>
+            <button class="btn-profile"><img src="assets/icons/profile.svg" alt="profile icon"><span
+                    class="btn-profile-txt">Login</span><img src="assets/icons/drop-down-arrow.svg" alt="drop down"
+                    class="drop-down"></button>
+            <a href="./cart.html" class="cart"><img src="assets/icons/cart.svg" alt="cart"></a>
+        </div>
+    </header>
     <main>
         <form action="/api/products">
             <input type="search" name="keyword" placeholder="Search for products">
             <button><img src="assets/icons/search.svg" alt="search button"></button>
         </form>
         <div class="search-summary">
-            <p>Showing <span class="range-start"></span> - <span class="range-end"></span> of <span class="results-count"></span> results</p>
+            <p>Showing <span class="range-start"></span> - <span class="range-end"></span> of <span
+                    class="results-count"></span> results</p>
             <p>for &quot;<span class="search-keyword"></span>&quot;</p>
         </div>
         <div class="products-container">
-            <div class="product-card">
-                <img alt="product image" class="product-image">
-                <h1 class="product-title"></h1>
-                <h2 class="product-price"></h2>
-            </div>
+            <template id="product-template">
+                <div class="product-card">
+                    <img alt="product image" class="product-image">
+                    <h1 class="product-title"></h1>
+                    <h2 class="product-price"></h2>
+                </div>
+            </template>
         </div>
     </main>
 </body>
+
 </html>

@@ -5,9 +5,8 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class OrderItemDTO {
+public class UpdateProductStockRequest {
 
-    private Long orderItemId;
-    private ProductSnapshot product;
-    private int quantity;
+    private Long productId;
+    private int changeInQty;
 }

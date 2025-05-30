@@ -91,3 +91,12 @@ main {
     width: 80%;
     max-width: 420px;
 }
+
+.select-mode .set-default {
+    display: none;
+}
+
+.select-mode .remove {
+    display: none;
+}
+

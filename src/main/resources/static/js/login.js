@@ -1,4 +1,4 @@
-fetch("/api/auth/check", {
+fetch("/api/auth/me", {
     method: "GET",
     credentials: "include"  // VERY IMPORTANT to send cookies
 })
@@ -10,7 +10,6 @@ fetch("/api/auth/check", {
         continueLogin()
         }
     })
-    .catch(() => continueLogin())
 
 function continueLogin() {
 

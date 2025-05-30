@@ -1,4 +1,4 @@
-package com.swiftcart.swiftcart.security.entity;
+package com.swiftcart.swiftcart.security;
 
 import java.util.Collection;
 import java.util.stream.Collectors;

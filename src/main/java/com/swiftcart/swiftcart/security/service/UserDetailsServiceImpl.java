@@ -9,7 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import com.swiftcart.swiftcart.entity.User;
 import com.swiftcart.swiftcart.repository.UserRepo;
-import com.swiftcart.swiftcart.security.entity.UserDetailsImpl;
+import com.swiftcart.swiftcart.security.UserDetailsImpl;
 
 public class UserDetailsServiceImpl implements UserDetailsService {
 

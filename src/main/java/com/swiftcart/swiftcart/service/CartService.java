@@ -1,19 +1,14 @@
 package com.swiftcart.swiftcart.service;
 
-import java.util.List;
-
-import com.swiftcart.swiftcart.entity.Cart;
 import com.swiftcart.swiftcart.entity.User;
 import com.swiftcart.swiftcart.payload.BuyNowPreview;
-import com.swiftcart.swiftcart.payload.CartItemDTO;
+import com.swiftcart.swiftcart.payload.CartResponse;
 
 public interface CartService {
 
-    public CartItemDTO addProductToCart(User user, Long productId);
-    public boolean removeProductFromCart(Long userId, Long cartItemId);
-    public int incrementQuantity(Long userId, Long cartItemId);
-    public int decrementQuantity(Long userId, Long cartItemId);
-    public List<CartItemDTO> getCartItems(Long userId);
-    public Cart createNewCartForUser(User user);
+    public CartResponse addProductToCart(User user, Long productId, int quantity);
+    public CartResponse removeProductFromCart(Long userId, Long cartItemId);
+    public CartResponse updateQuantity(Long userId, Long cartItemId, int quantity);
+    public CartResponse getCartResponse(Long userId);
     public BuyNowPreview createBuyNowPreview(Long productId, User user);
 }

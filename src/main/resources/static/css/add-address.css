@@ -75,8 +75,5 @@ div {
     margin-bottom: 16px;
     font-weight: 800;
     font-size: 20px;
-}
-
-.add-address:hover {
     cursor: pointer;
 }

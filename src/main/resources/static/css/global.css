@@ -4,3 +4,71 @@
     --accent-color: #FF9800;
     --bg-color: #EFEEEE;
 }
+
+.btn-profile {
+    border-radius: 20px;
+    width: fit-content;
+    height: 40px;
+    background-color: #FF9800;
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    gap: 2px;
+}
+
+.logged-in .btn-profile {
+    background-color: #D9D9D9;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 64px;
+    padding-inline: 12px;
+    position: fixed;
+    box-sizing: border-box;
+    width: 100%;
+    background-color: white;
+    max-width: 480px;
+}
+
+header nav {
+    display: none;
+    position: absolute;
+}
+
+header div {
+    display: flex;
+    gap: 12px;
+}
+
+.cart {
+    display: none;
+    cursor: pointer;
+}
+
+.logged-in .cart {
+    display: flex;
+}
+
+.hamburger {
+    visibility: hidden;
+    position: relative;
+    cursor: pointer;
+}
+
+.logged-in .hamburger {
+    visibility: visible;
+}
+
+.drop-down {
+    display: none;
+}
+
+.logged-in .drop-down {
+    display: inline-block;
+}

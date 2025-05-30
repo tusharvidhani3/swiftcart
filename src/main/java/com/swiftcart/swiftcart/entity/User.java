@@ -36,7 +36,7 @@ public class User {
     private String mobileNumber;
 
     @Email
-    @Column(unique = true, nullable = false)
+    @Column(unique = true)
     @Setter
     private String email;
 

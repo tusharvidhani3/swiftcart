@@ -22,7 +22,7 @@ public class StorageServiceImpl implements StorageService {
         Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
         }
         catch(IOException ex) {
-            throw new ResourceNotFoundException("File Not Found.");
+            throw new ResourceNotFoundException("File Not Found");
         }
         return destination.toString();
     }

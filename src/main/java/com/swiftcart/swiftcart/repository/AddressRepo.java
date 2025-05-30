@@ -1,6 +1,7 @@
 package com.swiftcart.swiftcart.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -14,10 +15,10 @@ import com.swiftcart.swiftcart.entity.Address;
 public interface AddressRepo extends JpaRepository<Address,Long> {
 
     public List<Address> findAllByUser_UserId(Long userId);
-    public Address findByAddressId(Long shippingAddressId);
+    public Optional<Address> findByAddressId(Long shippingAddressId);
     
     @Query("SELECT a FROM Address a WHERE a.user.userId = :userId AND a.isDefaultShipping = true")
-    public Address findDefaultShippingAddress(@Param("userId") Long userId);
+    public Optional<Address> findDefaultShippingAddress(@Param("userId") Long userId);
 
     @Modifying
     @Query("UPDATE Address a SET a.isDefaultShipping = false WHERE a.user.id = :userId")

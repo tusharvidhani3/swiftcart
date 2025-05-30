@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.swiftcart.swiftcart.payload.LoginRequest;
 import com.swiftcart.swiftcart.payload.RegisterRequest;
 import com.swiftcart.swiftcart.payload.UserDTO;
-import com.swiftcart.swiftcart.security.entity.UserDetailsImpl;
+import com.swiftcart.swiftcart.security.UserDetailsImpl;
 import com.swiftcart.swiftcart.security.service.JwtService;
 import com.swiftcart.swiftcart.service.UserService;
 
@@ -38,7 +39,7 @@ public class AuthController {
     private ModelMapper modelMapper;
 
     @PostMapping(value = {"/register", "/signup"})
-    public ResponseEntity<UserDTO> register(@RequestBody RegisterRequest registerReq) {
+    public ResponseEntity<UserDTO> register(@RequestBody @Valid RegisterRequest registerReq) {
         userService.register(registerReq);
         UserDetailsImpl userDetailsImpl = userService.authenticate(modelMapper.map(registerReq, LoginRequest.class));
         UserDTO userDTO = modelMapper.map(userDetailsImpl.getUser(), UserDTO.class);
@@ -74,15 +75,15 @@ public class AuthController {
             .body(userDTO);
     }
 
-    @GetMapping("/check")
-    public ResponseEntity<Void> checkAuthentication(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        System.out.println(userDetailsImpl);
-        if(userDetailsImpl == null)
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        return ResponseEntity.ok().build();
+    @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<UserDTO> getLoggedInUser(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
+        UserDTO userDTO = modelMapper.map(userDetailsImpl.getUser(), UserDTO.class);
+        return ResponseEntity.ok(userDTO);
     }
 
-    @PostMapping("/logout")
+    @PostMapping(value = {"/logout", "signout"})
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> logout() {
         ResponseCookie cookie = ResponseCookie.from("jwt", null)
             .httpOnly(true)

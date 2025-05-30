@@ -1,6 +1,6 @@
 package com.swiftcart.swiftcart.entity;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.swiftcart.swiftcart.payload.AddressSnapshot;
 
@@ -36,12 +36,12 @@ public class Order {
     private AddressSnapshot shippingAddress;
 
     @Setter
-    private Double totalAmount;
+    private double totalAmount;
 
     @Setter
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
     @Setter
-    private LocalDate orderDate;
+    private LocalDateTime placedAt;
 }

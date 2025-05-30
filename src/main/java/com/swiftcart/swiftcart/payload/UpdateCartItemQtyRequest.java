@@ -1,13 +1,13 @@
 package com.swiftcart.swiftcart.payload;
 
+import jakarta.validation.constraints.Min;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class OrderItemDTO {
+public class UpdateCartItemQtyRequest {
 
-    private Long orderItemId;
-    private ProductSnapshot product;
+    @Min(1)
     private int quantity;
 }

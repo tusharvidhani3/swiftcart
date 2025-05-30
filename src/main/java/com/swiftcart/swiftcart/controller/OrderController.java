@@ -2,10 +2,14 @@ package com.swiftcart.swiftcart.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.swiftcart.swiftcart.payload.OrderDTO;
+import com.swiftcart.swiftcart.entity.OrderStatus;
+import com.swiftcart.swiftcart.payload.OrderResponse;
 import com.swiftcart.swiftcart.payload.PlaceOrderRequest;
-import com.swiftcart.swiftcart.security.entity.UserDetailsImpl;
+import com.swiftcart.swiftcart.payload.UpdateOrderStatusRequest;
+import com.swiftcart.swiftcart.security.UserDetailsImpl;
 import com.swiftcart.swiftcart.service.OrderService;
+
+import jakarta.validation.Valid;
 
 import java.net.URI;
 
@@ -16,11 +20,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,34 +38,60 @@ public class OrderController {
     OrderService orderService;
 
     @PostMapping("/checkout")
-    public ResponseEntity<OrderDTO> placeOrder(@RequestBody PlaceOrderRequest placeOrderRequest) {
-        OrderDTO orderDTO=orderService.placeOrder(placeOrderRequest);
-        return ResponseEntity.created(URI.create("/orders/"+orderDTO.getOrderId())).body(orderDTO);
+    @PreAuthorize("hasRole('CUSTOMER')")
+    public ResponseEntity<OrderResponse> placeOrder(@RequestBody @Valid PlaceOrderRequest placeOrderRequest, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
+        OrderResponse orderResponse=orderService.placeOrder(placeOrderRequest, userDetailsImpl.getUser().getUserId());
+        return ResponseEntity.created(URI.create("/orders/"+orderResponse.getOrderId())).body(orderResponse);
     }
 
     @GetMapping
-    public ResponseEntity<Page<OrderDTO>> getLoggedInUserOrders(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "productId") String sortBy) {
+    @PreAuthorize("hasRole('CUSTOMER')")
+    public ResponseEntity<Page<OrderResponse>> getLoggedInCustomerOrders(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "placedAt") String sortBy) {
         Pageable pageable=PageRequest.of(page, size, Sort.by(sortBy).descending());
-        Page<OrderDTO> orders=orderService.getLoggedInUserOrders(userDetailsImpl.getUser().getUserId(), pageable);
+        Page<OrderResponse> orders=orderService.getOrdersForLoggedInCustomer(userDetailsImpl.getUser().getUserId(), pageable);
+        return ResponseEntity.ok(orders);
+    }
+
+    @GetMapping("/seller")
+    @PreAuthorize("hasRole('SELLER')")
+    public ResponseEntity<Page<OrderResponse>> getLoggedInSellerOrders(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "placedAt") String sortBy) {
+        Pageable pageable=PageRequest.of(page, size, Sort.by(sortBy).descending());
+        Page<OrderResponse> orders=orderService.getOrdersForLoggedInSeller(userDetailsImpl.getUser().getUserId(), pageable);
         return ResponseEntity.ok(orders);
     }
     
-    @PutMapping("/{orderId}")
-    public ResponseEntity<OrderDTO> cancelOrder(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @PathVariable Long orderId) {
-        OrderDTO orderDTO=orderService.cancelOrder(userDetailsImpl.getUser().getUserId(),orderId);
-        return ResponseEntity.ok(orderDTO);
+    @PatchMapping("/{orderId}/cancel")
+    @PreAuthorize("hasRole('CUSTOMER')")
+    public ResponseEntity<OrderResponse> cancelOrder(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @PathVariable Long orderId) {
+        OrderResponse orderResponse=orderService.updateOrderStatus(userDetailsImpl.getUser(), orderId, OrderStatus.CANCELLED);
+        return ResponseEntity.ok(orderResponse);
+    }
+
+    @PatchMapping("/{orderId}")
+    @PreAuthorize("hasRole('SELLER')")
+    public ResponseEntity<OrderResponse> updateOrderStatus(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @RequestBody UpdateOrderStatusRequest req) {
+        OrderResponse orderResponse = orderService.updateOrderStatus(userDetailsImpl.getUser(), req.getOrderId(), req.getOrderStatus());
+        return ResponseEntity.ok(orderResponse);
     }
     
     @GetMapping("/{orderId}")
-    public ResponseEntity<OrderDTO> getOrder(@PathVariable Long orderId, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        OrderDTO orderDTO=orderService.getOrder(orderId, userDetailsImpl.getUser().getUserId());
-        return new ResponseEntity<OrderDTO>(orderDTO, HttpStatus.OK);
+    public ResponseEntity<OrderResponse> getOrder(@PathVariable Long orderId, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
+        OrderResponse orderResponse=orderService.getOrder(orderId, userDetailsImpl.getUser());
+        return new ResponseEntity<OrderResponse>(orderResponse, HttpStatus.OK);
     }
 
     @PostMapping("/checkout/buy-now/cartitem/{cartItemId}/address/{addressId}")
-    public ResponseEntity<OrderDTO> placeBuyNowOrder(@PathVariable Long cartItemId, @PathVariable Long addressId, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        OrderDTO orderDTO = orderService.placeBuyNowOrder(cartItemId, addressId, userDetailsImpl.getUser());
-        return ResponseEntity.created(URI.create("/orders/"+orderDTO.getOrderId())).body(orderDTO);
+    @PreAuthorize("hasRole('CUSTOMER') or hasRole('ADMIN')")
+    public ResponseEntity<OrderResponse> placeBuyNowOrder(@PathVariable Long cartItemId, @PathVariable Long addressId, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
+        OrderResponse orderResponse = orderService.placeBuyNowOrder(cartItemId, addressId, userDetailsImpl.getUser());
+        return ResponseEntity.created(URI.create("/orders/"+orderResponse.getOrderId())).body(orderResponse);
+    }
+
+    @GetMapping("/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Page<OrderResponse>> getAllOrders(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "placedAt") String sortBy) {
+        Page<OrderResponse> orders= orderService.getAllOrders(PageRequest.of(page, size, Sort.by(sortBy).descending()));
+        return ResponseEntity.ok(orders);
     }
 
 }
