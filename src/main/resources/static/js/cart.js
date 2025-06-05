@@ -1,6 +1,9 @@
 const cartItemsContainer = document.querySelector(".cart-items-container")
 const cartItemTemplate = document.getElementById("cart-item")
 
+const urlParams = new URLSearchParams(window.location.search);
+const selectedAddressId = urlParams.get("addressId")
+
 fetch("/api/cart", {
     method: "GET",
     credentials: "include",
@@ -9,7 +12,6 @@ fetch("/api/cart", {
     .then(cartResponse => refreshCart(cartResponse))
 
 function refreshCart(cartResponse) {
-    console.log(cartResponse)
     cartItemsContainer.innerHTML = ""
     const cartItems = cartResponse.cartItems
     const cartItemsFragment = document.createDocumentFragment()
@@ -30,17 +32,19 @@ function refreshCart(cartResponse) {
     cartItemsContainer.append(cartItemsFragment)
     const cartTotal = document.querySelector(".total-amount")
     const priceToPay = document.querySelector(".price-to-pay")
+    const price = document.querySelector(".price")
+    const cartItemsCount = document.querySelector(".cart-items-count")
     cartTotal.textContent = cartResponse.totalPrice
     priceToPay.textContent = cartResponse.totalPrice
+    price.textContent = cartResponse.totalPrice
+    cartItemsCount.textContent = cartResponse.cartItems.length
 }
 
 cartItemsContainer.addEventListener("click", (e) => {
     e.stopPropagation()
-    console.log(e.target.parentElement)
     const cartItemId = e.target.closest(".cart-item").getAttribute("data-cart-item-id")
     if (e.target.parentElement.classList.contains("btn-qty")) {
         const currentQty = parseInt(e.target.closest(".cart-item").querySelector(".qty").textContent)
-        console.log(currentQty)
         if (e.target.parentElement.classList.contains("btn-increment-qty")) {
             fetch(`/api/cart/items/${cartItemId}`, {
                 method: "PUT",
@@ -50,7 +54,8 @@ cartItemsContainer.addEventListener("click", (e) => {
                 },
                 body: JSON.stringify({ "quantity": currentQty + 1 })
             })
-                .then(cartResponse => refreshCart(cartResponse))
+            .then(response => response.json())
+            .then(cartResponse => refreshCart(cartResponse))
         }
         else {
             fetch(`/api/cart/items/${cartItemId}`, {
@@ -61,7 +66,8 @@ cartItemsContainer.addEventListener("click", (e) => {
                 },
                 body: JSON.stringify({ "quantity": currentQty - 1 })
             })
-                .then(cartResponse => refreshCart(cartResponse))
+            .then(response => response.json())
+            .then(cartResponse => refreshCart(cartResponse))
         }
     }
     else if (e.target.classList.contains("btn-delete")) {
@@ -69,28 +75,35 @@ cartItemsContainer.addEventListener("click", (e) => {
             method: "DELETE",
             credentials: "include"
         })
-            .then(cartResponse => refreshCart())
+        .then(response => response.json())
+        .then(cartResponse => refreshCart(cartResponse))
     }
-    else if (e.target.classList.contains("cart-item")) {
-        const productId = e.target.getAttribute("data-product-id")
+    else {
+        const productId = e.target.closest(".cart-item").getAttribute("data-product-id")
         window.location.href = `./product-details.html?productId=${productId}`
     }
 
 })
 
 const changeAddressBtn = document.querySelector(".btn-change-address")
+const addressSpan = document.querySelector(".address")
 
 function fetchShippingAddress(addressId) {
-    fetch(`/api/${addressId ?? "default"}`, {
+    fetch(`/api/addresses/${addressId ?? "default"}`, {
         method: "GET",
         credentials: "include",
     })
         .then(response => response.json())
         .then(address => {
-
+            addressSpan.innerHTML = `${address.name} <br> ${address.addressLine1},... ${address.pincode}`
             changeAddressBtn.addEventListener("click", () => {
-                window.location.href = `./?selected=${address.addressId}`
+                window.location.href = `.manage-addresses/?mode=select?selected=${address.addressId}`
             })
         })
 }
+fetchShippingAddress(selectedAddressId)
 
+const payBtn = document.querySelector(".btn-pay")
+payBtn.addEventListener(("click"), () => {
+
+})

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Address</title>
     <link rel="stylesheet" href="css/add-address.css">
+    <script src="js/add-address.js" defer></script>
 </head>
 <body>
     <main>
@@ -39,12 +40,12 @@
             </div>
             <div>
                 <label for="address-type">Address Type</label>
-                <input type="radio" id="home" name="addressType" checked>
+                <input type="radio" id="home" name="addressType" value="HOME" checked>
                 <label for="home">Home</label>
-                <input type="radio" id="work" name="addressType">
+                <input type="radio" id="work" name="addressType" value="WORK">
                 <label for="work">Work</label>
             </div>
-            <button class=".btn-add-address">Add Address</button>
+            <button class="btn-add-address">Add Address</button>
         </form>
     </main>
 </body>

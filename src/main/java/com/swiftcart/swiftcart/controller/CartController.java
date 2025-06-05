@@ -32,8 +32,8 @@ public class CartController {
     CartService cartService;
 
     @GetMapping
-    public CartResponse getCart(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        return cartService.getCartResponse(userDetailsImpl.getUser().getUserId());
+    public ResponseEntity<CartResponse> getCart(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
+        return ResponseEntity.ok(cartService.getCartResponse(userDetailsImpl.getUser().getUserId()));
     }
     
     @PostMapping("/items")
@@ -44,13 +44,14 @@ public class CartController {
 
     @PutMapping("/items/{cartItemId}")
     public ResponseEntity<CartResponse> updateQty(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @PathVariable Long cartItemId, @RequestBody @Valid UpdateCartItemQtyRequest req){
-        return ResponseEntity.ok(cartService.updateQuantity(userDetailsImpl.getUser().getUserId(), cartItemId, req.getQuantity()));
+        cartService.updateQuantity(userDetailsImpl.getUser().getUserId(), cartItemId, req.getQuantity());
+        return ResponseEntity.ok(cartService.getCartResponse(userDetailsImpl.getUser().getUserId()));
     }
 
     @DeleteMapping("/items/{cartItemId}")
     public ResponseEntity<CartResponse> removeProductFromCart(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @PathVariable Long cartItemId) {
-        CartResponse cartResponse = cartService.removeProductFromCart(userDetailsImpl.getUser().getUserId(), cartItemId);
-        return ResponseEntity.ok(cartResponse);
+        cartService.removeProductFromCart(userDetailsImpl.getUser().getUserId(), cartItemId);
+        return ResponseEntity.ok(cartService.getCartResponse(userDetailsImpl.getUser().getUserId()));
     }
 
     @PostMapping("/checkout/buy-now/product/{productId}")

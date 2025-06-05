@@ -19,6 +19,9 @@ public class Address {
     private Long addressId;
 
     @Setter
+    private String name;
+
+    @Setter
     private String addressLine1;
 
     @Setter

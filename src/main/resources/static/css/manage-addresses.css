@@ -25,6 +25,9 @@ main {
     font-size: 16px;
     font-weight: 600;
     gap: 16px;
+    width: 100%;
+    box-sizing: border-box;
+    align-items: center;
 }
 
 .address-card {
@@ -35,6 +38,7 @@ main {
     height: 100px;
     display: flex;
     align-items: center;
+    justify-content: space-around;
 }
 
 .address {
@@ -78,18 +82,19 @@ main {
     /* background-color: rgba(0, 0, 255, 0.116); */
 }
 
-.btn-add-new-address {
-    position: fixed;
+.btn-add-address {
     bottom: 12px;
-    border: 0;
-    border-radius: 25px;
+    border: 2px solid black;
+    border-radius: 16px;
     height: 50px;
-    cursor: pointer;
-    background-color: var(--accent-color);
+    background-color: white;
     font-size: 20px;
     font-weight: 700;
-    width: 80%;
+    width: 100%;
     max-width: 420px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .select-mode .set-default {
@@ -100,3 +105,48 @@ main {
     display: none;
 }
 
+.select-mode .btn-add-address {
+    order: 1;
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.custom-radio {
+    display: none;
+    height: 12px;
+    width: 12px;
+    border-radius: 50%;
+    border: 2px solid gray;
+    padding: 2px;
+}
+
+.select-mode .custom-radio {
+    display: block;
+}
+
+.selected .custom-radio {
+    background-color: blue;
+    background-clip: content-box;
+}
+
+.btn-deliver-address {
+    display: none;
+    position: fixed;
+    bottom: 12px;
+    width: 80%;
+    height: 50px;
+    max-width: 400px;
+    background-color: #FF9800;
+    border-radius: 25px;
+    border: 0;
+    font-family: inherit;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.select-mode .btn-deliver-address {
+    display: block;
+}

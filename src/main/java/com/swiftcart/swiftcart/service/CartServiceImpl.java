@@ -23,8 +23,14 @@ import com.swiftcart.swiftcart.repository.CartItemRepo;
 import com.swiftcart.swiftcart.repository.CartRepo;
 import com.swiftcart.swiftcart.repository.ProductRepo;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+
 @Service
 public class CartServiceImpl implements CartService {
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Autowired
     CartItemRepo cartItemRepo;
@@ -67,18 +73,17 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
-    public CartResponse removeProductFromCart(Long userId, Long cartItemId) {
+    public void removeProductFromCart(Long userId, Long cartItemId) {
         CartItem cartItem = cartItemRepo.findByCartItemId(cartItemId)
         .orElseThrow(() -> new ResourceNotFoundException("Cart item not found"));
         if (!cartItem.getCart().getUser().getUserId().equals(userId))
             throw new AccessDeniedException("Unauthorized access to this cart item");
         cartItemRepo.deleteByCartItemId(cartItemId);
-        return getCartResponse(userId);
     }
 
     @Override
     @Transactional
-    public CartResponse updateQuantity(Long userId, Long cartItemId, int quantity) {
+    public void updateQuantity(Long userId, Long cartItemId, int quantity) {
         CartItem cartItem = cartItemRepo.findByCartItemId(cartItemId)
         .orElseThrow(() -> new ResourceNotFoundException("Cart item not found"));
         if (!cartItem.getCart().getUser().getUserId().equals(userId))
@@ -86,7 +91,7 @@ public class CartServiceImpl implements CartService {
         if (cartItem.getProduct().getStock() < quantity)
             throw new InsufficientStockException("Cannot add more items. Stock limit reached");
         cartItemRepo.updateQuantity(cartItemId, quantity);
-        return getCartResponse(userId);
+        entityManager.clear();
     }
 
     @Override
