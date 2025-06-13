@@ -12,44 +12,34 @@ import lombok.Setter;
 
 @Entity
 @Getter
+@Setter
 public class Address {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long addressId;
 
-    @Setter
     private String name;
 
-    @Setter
     private String addressLine1;
 
-    @Setter
 	private String addressLine2;
 
-    @Setter
 	private String area;
 
-    @Setter
 	private String pincode;
 
-    @Setter
 	private String city;
 
-    @Setter
 	private String state;
 
-    @Setter
     private String mobileNumber;
 
-    @Setter
     @Enumerated(EnumType.STRING)
     private AddressType addressType;
 
-    @Setter
     private Boolean isDefaultShipping = false;
 
 	@ManyToOne
-    @Setter
 	private User user;
 }

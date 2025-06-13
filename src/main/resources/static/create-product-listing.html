@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Product Listing</title>
     <link rel="stylesheet" href="css/create-product-listing.css">
+    <script src="js/create-product-listing.js" defer></script>
 </head>
 
 <body>
@@ -17,7 +18,7 @@
                 <img src="assets/images/product-upload.svg" alt="product upload image">
                 <h2>Upload Product Image</h2>
             </label>
-            <input type="file" id="file-upload" hidden />
+            <input type="file" id="file-upload" name="productImage" hidden />
             </div>
             <div>
                 <label for="product-title">Product Title</label>
@@ -25,7 +26,7 @@
             </div>
             <div>
                 <label for="price">Price</label>
-                <input type="text" id="price" name="price">
+                <input type="number" id="price" name="price">
             </div>
             <div>
                 <label for="category">Category</label>

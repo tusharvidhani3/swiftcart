@@ -14,7 +14,8 @@ public class SwiftcartApplication {
 
 	@Bean
 	ModelMapper modelMapper() {
-		return new ModelMapper();
+		ModelMapper modelMapper = new ModelMapper();
+		return modelMapper;
 	}
 
 }

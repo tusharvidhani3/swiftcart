@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,23 +8,31 @@
     <link rel="stylesheet" href="css/product-details.css">
     <script src="js/product-details.js" defer></script>
 </head>
+
 <body>
     <header>
         <nav>
-            
+
         </nav>
-        
+
     </header>
     <main>
         <div class="product-details">
-            <img alt="product image" class="product-image">
-            <h1 class="product-title"></h1>
-            <h2 class="product-price"></h2>
+            <div>
+                <img alt="product image" class="product-image">
+                <div class="product-actions">
+                    <button class="btn-add-to-cart btn-product-action">Add to cart</button>
+                    <button class="btn-buy-now btn-product-action">Buy now</button>
+                </div>
+            </div>
+            <div>
+                <h1 class="product-title"></h1>
+                <h2 class="product-price"></h2>
+                <div class="product-description"></div>
+            </div>
         </div>
-        <div class="product-actions">
-            <button class="btn-add-to-cart btn-product-action">Add to cart</button>
-            <button class="btn-buy-now btn-product-action">Buy now</button>
-        </div>
+        <div id="toast"></div>
     </main>
 </body>
+
 </html>

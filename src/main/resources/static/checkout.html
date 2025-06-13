@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+    <link rel="stylesheet" href="css/checkout.css">
+    <script src="js/checkout.js" defer></script>
+</head>
+
+<body>
+    <main>
+        <section class="address-preview">
+            <div>
+                <span>Deliver to: </span>
+                <span class="address"></span>
+            </div>
+            <button class="btn-change-address">Change</button>
+        </section>
+
+        <section class="price-details">
+            <h2>Price Details</h2>
+            <div>
+                <span>Price (<span class="cart-items-count"></span> items)</span> <span class="price"></span>
+            </div>
+            <div>
+                <span>Delivery Charges</span> <span class="delivery-charge">FREE DELIVERY</span>
+            </div>
+            <div>
+                <span>Total Amount</span> <span class="total-amount"></span>
+            </div>
+        </section>
+
+        <section class="payment-method">
+            <h2>Payment Method</h2>
+        <form>
+            <label class="payment-option">
+                <input type="radio" name="paymentMethod" value="UPI" checked> <img src="assets/icons/bhim-logo.svg" alt="bhim upi"> <img src="assets/icons/phonepe-logo.svg" alt="phonepe upi"> <img src="assets/icons/gpay-logo.svg" alt="google pay upi"> <img src="assets/icons/paytm-logo.svg" alt="paytm upi"> UPI
+            </label>
+            <br>
+            <label class="payment-option">
+                <input type="radio" name="paymentMethod" value="CARD"> Debit / Credit Card
+            </label>
+            <br>
+            <label class="payment-option">
+                <input type="radio" name="paymentMethod" value="NET_BANKING"> Net Banking
+            </label>
+            <br>
+            <label class="payment-option">
+                <input type="radio" name="paymentMethod" value="CASH_ON_DELIVERY"> Cash on Delivery
+            </label>
+            <br>
+        </form>
+        </section>
+
+        <section class="checkout">
+            <h2 class="price-to-pay"></h2>
+            <button class="btn-pay">Proceed to Pay</button>
+        </section>
+    </main>
+</body>
+
+</html>

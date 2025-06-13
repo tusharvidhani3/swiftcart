@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Summary</title>
     <link rel="stylesheet" href="css/order-summary.css">
+    <script src="js/order-summary.js" defer></script>
 </head>
 
 <body>
@@ -13,28 +14,32 @@
         <section>
             <h2>Order Details</h2>
             <div class="order-details">
-                <div><span>Order Id </span> <span>101</span></div>
-                <div><span>Order date</span> <span>26-Feb-2025</span></div>
-                <div><span>Order total</span> <span>₹ 82,998</span></div>
+                <div><span>Order Id</span> <span class="order-id"></span></div>
+                <div><span>Order date</span> <span class="order-date"></span></div>
+                <div><span>Order total</span> <span class="order-total"></span></div>
             </div>
         </section>
 
         <section>
             <h2>Products in Order</h2>
             <div class="products-ordered">
-                <div class="">
+                <template id="order-item">
                     <div class="order-item">
-                    <img src="uploads/product-images/in-galaxy-s24-s928-sm-s928bztcins-539573310.png" alt="product image preview">
-                    <div>
-                        <div><span class="product-title">Samsung Galaxy S24 Ultra</span> <span class="product-qty">x2</span></div>
-                        <p class="item-total">₹ 79,999</p>
-                    </div>
+                        <div class="order-status"></div>
+                        <div>
+                        <img alt="product image preview">
+                        <div>
+                            <div><span class="product-title"></span> <span class="product-qty"></span></div>
+                            <p class="item-total"></p>
+                        </div>
                     </div>
                     <div class="item-actions">
                         <button class="btn-return">Return / Replace</button>
                         <button class="btn-review">Review</button>
                     </div>
-                </div>
+                    </div>
+                </template>
+            </div>
 
             </div>
         </section>
@@ -43,23 +48,23 @@
             <h2>Payment Information</h2>
             <div class="payment-info">
                 <h3>Payment Method(s)</h3>
-                <p>Rupay Debit Card ending wih 8580</p>
+                <p class="payment-method">Rupay Debit Card ending wih 8580</p>
             </div>
         </section>
 
         <section>
             <h2>Ship to</h2>
             <div class="ship-to">
-                <p>Tushar Vidhani</p>
-                <p>Near SBI, Torwa Main Road, Raipur, Chhattisgarh 450001</p>
+                <p class="name"></p>
+                <p class="address"></p>
             </div>
         </section>
 
         <section>
             <h2>Price Details</h2>
             <div class="price-details">
-                <div><span>Items</span> <span class="items-total">₹ 82,998</span></div>
-                <div><span>Delivery</span><span class="delivery-charge">₹ 40</span></div>
+                <div><span>Items</span> <span class="items-total"></span></div>
+                <div><span>Delivery</span><span class="delivery-charge"></span></div>
                 <div class="order-summary-total"><span>Order total</span> <span class="order-total">₹ 83,038</span></div>
             </div>
         </section>

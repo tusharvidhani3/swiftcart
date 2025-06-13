@@ -1,7 +1,7 @@
 const urlParams = new URLSearchParams(window.location.search);
-const mode = urlParams.get("mode");
-const selectedAddressId = urlParams.get("selected")
-const isSelectMode = mode == "select"
+const returnTo = urlParams.get("returnTo")
+const isSelectMode = Boolean(returnTo)
+const selectedAddress = isSelectMode?JSON.parse(localStorage.getItem("selectedAddress")):undefined
 
 const addressesContainer = document.querySelector(".addresses-container")
 const addressCardTemplate = document.getElementById("address-card")
@@ -10,14 +10,30 @@ if (isSelectMode) {
     addressesContainer.classList.add("select-mode")
 }
 
+const fields = {
+  name: 'name',
+  'mobile-number': 'mobileNumber',
+  'address-line-1': 'addressLine1',
+  'address-line-2': 'addressLine2',
+  city: 'city',
+  state: 'state',
+  pincode: 'pincode',
+  'address-type': 'addressType'
+}
+
 function refreshAddresses(addresses) {
     const addressesFragment = document.createDocumentFragment()
     addresses.forEach(addressData => {
         const addressCard = addressCardTemplate.content.children[0].cloneNode(true)
         const address = addressCard.querySelector(".address")
-        address.innerHTML = `${addressData.name} - ${addressData.mobileNumber} <br> ${addressData.addressLine1}, ${addressData.addressLine2}, ${addressData.city}, ${addressData.state} - ${addressData.pincode}`
+        for(const className in fields) {
+        address.getElementsByClassName(className)[0].textContent = addressData[fields[className]]
+        }
+        
         addressCard.setAttribute("data-address-id", addressData.addressId)
-        if (isSelectMode && addressData.addressId == selectedAddressId)
+        if(addressData.isDefaultShipping)
+            addressCard.classList.add("default")
+        if (isSelectMode && addressData.addressId == selectedAddress.addressId)
             addressCard.classList.add("selected")
         addressesFragment.append(addressCard)
     })
@@ -44,28 +60,44 @@ addressesContainer.addEventListener("click", e => {
             method: "PUT",
             credentials: "include"
         })
-            .then()
+            .then(res => {
+                if(res.ok)
+                    window.location.reload()
+            })
     }
-    else if (e.target.classList.contains("remove")) {
+    else if (e.target.classList.contains("delete")) {
         const addressId = e.target.closest(".address-card").getAttribute("data-address-id")
         fetch(`/api/addresses/${addressId}`, {
             method: "DELETE",
             credentials: "include"
         })
-            .then(() => e.target.closest(".address-card").remove())
+            .then(res => {
+                if(res.ok)
+                    e.target.closest(".address-card").remove()
+            })
     }
     else if (e.target.classList.contains("edit")) {
-        const addressId = e.target.closest(".address-card").getAttribute("data-address-id")
-        //delegate field data to edit page
+        const addressCard = e.target.closest(".address-card")
+        const addressId = addressCard.getAttribute("data-address-id")
+        const address = addressCard.getElementsByClassName("address")[0]
+        const addressData = {addressId}
+        for(const className in fields) {
+        addressData[fields[className]] = address.getElementsByClassName(className)[0].textContent
+        }
+        sessionStorage.setItem("addressToEdit", JSON.stringify(addressData))
+        window.location.href = `./add-address.html?mode=edit`
     }
     else {
-        document.querySelector(".three-dots-menu.open")?.classList.remove("open")
         const addressCard = e.target.closest(".address-card")
         if (addressCard) {
             document.querySelector(".three-dots-menu.open")?.classList.remove("open")
             addressesContainer.querySelector(".address-card.selected")?.classList.remove("selected")
             addressCard.classList.add("selected")
-            selectedAddressId = addressCard.getAttribute("data-address-id")
+            selectedAddress.addressId = addressCard.getAttribute("data-address-id")
+            const address = addressCard.getElementsByClassName("address")[0]
+            for(const className in fields) {
+                selectedAddress[fields[className]] = address.getElementsByClassName(className)[0].textContent
+            }
         }
     }
 })
@@ -77,5 +109,6 @@ addAddressBtn.addEventListener("click", () => {
 
 const deliverAddressBtn = document.querySelector(".btn-deliver-address")
 deliverAddressBtn.addEventListener("click", () => {
-    window.location.href = `./cart.html?addressId = ${selectedAddressId}`
+    localStorage.setItem("selectedAddress", JSON.stringify(selectedAddress))
+    window.location.href = `./${returnTo}`
 })

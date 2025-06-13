@@ -33,7 +33,7 @@ h2 {
 
 }
 
-.order-card {
+.order-item-card {
     display: flex;
     padding: 12px;
     background-color: white;
@@ -41,6 +41,7 @@ h2 {
     cursor: pointer;
     align-items: center;
     padding: 8px;
+    height: 80px;
 }
 
 .product-title {
@@ -50,4 +51,12 @@ h2 {
 
 .product-title + div {
     margin: 8px;
+}
+
+.order-item-card img {
+    height: 72px;
+}
+
+.ordered-on {
+    color: #656565;
 }

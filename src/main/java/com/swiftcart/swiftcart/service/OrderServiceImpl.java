@@ -3,6 +3,7 @@ package com.swiftcart.swiftcart.service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import com.swiftcart.swiftcart.entity.OrderStatus;
 import com.swiftcart.swiftcart.entity.User;
 import com.swiftcart.swiftcart.exception.ResourceNotFoundException;
 import com.swiftcart.swiftcart.payload.AddressSnapshot;
+import com.swiftcart.swiftcart.payload.OrderItemResponse;
 import com.swiftcart.swiftcart.payload.OrderResponse;
 import com.swiftcart.swiftcart.payload.PlaceOrderRequest;
 import com.swiftcart.swiftcart.payload.ProductSnapshot;
@@ -99,7 +101,19 @@ public class OrderServiceImpl implements OrderService {
                 .anyMatch(role -> role.getName().equals("ROLE_ADMIN") || role.getName().equals("ROLE_SELLER"));
         if (!isAdminOrSeller && !order.getUser().getUserId().equals(user.getUserId())) // since this is currently single seller system, seller-orderItem.product relationship is not established and the seller is allowed to view all the orders without verification
             throw new AccessDeniedException("You are not authorized to access this order");
-        return modelMapper.map(order, OrderResponse.class);
+        List<OrderItemResponse> orderItems = orderItemRepo.findAllByOrder_OrderId(orderId).stream().map(orderItem -> {
+            OrderItemResponse orderItemResponse = new OrderItemResponse();
+            orderItemResponse.setOrderId(orderId);
+            orderItemResponse.setOrderItemId(orderItem.getOrderItemId());
+            orderItemResponse.setPlacedAt(order.getPlacedAt());
+            orderItemResponse.setProduct(orderItem.getProduct());
+            orderItemResponse.setQuantity(orderItem.getQuantity());
+            return orderItemResponse;
+        })
+        .collect(Collectors.toList());
+        OrderResponse orderResponse = modelMapper.map(order, OrderResponse.class);
+        orderResponse.setOrderItems(orderItems);
+        return orderResponse;
     }
 
     @Override
@@ -179,9 +193,29 @@ public class OrderServiceImpl implements OrderService {
         orderItems.stream().forEach(orderItem -> {
             productService.updateStock(orderItem.getProduct().getProductId(), orderItem.getQuantity());
         });
+        if(order.getOrderStatus() == OrderStatus.PENDING || order.getOrderStatus() == OrderStatus.PROCESSING || order.getOrderStatus() == OrderStatus.SHIPPED)
         order.setOrderStatus(OrderStatus.CANCELLED);
+        else {
+            
+        }
         order = orderRepo.save(order);
         return modelMapper.map(order, OrderResponse.class);
+    }
+
+    @Override
+    public Page<OrderItemResponse> getOrderItemsForLoggedInCustomer(Long userId, Pageable pageable) {
+        Page<OrderItemResponse> orderItems = orderItemRepo.findAllByOrder_User_UserId(userId, pageable)
+                                                     .map(orderItem -> {
+                                                        OrderItemResponse orderItemResponse = new OrderItemResponse();
+                                                        orderItemResponse.setOrderId(orderItem.getOrder().getOrderId());
+                                                        orderItemResponse.setOrderItemId(orderItem.getOrderItemId());
+                                                        orderItemResponse.setProduct(modelMapper.map(orderItem.getProduct(), ProductSnapshot.class));
+                                                        orderItemResponse.setQuantity(orderItem.getQuantity());
+                                                        orderItemResponse.setPlacedAt(orderItem.getOrder().getPlacedAt());
+                                                        return orderItemResponse;
+                                                     });
+        return orderItems;
+
     }
 
 }

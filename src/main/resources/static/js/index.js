@@ -6,6 +6,7 @@ const rangeEnd = searchSummary.querySelector(".range-end")
 const resultsCount = searchSummary.querySelector(".results-count")
 const searchKeyword = searchSummary.querySelector(".search-keyword")
 const productTemplate = document.getElementById("product-template")
+const toast = document.getElementById("toast")
 
 function getProducts(keyword = "") {
     productsContainer.innerHTML = ""
@@ -49,7 +50,26 @@ searchForm.addEventListener('submit', (e) => {
 
 productsContainer.addEventListener('click', (e) => {
     e.stopPropagation()
-    if (e.target != productsContainer) {
+    const addToCartBtn = e.target.closest(".btn-add-to-cart")
+    if (addToCartBtn) {
+        e.stopPropagation()
+        const productId = e.target.closest(".product-card").getAttribute("data-product-id")
+        fetch("/api/cart/items", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ productId: productId })
+        })
+            .then(res => {
+                if (res.ok) {
+                    toast.classList.add("show")
+                    toast.textContent = "Product added to cart"
+                    setTimeout(() => toast.classList.remove("show"), 1500)
+                }
+            })
+    }
+    else if (e.target != productsContainer) {
         const productId = e.target.closest(".product-card").getAttribute("data-product-id")
         window.open(`./product-details.html?productId=${parseInt(productId)}`)
     }

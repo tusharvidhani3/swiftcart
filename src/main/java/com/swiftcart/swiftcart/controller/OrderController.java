@@ -3,6 +3,7 @@ package com.swiftcart.swiftcart.controller;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.swiftcart.swiftcart.entity.OrderStatus;
+import com.swiftcart.swiftcart.payload.OrderItemResponse;
 import com.swiftcart.swiftcart.payload.OrderResponse;
 import com.swiftcart.swiftcart.payload.PlaceOrderRequest;
 import com.swiftcart.swiftcart.payload.UpdateOrderStatusRequest;
@@ -50,6 +51,14 @@ public class OrderController {
         Pageable pageable=PageRequest.of(page, size, Sort.by(sortBy).descending());
         Page<OrderResponse> orders=orderService.getOrdersForLoggedInCustomer(userDetailsImpl.getUser().getUserId(), pageable);
         return ResponseEntity.ok(orders);
+    }
+
+    @GetMapping("/items")
+    @PreAuthorize("hasRole('CUSTOMER')")
+    public ResponseEntity<Page<OrderItemResponse>> getLoggedInCustomerOrderItems(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "order.placedAt") String sortBy) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
+        Page<OrderItemResponse> orderItems = orderService.getOrderItemsForLoggedInCustomer(userDetailsImpl.getUser().getUserId(), pageable);
+        return ResponseEntity.ok(orderItems);
     }
 
     @GetMapping("/seller")

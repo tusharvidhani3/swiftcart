@@ -33,7 +33,7 @@ header {
     box-sizing: border-box;
     width: 100%;
     background-color: white;
-    max-width: 480px;
+    box-shadow: 0 1px 4px 1px gray;
 }
 
 header nav {

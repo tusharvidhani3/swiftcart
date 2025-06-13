@@ -15,13 +15,18 @@
             <template id="address-card">
             <div class="address-card">
                 <div class="custom-radio"></div>
-                <div class="address"></div>
+                <div class="address">
+                    <div class="default-label">Default</div><br>
+                    <span class="name"></span> - <span class="mobile-number"></span><br>
+                    <span class="address-line-1"></span>, <span class="address-line-2"></span>, <span class="city"></span>, <span class="state"></span> - <span class="pincode"></span><br>
+                    <span class="address-type"></span>
+                </div>
                 <div class="three-dots-menu">
                 <img class="three-dots" src="assets/icons/three-dots.svg" alt="More options">
                 <ul class="options">
+                    <li class="edit">Edit</li> | 
+                    <li class="delete">Delete</li> | 
                     <li class="set-default">Set as default</li>
-                    <li class="remove">Remove</li>
-                    <li class="edit">Edit</li>
                 </ul>
                 </div>
             </div>

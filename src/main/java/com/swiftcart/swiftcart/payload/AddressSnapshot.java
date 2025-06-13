@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AddressSnapshot {
 
+    private String name;
     private String addressLine1;
     private String addressLine2;
     private String pincode;

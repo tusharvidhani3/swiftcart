@@ -4,6 +4,8 @@ const productId = urlParams.get("productId");
 const productImage = document.querySelector(".product-image")
 const productTitle = document.querySelector(".product-title")
 const productPrice = document.querySelector(".product-price")
+const productDescription = document.getElementsByClassName("product-description")[0]
+const toast = document.getElementById("toast")
 
 function getProductDetails(productId) {
     fetch(`/api/products/${productId}`, {
@@ -17,6 +19,7 @@ function getProductDetails(productId) {
         productImage.src = product.image
         productTitle.textContent = product.productName
         productPrice.textContent = "₹ "+ product.price
+        productDescription.textContent = product.description
     })
 }
 
@@ -39,10 +42,18 @@ buyNowBtn.addEventListener('click', (e) => {
 
 addToCartBtn.addEventListener('click', (e) => {
     e.stopPropagation()
-    fetch(`/api/customer/cart/products/${productId}`, {
+    fetch(`/api/cart/items`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
+        },
+        body: JSON.stringify({productId: productId})
+    })
+    .then(res => {
+        if(res.ok) {
+            toast.classList.add("show")
+            toast.textContent = "Item added to cart!"
+            setTimeout(() => toast.classList.remove("show"), 1500)
         }
     })
 })

@@ -1,6 +1,7 @@
 package com.swiftcart.swiftcart.payload;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
 import com.swiftcart.swiftcart.entity.OrderStatus;
 
@@ -15,5 +16,7 @@ public class OrderResponse {
     private AddressSnapshot shippingAddress;
     private double totalAmount;
     private OrderStatus orderStatus;
-    private LocalDate orderDate;
+    private LocalDateTime placedAt;
+    private List<OrderItemResponse> orderItems;
+    private PaymentDTO payment;
 }

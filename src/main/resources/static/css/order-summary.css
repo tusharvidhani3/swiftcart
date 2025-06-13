@@ -50,15 +50,20 @@ h3 {
 
 .products-ordered > div {
     display: flex;
-    flex-direction: column;
     padding: 8px;
 }
 
 .order-item {
     display: flex;
     background-color: white;
-    align-items: center;
     gap: 12px;
+    flex-direction: column;
+}
+
+.order-item > div {
+    display: flex;
+    align-items: center;
+    justify-content: stretch;
 }
 
 .order-item img {
@@ -83,6 +88,7 @@ h3 {
 
 .item-actions {
     display: flex;
+    width: 100%;
 }
 
 .item-actions > button {
@@ -133,4 +139,8 @@ h3 {
 
 .order-total {
     color: #BD0F0F;
+}
+
+.order-item > div:first-child {
+    cursor: pointer;
 }

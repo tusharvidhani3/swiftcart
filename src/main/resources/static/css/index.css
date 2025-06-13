@@ -4,7 +4,6 @@ body {
     margin: 0;
     padding: 0;
     font-family: "Inter", sans-serif;
-    max-width: 480px;
     margin: auto;
 }
 
@@ -54,9 +53,8 @@ form button {
     background-color: white;
     padding: 12px;
     cursor: pointer;
-    width: 40%;
     border-radius: 14px;
-    width: 80%;
+    width: 90%;
 }
 
 .product-title {
@@ -83,4 +81,48 @@ form button {
 
 .search-summary.open {
     display: block;
+}
+
+.drop-down-menu {
+    position: absolute;
+    list-style-type: none;
+}
+
+.btn-add-to-cart {
+    background-color: #FFD814;
+    border: 0;
+    height: 40px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 20px;
+    width: 100%;
+    margin-top: 12px;
+}
+
+.btn-add-to-cart:hover {
+    background-color: #FFCE12;
+}
+
+#toast {
+    display: flex;
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    width: fit-content;
+    height: 32px;
+    border-radius: 16px;
+    background-color: gray;
+    color: white;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    visibility: hidden;
+    transition: opacity .5s ease-in-out;
+    opacity: 0;
+}
+
+#toast.show {
+    visibility: visible;
+    opacity: 1;
 }

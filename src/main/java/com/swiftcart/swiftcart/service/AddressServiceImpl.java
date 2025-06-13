@@ -46,7 +46,7 @@ public class AddressServiceImpl implements AddressService {
     public AddressDTO getAddress(Long addressId, Long userId) {
         Address address = addressRepo.findByAddressId(addressId)
         .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
-        if (address.getUser().getUserId().equals(userId))
+        if (!address.getUser().getUserId().equals(userId))
             throw new AccessDeniedException("Unauthorized access to this address");
         return modelMapper.map(address, AddressDTO.class);
     }
@@ -56,9 +56,9 @@ public class AddressServiceImpl implements AddressService {
     public void deleteAddress(Long addressId, Long userId) {
         Address address = addressRepo.findByAddressId(addressId)
         .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
-        if (address.getUser().getUserId().equals(userId))
+        if (!address.getUser().getUserId().equals(userId))
             throw new AccessDeniedException("Unauthorized access to this address");
-        if(address.getIsDefaultShipping())
+        if(address.getIsDefaultShipping() != null && address.getIsDefaultShipping())
         throw new IllegalStateException("Cannot delete the default shipping address");
         addressRepo.deleteById(addressId);
     }
@@ -67,9 +67,11 @@ public class AddressServiceImpl implements AddressService {
     @Transactional
     public AddressDTO updateAddress(AddressDTO addressDTO, User user) {
         Address address = modelMapper.map(addressDTO, Address.class);
-        if (address.getUser().getUserId().equals(user.getUserId()))
+        Address beforeAddress = addressRepo.findByAddressId(addressDTO.getAddressId()).get();
+        if (!beforeAddress.getUser().getUserId().equals(user.getUserId()))
             throw new AccessDeniedException("Unauthorized access to this address");
         address.setUser(user);
+        address.setIsDefaultShipping(beforeAddress.getIsDefaultShipping());
         return modelMapper.map(addressRepo.save(address), AddressDTO.class);
     }
 
