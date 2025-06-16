@@ -50,13 +50,11 @@ h3 {
 
 .products-ordered > div {
     display: flex;
-    padding: 8px;
 }
 
 .order-item {
     display: flex;
     background-color: white;
-    gap: 12px;
     flex-direction: column;
 }
 
@@ -82,8 +80,26 @@ h3 {
 }
 
 .product-qty {
-    font-weight: 600;
-    color: gray;
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+    background-color: white;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    top: 96px;
+    left: 104px;
+}
+
+.product-qty.show {
+    display: flex;
+}
+
+.product-details {
+    position: relative;
+    gap: 24px;
 }
 
 .item-actions {

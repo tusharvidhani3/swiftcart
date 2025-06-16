@@ -30,7 +30,11 @@ fetch(`/api/orders/${orderId}`, {
         orderItem.getElementsByTagName("img")[0].src = orderItemData.product.image
         orderItem.getElementsByClassName("product-title")[0].textContent = orderItemData.product.productName
         orderItem.getElementsByClassName("item-total")[0].textContent = `₹ ${orderItemData.product.price * orderItemData.quantity}`
-        orderItem.getElementsByClassName("product-qty")[0].textContent = orderItemData.quantity>1?`x ${orderItemData.quantity}`:""
+        if(orderItemData.quantity>1) {
+            const productQty = orderItem.getElementsByClassName("product-qty")[0]
+            productQty.textContent = orderItemData.quantity
+            productQty.classList.add("show")
+        }
         orderItem.getElementsByClassName("order-status")[0].textContent = orderItemData.orderStatus
         orderItemsFragment.append(orderItem)
     });

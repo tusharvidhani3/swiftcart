@@ -83,7 +83,7 @@ public class OrderServiceImpl implements OrderService {
             orderItem.setQuantity(ci.getQuantity());
             orderItems.add(orderItem);
             productService.updateStock(ci.getProduct().getProductId(), -orderItem.getQuantity());
-            totalAmount += ci.getProduct().getPrice();
+            totalAmount += ci.getProduct().getPrice()*ci.getQuantity();
         }
         order.setTotalAmount(totalAmount);
         orderItemRepo.saveAll(orderItems);

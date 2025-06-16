@@ -1,3 +1,5 @@
+import {setupHeader} from './global.js'
+
 const searchForm = document.querySelector("form")
 const productsContainer = document.querySelector(".products-container")
 const searchSummary = document.querySelector(".search-summary")
@@ -75,38 +77,4 @@ productsContainer.addEventListener('click', (e) => {
     }
 })
 
-function setupHeader() {
-
-    const profileBtn = document.querySelector(".btn-profile")
-    const header = document.querySelector("header")
-
-    profileBtn.addEventListener("click", () => {
-        window.location.href = "./login.html"
-    })
-
-    let isLoggedIn
-    fetch("/api/auth/me", {
-        method: "GET",
-        credentials: "include"
-    })
-        .then((response) => {
-            if (response.ok) {
-                header.classList.add("logged-in")
-                profileBtn.addEventListener("click", () => {
-                    window.location.href = "./profile.html"
-                })
-                return response.json()
-            }
-        })
-        .then((res) => {
-            if (res) {
-                const profileBtnTxt = document.querySelector(".btn-profile-txt")
-                if (res.firstName) {
-                    profileBtnTxt.textContent = res.firstName
-                }
-                else
-                    profileBtnTxt.textContent = "User"
-            }
-        })
-}
 setupHeader()

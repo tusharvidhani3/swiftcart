@@ -48,7 +48,7 @@ public class AuthController {
             .httpOnly(true)
             .secure(true) // set to false if you're testing on localhost without HTTPS
             .path("/")
-            .maxAge(Duration.ofDays(7))
+            .maxAge(Duration.ofMinutes(15))
             .sameSite("Strict")
             .build();
 
@@ -66,7 +66,7 @@ public class AuthController {
             .httpOnly(true)
             .secure(true) // set to false if you're testing on localhost without HTTPS
             .path("/")
-            .maxAge(Duration.ofDays(7))
+            .maxAge(Duration.ofMinutes(15))
             .sameSite("Strict")
             .build();
 
@@ -82,7 +82,7 @@ public class AuthController {
         return ResponseEntity.ok(userDTO);
     }
 
-    @PostMapping(value = {"/logout", "signout"})
+    @PostMapping(value = {"/logout", "/signout"})
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> logout() {
         ResponseCookie cookie = ResponseCookie.from("jwt", null)

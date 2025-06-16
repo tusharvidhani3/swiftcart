@@ -162,3 +162,26 @@ button {
 .grayed-out {
     display: none;
 }
+
+#toast {
+    display: flex;
+    position: fixed;
+    bottom: 100px;
+    margin-inline: auto;
+    width: fit-content;
+    height: 32px;
+    border-radius: 16px;
+    background-color: gray;
+    color: white;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    visibility: hidden;
+    transition: opacity .5s ease-in-out;
+    opacity: 0;
+}
+
+#toast.show {
+    visibility: visible;
+    opacity: 1;
+}

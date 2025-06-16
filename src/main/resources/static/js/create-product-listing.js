@@ -10,7 +10,9 @@ productForm.addEventListener("submit", e => {
         }
     })
     const formData = new FormData()
-    formData.append("createProductRequest", JSON.stringify(productData))
+    formData.append("createProductRequest", new Blob(
+        [JSON.stringify(productData)], { type: "application/json" }
+    ))
     formData.append("productImage", productForm.querySelector('input[type="file"]').files[0])
     console.log(productData)
     fetch("/api/products", {

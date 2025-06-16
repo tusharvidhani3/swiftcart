@@ -38,6 +38,7 @@ public class ProductServiceImpl implements ProductService {
         product.setProductName(createProductRequest.getProductName());
         product.setPrice(createProductRequest.getPrice());
         product.setCategory(createProductRequest.getCategory());
+        product.setStock(0);
         String fullPath = storageService.store(productImage, uploadDir);
         int relativeStartIndex = fullPath.indexOf("uploads/");
         product.setImage(fullPath.substring(relativeStartIndex));

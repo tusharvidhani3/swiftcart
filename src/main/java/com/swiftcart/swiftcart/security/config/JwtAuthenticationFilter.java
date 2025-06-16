@@ -51,6 +51,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     .sameSite("Strict")
                     .build();
             response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+            filterChain.doFilter(request, response);
+            return;
         }
 
         // If user is not yet authenticated in this context
@@ -69,9 +71,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // Mark user as authenticated
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
-
-            filterChain.doFilter(request, response);
         }
+        filterChain.doFilter(request, response);
     }
 
 }

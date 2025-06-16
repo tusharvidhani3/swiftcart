@@ -65,6 +65,8 @@ public class CartServiceImpl implements CartService {
         else {
             CartItem cartItem = cartItemOptional.get();
             int updatedQty = cartItem.getQuantity() + quantity;
+            if (cartItem.getProduct().getStock() < updatedQty)
+            throw new InsufficientStockException("Cannot add more items. Stock limit reached");
             cartItem.setQuantity(updatedQty);
             cartItemRepo.save(cartItem);
             return getCartResponse(user.getUserId());

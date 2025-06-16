@@ -18,7 +18,6 @@ fetch("/api/cart", {
 function refreshCart(cartResponse) {
     cartItemsContainer.innerHTML = ""
     const cartItems = cartResponse.cartItems
-    console.log(cartResponse)
     const cartItemsFragment = document.createDocumentFragment()
     cartItems.forEach(cartItemData => {
         const cartItem = cartItemTemplate.content.children[0].cloneNode(true)
@@ -47,12 +46,12 @@ function refreshCart(cartResponse) {
     cartItemsCount.textContent = cartResponse.cartItems.length
 }
 
+const toast = document.getElementById("toast")
 cartItemsContainer.addEventListener("click", (e) => {
     e.stopPropagation()
     const cartItemId = e.target.closest(".cart-item").getAttribute("data-cart-item-id")
     if (e.target.parentElement.classList.contains("btn-qty")) {
         const currentQty = parseInt(e.target.closest(".cart-item").querySelector(".qty").textContent)
-        console.log(e.target.parentElement.closest(".cart-item"))
         if (e.target.parentElement.classList.contains("btn-increment-qty")) {
             fetch(`/api/cart/items/${cartItemId}`, {
                 method: "PUT",
@@ -62,8 +61,19 @@ cartItemsContainer.addEventListener("click", (e) => {
                 },
                 body: JSON.stringify({ "quantity": currentQty + 1 })
             })
-                .then(response => response.json())
-                .then(cartResponse => refreshCart(cartResponse))
+                .then(response => {
+                    if(response.ok)
+                    response.json()
+                else{
+                    toast.textContent = "Cannot add more items. Stock limit reached"
+                    toast.classList.add("show")
+                    setTimeout(() => toast.classList.remove("show"), 1500)
+                }
+                })
+                .then(cartResponse => {
+                    if(cartResponse)
+                    refreshCart(cartResponse)
+                })
         }
         else {
             fetch(`/api/cart/items/${cartItemId}`, {
