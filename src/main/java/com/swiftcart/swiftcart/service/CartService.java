@@ -11,4 +11,5 @@ public interface CartService {
     public void updateQuantity(Long userId, Long cartItemId, int quantity);
     public CartResponse getCartResponse(Long userId);
     public BuyNowPreview createBuyNowPreview(Long productId, User user);
+    public int getCartQuantityCount(User user);
 }

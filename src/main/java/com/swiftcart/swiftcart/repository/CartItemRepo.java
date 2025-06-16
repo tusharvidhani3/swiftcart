@@ -29,4 +29,7 @@ public interface CartItemRepo extends JpaRepository<CartItem,Integer> {
     @Modifying
     @Query("UPDATE CartItem c SET c.quantity = :quantity WHERE c.cartItemId = :cartItemId")
     public void updateQuantity(@Param("cartItemId") Long cartItemId, @Param("quantity") int quantity);
+
+    @Query("SELECT SUM(ci.quantity) FROM CartItem ci WHERE ci.cart.cartId = :cartId")
+    public Integer getTotalQuantityByCartId(@Param("cartId") Long cartId);
 }

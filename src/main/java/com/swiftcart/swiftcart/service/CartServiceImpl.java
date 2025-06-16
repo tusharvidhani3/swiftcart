@@ -156,4 +156,10 @@ public class CartServiceImpl implements CartService {
         return cartResponse;
     }
 
+    public int getCartQuantityCount(User user) {
+        Long cartId = cartRepo.findByUser_UserId(user.getUserId()).get().getCartId();
+        Integer cartQuantityCount = cartItemRepo.getTotalQuantityByCartId(cartId);
+        return cartQuantityCount!=null?cartQuantityCount:0;
+    }
+
 }

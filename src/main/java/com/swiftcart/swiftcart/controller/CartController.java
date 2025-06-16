@@ -60,4 +60,9 @@ public class CartController {
         return new ResponseEntity<>(buyNowPreview, HttpStatus.OK);
     }
 
+    @GetMapping("/count")
+    public ResponseEntity<Integer> getCartQtyCount(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
+        return ResponseEntity.ok(cartService.getCartQuantityCount(userDetailsImpl.getUser()));
+    }
+
 }

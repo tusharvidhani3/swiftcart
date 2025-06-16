@@ -6,7 +6,8 @@
 }
 
 .btn-profile {
-    border-radius: 20px;
+    border-radius: 8px;
+    border: none;
     width: fit-content;
     height: 40px;
     background-color: #FF9800;
@@ -17,10 +18,11 @@
     font-family: inherit;
     cursor: pointer;
     gap: 2px;
+    padding-inline: 8px;
 }
 
 .logged-in .btn-profile {
-    background-color: #D9D9D9;
+    background-color: white;
 }
 
 header {
@@ -34,6 +36,7 @@ header {
     width: 100%;
     background-color: white;
     box-shadow: 0 1px 4px 1px gray;
+    gap: 32px;
 }
 
 header nav {
@@ -41,17 +44,45 @@ header nav {
     position: absolute;
 }
 
-header div {
+.swiftcart {
+    font-size: 20px;
+    font-weight: 700;
     display: flex;
-    gap: 12px;
+    align-items: center;
+    text-decoration-line: none;
+    color: black;
+}
+
+.links {
+    display: flex;
+    gap: 32px;
 }
 
 .cart {
-    display: none;
+    display: flex;
     cursor: pointer;
+    color: black;
+    align-items: center;
+    text-decoration-line: none;
+    gap: 4px;
+    position: relative;
 }
 
-.logged-in .cart {
+.cart-count {
+    position: absolute;
+    justify-content: center;
+    align-items: center;
+    background-color: red;
+    color: white;
+    display: none;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    left: 12px;
+    top: 2px;
+}
+
+.logged-in .cart-count {
     display: flex;
 }
 
@@ -67,10 +98,15 @@ header div {
 
 .drop-down {
     display: none;
+    margin-left: 4px;
 }
 
 .logged-in .drop-down {
     display: inline-block;
+}
+
+.profile.show {
+    position: relative;
 }
 
 .drop-down-menu {
@@ -80,25 +116,74 @@ header div {
     flex-direction: column;
     align-items: flex-start;
     padding-left: 0;
-    gap: 4px;
-    right: 70px;
-    top: 40px;
+    top: 26px;
+    width: 150%;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px 0 rgba(0,0,0,.2);
+    overflow: hidden;
+    left: -16px;
 }
 
-.drop-down-menu.show {
+.show .drop-down-menu {
     display: flex;
 }
 
 .drop-down-menu li {
-    padding: 4px;
+    padding-inline: 8px;
     width: 100%;
     box-sizing: border-box;
     cursor: pointer;
     background-color: white;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .drop-down-menu li:hover {
     background-color: #D9D9D9;
+}
+
+.searchbox {
+    display: flex;
+    justify-content: center;
+    width: 80%;
+    height: 40px;
+}
+
+.searchbox input {
+    border-radius: 8px 0 0 8px;
+    border: none;
+    flex-basis: 80%;
+    padding: 12px;
+    font-size: 20px;
+    background-color: #F0F5FF;
+}
+
+.searchbox button {
+    border-radius: 0 8px 8px 0;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-basis: 20%;
+    cursor: pointer;
+    background-color: var(--accent-color);
+    max-width: 100px;
+    min-width: 64px;
+}
+
+.become-a-seller {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    text-decoration-line: none;
+    color: black;
+}
+
+.become-a-seller img {
+    width: 32px;
+    height: 32px;
 }
 
 @media screen and (min-width: 768px) {

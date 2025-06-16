@@ -39,6 +39,7 @@ input {
     width: 100%;
     font-size: 18px;
     box-sizing: border-box;
+    border: none;
 }
 
 div {
@@ -71,7 +72,6 @@ a {
     background-color: lightgray;
     height: 100%;
     flex-basis: 20%;
-    border: 1px solid black;
     display: flex;
     align-items: center;
     justify-content: center;

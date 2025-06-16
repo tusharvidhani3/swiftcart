@@ -1,6 +1,5 @@
 import {setupHeader} from './global.js'
 
-const searchForm = document.querySelector("form")
 const productsContainer = document.querySelector(".products-container")
 const searchSummary = document.querySelector(".search-summary")
 const rangeStart = searchSummary.querySelector(".range-start")
@@ -9,6 +8,8 @@ const resultsCount = searchSummary.querySelector(".results-count")
 const searchKeyword = searchSummary.querySelector(".search-keyword")
 const productTemplate = document.getElementById("product-template")
 const toast = document.getElementById("toast")
+const urlParams = new URLSearchParams(window.location.search)
+const keyword = urlParams.get("keyword")
 
 function getProducts(keyword = "") {
     productsContainer.innerHTML = ""
@@ -43,12 +44,7 @@ function getProducts(keyword = "") {
             productsContainer.append(productsFragment)
         })
 }
-getProducts()
-searchForm.addEventListener('submit', (e) => {
-    e.preventDefault()
-    const keyword = searchForm.querySelector("input").value
-    getProducts(keyword)
-})
+getProducts(keyword??undefined)
 
 productsContainer.addEventListener('click', (e) => {
     e.stopPropagation()
