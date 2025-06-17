@@ -25,18 +25,22 @@
     background-color: white;
 }
 
+main {
+    padding-top: 146px;
+}
+
 header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 64px;
+    height: 128px;
     padding-inline: 16px;
     position: fixed;
     box-sizing: border-box;
     width: 100vw;
     background-color: white;
     box-shadow: 0 1px 4px 1px gray;
-    gap: 32px;
+    flex-wrap: wrap;
 }
 
 header nav {
@@ -106,7 +110,7 @@ header nav {
     display: inline-block;
 }
 
-.profile.show {
+.profile {
     position: relative;
 }
 
@@ -125,7 +129,7 @@ header nav {
     left: -16px;
 }
 
-.show .drop-down-menu {
+.show.drop-down-menu {
     display: flex;
 }
 
@@ -146,10 +150,11 @@ header nav {
 }
 
 .searchbox {
-    display: none;
+    display: flex;
     justify-content: center;
-    flex-basis: 60%;
+    flex-basis: 100%;
     height: 40px;
+    order: 1;
 }
 
 .searchbox input {
@@ -196,13 +201,32 @@ header nav {
 }
 
 @media screen and (min-width: 768px) {
+    
+    header {
+        height: 64px;
+        flex-wrap: nowrap;
+        gap: 32px;
+    }
+
+    main {
+        padding-top: 80px;
+    }
 
     .searchbox {
-        display: flex;
+        /* display: flex; */
     }
 
     .links {
         gap: 32px;
+    }
+
+    .become-a-seller {
+        display: flex;
+    }
+
+    .searchbox {
+        order: 0;
+        flex-basis: 60%;
     }
     
 }
@@ -217,7 +241,4 @@ header nav {
         display: inline;
     }
 
-    .become-a-seller {
-        display: flex;
-    }
 }
