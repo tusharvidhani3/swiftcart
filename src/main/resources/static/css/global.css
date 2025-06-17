@@ -30,10 +30,10 @@ header {
     justify-content: space-between;
     align-items: center;
     height: 64px;
-    padding-inline: 20px;
+    padding-inline: 16px;
     position: fixed;
     box-sizing: border-box;
-    width: 100%;
+    width: 100vw;
     background-color: white;
     box-shadow: 0 1px 4px 1px gray;
     gap: 32px;
@@ -55,7 +55,7 @@ header nav {
 
 .links {
     display: flex;
-    gap: 32px;
+    gap: 16px;
 }
 
 .cart {
@@ -72,14 +72,15 @@ header nav {
     position: absolute;
     justify-content: center;
     align-items: center;
-    background-color: red;
-    color: white;
+    background-color: #FF9800;
+    color: black;
     display: none;
     border-radius: 50%;
     width: 16px;
     height: 16px;
     left: 12px;
     top: 2px;
+    padding: 1px;
 }
 
 .logged-in .cart-count {
@@ -145,19 +146,19 @@ header nav {
 }
 
 .searchbox {
-    display: flex;
+    display: none;
     justify-content: center;
-    width: 80%;
+    flex-basis: 60%;
     height: 40px;
 }
 
 .searchbox input {
     border-radius: 8px 0 0 8px;
     border: none;
-    flex-basis: 80%;
     padding: 12px;
     font-size: 20px;
     background-color: #F0F5FF;
+    width: 80%;
 }
 
 .searchbox button {
@@ -174,7 +175,7 @@ header nav {
 }
 
 .become-a-seller {
-    display: flex;
+    display: none;
     align-items: center;
     gap: 4px;
     text-decoration-line: none;
@@ -186,9 +187,37 @@ header nav {
     height: 32px;
 }
 
+.label {
+    display: none;
+}
+
+.logo {
+    width: 32px;
+}
+
 @media screen and (min-width: 768px) {
+
+    .searchbox {
+        display: flex;
+    }
+
+    .links {
+        gap: 32px;
+    }
     
+}
+
+@media screen and (min-width: 1080px) {
+
     header {
         padding-inline: 64px;
+    }
+
+    .label {
+        display: inline;
+    }
+
+    .become-a-seller {
+        display: flex;
     }
 }

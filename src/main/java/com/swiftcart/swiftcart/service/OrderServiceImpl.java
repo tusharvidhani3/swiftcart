@@ -64,6 +64,10 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponse placeOrder(PlaceOrderRequest placeOrderRequest, Long userId) {
         Cart cart = cartRepo.findByUser_UserId(userId)
         .orElseThrow(() -> new ResourceNotFoundException("Cart empty"));
+        List<CartItem> cartItems = cartItemRepo.findAllByCart_CartId(cart.getCartId());
+        System.out.println(cartItems);
+        if(cartItems.isEmpty())
+        throw new ResourceNotFoundException("Order cannot be placed on empty cart");
         Address shippingAddress = addressRepo.findByAddressId(placeOrderRequest.getShippingAddressId())
         .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
         if(!shippingAddress.getUser().getUserId().equals(userId))
@@ -73,7 +77,6 @@ public class OrderServiceImpl implements OrderService {
         order.setPlacedAt(LocalDateTime.now());
         order.setShippingAddress(modelMapper.map(shippingAddress, AddressSnapshot.class));
         order.setUser(cart.getUser());
-        List<CartItem> cartItems = cartItemRepo.findAllByCart_CartId(cart.getCartId());
         List<OrderItem> orderItems = new ArrayList<>();
         double totalAmount = 0;
         for (CartItem ci : cartItems) {

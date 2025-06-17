@@ -22,9 +22,9 @@ main {
     display: grid;
     padding-bottom: 24px;
     padding-inline: 48px;
-    grid-template-columns: repeat(auto-fit, minmax(250px,280px));
+    grid-template-columns: repeat(2, 1fr);
     justify-content: center;
-    gap: 24px;
+    gap: 12px;
     width: 100%;
     box-sizing: border-box;
 }
@@ -37,17 +37,23 @@ main {
     padding: 12px;
     cursor: pointer;
     border-radius: 14px;
+    min-width: 0;
 }
 
 .product-title {
-    font-size: 16px;
+    font-size: 12px;
     font-weight: 500;
     margin-block: 12px 4px;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
 }
 
 .product-price {
     margin-block: 4px;
-    font-size: 20px;
+    font-size: 16px;
 }
 
 .product-image {
@@ -110,6 +116,15 @@ main {
 @media screen and (min-width: 768px) {
     
     .products-container {
-        
+        grid-template-columns: repeat(auto-fit, minmax(clamp(240px, 25vw, 280px), 1fr));
+        gap: 24px;
+    }
+
+    .product-title {
+        font-size: 16px;
+    }
+
+    .product-price {
+        font-size: 20px;
     }
 }
