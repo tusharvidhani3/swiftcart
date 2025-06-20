@@ -48,7 +48,7 @@ public class AuthController {
             .httpOnly(true)
             .secure(true) // set to false if you're testing on localhost without HTTPS
             .path("/")
-            .maxAge(Duration.ofMinutes(15))
+            .maxAge(Duration.ofMinutes(60))
             .sameSite("Strict")
             .build();
 
@@ -66,7 +66,7 @@ public class AuthController {
             .httpOnly(true)
             .secure(true) // set to false if you're testing on localhost without HTTPS
             .path("/")
-            .maxAge(Duration.ofMinutes(15))
+            .maxAge(Duration.ofMinutes(60))
             .sameSite("Strict")
             .build();
 

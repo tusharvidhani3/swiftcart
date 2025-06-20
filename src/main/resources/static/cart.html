@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cart</title>
+    <title>Shopping Cart</title>
     <link rel="stylesheet" href="css/cart.css">
     <script src="js/cart.js" defer></script>
 </head>
@@ -12,50 +12,55 @@
 <body>
     <header></header>
     <main>
-        <section class="address-preview">
-            <div>
-                <span>Deliver to: </span>
-                <span class="address"></span>
-            </div>
-            <button class="btn-change-address">Change</button>
-        </section>
-        <section class="cart-items-container">
-            <template id="cart-item">
-            <div class="cart-item">
-                <div class="product-preview">
-                    <img alt="product image preview" class="product-image">
-                    <div>
-                        <h2 class="product-title"></h2>
-                        <h3 class="product-price"></h3>
+        <section>
+            <section class="address-preview">
+                <div>
+                    <span>Deliver to: </span>
+                    <span class="address"></span>
+                </div>
+                <button class="btn-change-address">Change</button>
+            </section>
+            <section class="cart-items-container">
+                <template id="cart-item">
+                    <div class="cart-item">
+                        <div class="product-preview">
+                            <img alt="product image preview" class="product-image">
+                            <div>
+                                <h2 class="product-title"></h2>
+                                <h3 class="product-price"></h3>
+                            </div>
+                        </div>
+                        <div class="cart-item-actions">
+                            <button class="btn-qty btn-increment-qty"><img src="assets/icons/plus.svg"
+                                    alt="increment button"></button>
+                            <span class="qty"></span>
+                            <button class="btn-qty btn-decrement-qty"><img src="assets/icons/minus.svg"
+                                    alt="decrement button"></button>
+                            <button class="btn-remove">Remove</button>
+                        </div>
                     </div>
-                </div>
-                <div class="cart-item-actions">
-                    <button class="btn-qty btn-increment-qty"><img src="assets/icons/plus.svg" alt="increment button"></button>
-                    <span class="qty"></span>
-                    <button class="btn-qty btn-decrement-qty"><img src="assets/icons/minus.svg" alt="decrement button"></button>
-                    <button class="btn-delete">Delete</button>
-                </div>
-            </div>
-            </template>
+                </template>
+            </section>
         </section>
 
         <section class="price-details">
-            <h2>Price Details</h2>
-            <div>
+            <h2 class="price-summary-title">Price Details</h2>
+            <div class="price-summary">
                 <span>Price (<span class="cart-items-count"></span> items)</span> <span class="price"></span>
             </div>
-            <div>
+            <div class="price-summary">
                 <span>Delivery Charges</span> <span class="delivery-charge">FREE DELIVERY</span>
             </div>
-            <div>
+            <div class="price-summary order-total">
                 <span>Total Amount</span> <span class="total-amount"></span>
+            </div>
+
+            <div class="cart-checkout">
+                <h2 class="price-to-pay"></h2>
+                <button class="btn-pay">Proceed to Pay</button>
             </div>
         </section>
 
-        <section class="cart-checkout">
-            <h2 class="price-to-pay"></h2>
-            <button class="btn-pay">Proceed to Pay</button>
-        </section>
         <div id="toast"></div>
     </main>
 </body>

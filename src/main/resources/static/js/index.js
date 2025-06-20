@@ -51,6 +51,8 @@ productsContainer.addEventListener('click', (e) => {
     const addToCartBtn = e.target.closest(".btn-add-to-cart")
     if (addToCartBtn) {
         e.stopPropagation()
+        if(!window.isLoggedIn)
+            window.location.href = "./login.html"
         const productId = e.target.closest(".product-card").getAttribute("data-product-id")
         fetch("/api/cart/items", {
             method: "POST",

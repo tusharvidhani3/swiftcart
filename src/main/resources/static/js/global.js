@@ -10,6 +10,8 @@ export function setupHeader() {
     })
         .then((response) => {
             if (response.ok) {
+                window.isLoggedIn = true
+                fetchCartCount()
                 header.classList.add("logged-in")
                 profileBtn.addEventListener("click", () => {
                     dropDownMenu.classList.toggle("show")
@@ -56,11 +58,13 @@ export function setupHeader() {
         window.location.href = `./index.html?keyword=${keyword}`
     })
 
-    const cartQtyCount = document.getElementsByClassName("cart-count")[0]
-    fetch("/api/cart/count", {
-        method: "GET",
-        credentials: "include"
-    })
-    .then(res => res.json())
-    .then(qty => cartQtyCount.textContent = qty)
+    function fetchCartCount() {
+        const cartQtyCount = document.getElementsByClassName("cart-count")[0]
+        fetch("/api/cart/count", {
+            method: "GET",
+            credentials: "include"
+        })
+            .then(res => res.json())
+            .then(qty => cartQtyCount.textContent = qty)
+    }
 }

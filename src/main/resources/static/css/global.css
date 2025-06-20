@@ -49,7 +49,7 @@ header nav {
 }
 
 .swiftcart {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 700;
     display: flex;
     align-items: center;
@@ -57,9 +57,14 @@ header nav {
     color: black;
 }
 
-.links {
+.header-left {
     display: flex;
-    gap: 16px;
+    gap: 12px;
+}
+
+.header-right {
+    display: flex;
+    gap: 8px;
 }
 
 .cart {
@@ -196,8 +201,8 @@ header nav {
     display: none;
 }
 
-.logo {
-    width: 32px;
+aside {
+    display: none;
 }
 
 @media screen and (min-width: 768px) {
@@ -216,7 +221,7 @@ header nav {
         /* display: flex; */
     }
 
-    .links {
+    .header-right {
         gap: 32px;
     }
 
@@ -227,6 +232,10 @@ header nav {
     .searchbox {
         order: 0;
         flex-basis: 60%;
+    }
+
+    .swiftcart {
+        font-size: 20px;
     }
     
 }
@@ -239,6 +248,10 @@ header nav {
 
     .label {
         display: inline;
+    }
+
+    .hamburger {
+        display: none;
     }
 
 }

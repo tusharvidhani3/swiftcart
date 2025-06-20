@@ -63,8 +63,8 @@ cartItemsContainer.addEventListener("click", (e) => {
             })
                 .then(response => {
                     if(response.ok)
-                    response.json()
-                else{
+                    return response.json()
+                else {
                     toast.textContent = "Cannot add more items. Stock limit reached"
                     toast.classList.add("show")
                     setTimeout(() => toast.classList.remove("show"), 1500)
@@ -88,7 +88,7 @@ cartItemsContainer.addEventListener("click", (e) => {
                 .then(cartResponse => refreshCart(cartResponse))
         }
     }
-    else if (e.target.classList.contains("btn-delete")) {
+    else if (e.target.classList.contains("btn-remove")) {
         fetch(`/api/cart/items/${cartItemId}`, {
             method: "DELETE",
             credentials: "include"
