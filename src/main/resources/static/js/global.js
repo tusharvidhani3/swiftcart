@@ -46,7 +46,7 @@ export async function setupUser() {
     const profileBtn = header.querySelector(".btn-profile")
     const profile = header.getElementsByClassName("profile")[0]
 
-    await fetch("/api/auth/me", {
+    await fetch("/api/user/me", {
         method: "GET",
         credentials: "include"
     })

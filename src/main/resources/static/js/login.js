@@ -1,4 +1,4 @@
-fetch("/api/auth/me", {
+fetch("/api/user/me", {
     method: "GET",
     credentials: "include"  // VERY IMPORTANT to send cookies
 })

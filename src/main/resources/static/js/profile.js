@@ -1,7 +1,13 @@
 const profileForm = document.getElementById("profile-form")
 
+profileForm.addEventListener("submit", () => {
+    const profileFormData = new FormData(profileForm)
+    fetch("/api/")
+    Object.fromEntries(profileFormData)
+})
+
 function fetchUserData() {
-    fetch("/api/auth/me", {
+    fetch("/api/user/me", {
         method: "GET",
         credentials: "include",
     })

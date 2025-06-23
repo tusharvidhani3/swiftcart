@@ -16,6 +16,7 @@ import com.swiftcart.swiftcart.entity.User;
 import com.swiftcart.swiftcart.exception.BadRequestException;
 import com.swiftcart.swiftcart.payload.LoginRequest;
 import com.swiftcart.swiftcart.payload.RegisterRequest;
+import com.swiftcart.swiftcart.payload.UserDTO;
 import com.swiftcart.swiftcart.repository.RoleRepo;
 import com.swiftcart.swiftcart.repository.UserRepo;
 import com.swiftcart.swiftcart.security.UserDetailsImpl;
@@ -55,6 +56,11 @@ public class UserServiceImpl implements UserService {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getMobileNumber(), loginRequest.getPassword()));
         UserDetailsImpl userDetailsImpl = (UserDetailsImpl)authentication.getPrincipal();
         return userDetailsImpl;
+    }
+
+    @Override
+    public void updateUser(UserDTO userDTO) {
+        userRepo.save(modelMapper.map(userDTO, User.class));
     }
 
 }
