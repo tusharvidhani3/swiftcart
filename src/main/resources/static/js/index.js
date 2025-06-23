@@ -1,4 +1,7 @@
 import {setupHeader} from './global.js'
+import { setupUser } from './global.js'
+setupUser()
+setupHeader()
 
 const productsContainer = document.querySelector(".products-container")
 const searchSummary = document.querySelector(".search-summary")
@@ -74,5 +77,3 @@ productsContainer.addEventListener('click', (e) => {
         window.open(`./product-details.html?productId=${parseInt(productId)}`)
     }
 })
-
-setupHeader()

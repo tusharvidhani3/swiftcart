@@ -1,23 +1,34 @@
-let checkoutData = JSON.parse(sessionStorage.getItem("checkoutData"))
-if (!checkoutData)
-    window.location.href = "./error.html"
-
 const urlParams = new URLSearchParams(window.location.search)
 const addressId = urlParams.get("addressId")
-if(addressId)
-    fetchShippingAddress(addressId)
+let checkoutData = {}
+const cartItemsCount = document.getElementById("cart-items-count")
+const price = document.getElementsByClassName("price")[0]
+const totalAmount = document.getElementsByClassName("total-amount")[0]
+const priceToPay = document.getElementsByClassName("price-to-pay")[0]
 
-const addressSpan = document.getElementsByClassName("address")[0]
+fetchShippingAddress(addressId)
+
+const address = {
+    "name": document.getElementById("name"),
+    "addressLine1": document.getElementById("address-line-1"),
+    "addressLine2": document.getElementById("address-line-2"),
+    "city": document.getElementById("city"),
+    "state": document.getElementById("state"),
+    "pincode": document.getElementById("pincode"),
+    "mobileNumber": document.getElementById("mobile-number"),
+    "address-type": document.getElementById("address-type")
+}
 
 function fetchShippingAddress(addressId) {
-    fetch(`/api/addresses/${addressId}`, {
+    fetch(`/api/addresses/${addressId ?? "default"}`, {
         method: "GET",
         credentials: "include",
     })
         .then(response => response.json())
-        .then(address => {
-            checkoutData = address
-            addressSpan.innerHTML = `${address.name} <br> ${address.addressLine1},... , ${address.pincode}`
+        .then(addressData => {
+            checkoutData = addressData
+            for (const field in address)
+                address[field].textContent = checkoutData[field]
         })
 }
 
@@ -26,7 +37,8 @@ changeAddressBtn.addEventListener("click", () => {
     window.location.href = `./manage-addresses.html?mode=select&selected=${checkoutData.addressId}&returnTo=checkout.html`
 })
 
-addressSpan.innerHTML = `${checkoutData.name} <br> ${checkoutData.addressLine1},... , ${checkoutData.pincode}`
+for (const field in address)
+    address[field].textContent = checkoutData[field]
 
 const payBtn = document.getElementsByClassName("btn-pay")[0]
 payBtn.addEventListener("click", e => {
@@ -42,8 +54,25 @@ payBtn.addEventListener("click", e => {
             "shippingAddressId": checkoutData.addressId
         })
     })
-    .then(() => {
-        sessionStorage.removeItem("checkoutData")
-        console.log("Order placed")
-    })
+        .then(() => {
+            console.log("Order placed")
+        })
 })
+
+function fetchCartSummary() {
+    fetch("/api/cart/summary", {
+        method: "GET",
+        credentials: "include",
+    })
+    .then(res => res.json())
+    .then(summary => {
+        cartItemsCount.textContent = summary.cartItemsCount
+        price.textContent = summary.totalPrice
+        totalAmount.textContent = summary.totalPrice
+        checkoutData.cartId = summary.cartId
+        priceToPay.textContent = `₹ ${summary.totalPrice}`
+    })
+    // .catch(() => window.location.href = "./error.html")
+}
+
+fetchCartSummary()

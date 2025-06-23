@@ -13,8 +13,9 @@
     <main>
         <section class="address-preview">
             <div>
-                <span>Deliver to: </span>
-                <span class="address"></span>
+                <span>Deliver to:</span> <span id="name"></span> <span id="address-type"></span>
+                <div class="address"><span id="address-line-1"></span>, <span id="address-line-2"></span>, <span id="city"></span>, <span id="state"></span> - <span id="pincode"></span></div>
+                <div id="mobile-number"></div>
             </div>
             <button class="btn-change-address">Change</button>
         </section>
@@ -22,7 +23,7 @@
         <section class="price-details">
             <h2>Price Details</h2>
             <div>
-                <span>Price (<span class="cart-items-count"></span> items)</span> <span class="price"></span>
+                <span>Price (<span id="cart-items-count"></span> items)</span> <span class="price"></span>
             </div>
             <div>
                 <span>Delivery Charges</span> <span class="delivery-charge">FREE DELIVERY</span>

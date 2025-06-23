@@ -1,21 +1,47 @@
+import { setupHeader } from "./global.js";
+import { setupUser } from "./global.js";
+setupHeader()
+await setupUser()
+
 const cartItemsContainer = document.querySelector(".cart-items-container")
 const cartItemTemplate = document.getElementById("cart-item")
 
-const urlParams = new URLSearchParams(window.location.search);
-const selectedAddress = JSON.parse(localStorage.getItem("selectedAddress"))
 let checkoutData = {}
 
-fetch("/api/cart", {
-    method: "GET",
-    credentials: "include",
-})
-    .then(response => response.json())
-    .then(cartResponse => {
-        refreshCart(cartResponse)
-        checkoutData["cartId"] = cartResponse.cartId
+if (window.isLoggedIn) {
+    fetch("/api/cart", {
+        method: "GET",
+        credentials: "include",
     })
+        .then(response => response.json())
+        .then(cartResponse => {
+            refreshCart(cartResponse)
+            checkoutData["cartId"] = cartResponse.cartId
+        })
+}
+else
+    refreshCart()
 
 function refreshCart(cartResponse) {
+
+    if (!window.isLoggedIn) {
+        document.getElementsByTagName("main")[0].classList.add("cart-empty")
+        document.getElementsByTagName("main")[0].style.backgroundColor = "white"
+        const emptyCart = document.getElementsByClassName("empty-cart")[0]
+        emptyCart.getElementsByTagName("img")[0].src = "assets/images/d438a32e-765a-4d8b-b4a6-520b560971e8.webp"
+        emptyCart.getElementsByTagName("h2")[0].textContent = "Missing Cart items?"
+        emptyCart.getElementsByTagName("p")[0].textContent = "Login to see the items you added previously"
+        const shopNow = emptyCart.getElementsByClassName("shop-now")[0]
+        shopNow.textContent = "Login"
+        shopNow.href = "./login.html"
+        return
+    }
+
+    else if (!cartResponse.cartItems.length) {
+        document.getElementsByTagName("main")[0].classList.add("cart-empty")
+        return
+    }
+
     cartItemsContainer.innerHTML = ""
     const cartItems = cartResponse.cartItems
     const cartItemsFragment = document.createDocumentFragment()
@@ -62,17 +88,17 @@ cartItemsContainer.addEventListener("click", (e) => {
                 body: JSON.stringify({ "quantity": currentQty + 1 })
             })
                 .then(response => {
-                    if(response.ok)
-                    return response.json()
-                else {
-                    toast.textContent = "Cannot add more items. Stock limit reached"
-                    toast.classList.add("show")
-                    setTimeout(() => toast.classList.remove("show"), 1500)
-                }
+                    if (response.ok)
+                        return response.json()
+                    else {
+                        toast.textContent = "Cannot add more items. Stock limit reached"
+                        toast.classList.add("show")
+                        setTimeout(() => toast.classList.remove("show"), 1500)
+                    }
                 })
                 .then(cartResponse => {
-                    if(cartResponse)
-                    refreshCart(cartResponse)
+                    if (cartResponse)
+                        refreshCart(cartResponse)
                 })
         }
         else {
@@ -103,33 +129,8 @@ cartItemsContainer.addEventListener("click", (e) => {
 
 })
 
-const changeAddressBtn = document.querySelector(".btn-change-address")
-changeAddressBtn.addEventListener("click", () => {
-    window.location.href = `./manage-addresses.html?returnTo=cart.html`
-})
-
-const addressSpan = document.querySelector(".address")
-
-function fetchDefaultShippingAddress() {
-    fetch(`/api/addresses/default`, {
-        method: "GET",
-        credentials: "include",
-    })
-        .then(response => response.json())
-        .then(address => {
-            checkoutData = { ...checkoutData, ...address }
-            addressSpan.innerHTML = `${address.name} <br> ${address.addressLine1},... ${address.pincode}`
-        })
-}
-if (!selectedAddress)
-    fetchDefaultShippingAddress()
-else {
-    addressSpan.innerHTML = `${selectedAddress.name} <br> ${selectedAddress.addressLine1},... ${selectedAddress.pincode}`
-    checkoutData = { ...checkoutData, ...selectedAddress }
-}
-
-const payBtn = document.querySelector(".btn-pay")
-payBtn.addEventListener(("click"), () => {
+const checkoutBtn = document.querySelector(".btn-checkout")
+checkoutBtn.addEventListener(("click"), () => {
     sessionStorage.setItem("checkoutData", JSON.stringify(checkoutData))
     window.location.href = "./checkout.html"
 })

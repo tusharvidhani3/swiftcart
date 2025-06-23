@@ -1,0 +1,96 @@
+@import url(global.css);
+
+main {
+    display: flex;
+    justify-content: center;
+    height: 100vh;
+    align-items: center;
+    box-sizing: border-box;
+    margin-inline: auto;
+    width: 100%;
+}
+
+form {
+    display: flex;
+    gap: 32px;
+    background-color: white;
+    flex-direction: column;
+    min-height: 80vh;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+form div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    width: 90%;
+}
+
+.name {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.name div {
+    width: 100%;
+}
+
+label {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+input {
+    width: 100%;
+    height: 40px;
+    font-size: 18px;
+    font-family: inherit;
+    border-top: 0;
+    border-inline: 0;
+    border-color: #c2c2c2;
+}
+
+input:focus {
+    outline: none;
+    border-color: blue;
+}
+
+.btn-save-changes {
+    display: none;
+}
+
+.changed .btn-save-changes {
+    display: flex;
+}
+
+@media screen and (min-width: 768px) {
+
+    form {
+        align-items: flex-start;
+        padding-left: 64px;
+    }
+
+    main {
+        width: fit-content;
+    }
+    
+    .name {
+        flex-direction: row;
+        justify-content: space-between;
+        padding-right: 64px;
+        box-sizing: border-box;
+        width: 100%;
+    }
+
+    .name > div {
+        width: 45%;
+    }
+
+    form div {
+        width: 40%;
+    }
+}

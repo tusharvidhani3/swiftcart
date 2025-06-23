@@ -2,7 +2,14 @@
 
 :root {
     --accent-color: #FF9800;
-    --bg-color: #EFEEEE;
+    --bg-color: #f1f3f6;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Inter", sans-serif;
+    background-color: var(--bg-color);
 }
 
 .btn-profile {
@@ -41,6 +48,7 @@ header {
     background-color: white;
     box-shadow: 0 1px 4px 1px gray;
     flex-wrap: wrap;
+    z-index: 1;
 }
 
 header nav {
@@ -97,22 +105,27 @@ header nav {
 }
 
 .hamburger {
-    visibility: hidden;
     position: relative;
     cursor: pointer;
+    border: none;
+    background-color: inherit;
+    font-size: 44px;
+    padding: 0;
+    font-family: inherit;
 }
 
-.logged-in .hamburger {
-    visibility: visible;
-}
-
-.drop-down {
+.drop-down-arrow {
     display: none;
     margin-left: 4px;
 }
 
-.logged-in .drop-down {
-    display: inline-block;
+.show .drop-down-arrow {
+    transform: rotate(180deg);
+    transition: transform .2s;
+}
+
+.show .btn-profile {
+    background-color: #FAFAFA;
 }
 
 .profile {
@@ -126,16 +139,12 @@ header nav {
     flex-direction: column;
     align-items: flex-start;
     padding-left: 0;
-    top: 26px;
+    top: 24px;
     width: 150%;
     border-radius: 8px;
-    box-shadow: 0 4px 16px 0 rgba(0,0,0,.2);
+    box-shadow: 0 4px 16px 0 rgba(0, 0, 0, .2);
     overflow: hidden;
     left: -16px;
-}
-
-.show.drop-down-menu {
-    display: flex;
 }
 
 .drop-down-menu li {
@@ -177,11 +186,9 @@ header nav {
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-basis: 20%;
     cursor: pointer;
     background-color: var(--accent-color);
-    max-width: 100px;
-    min-width: 64px;
+    width: 72px;
 }
 
 .become-a-seller {
@@ -203,10 +210,17 @@ header nav {
 
 aside {
     display: none;
+    position: fixed;
+    flex-direction: column;
+    width: 300px;
+}
+
+.hamburger-open aside {
+    display: flex;
 }
 
 @media screen and (min-width: 768px) {
-    
+
     header {
         height: 64px;
         flex-wrap: nowrap;
@@ -215,10 +229,6 @@ aside {
 
     main {
         padding-top: 80px;
-    }
-
-    .searchbox {
-        /* display: flex; */
     }
 
     .header-right {
@@ -237,7 +247,19 @@ aside {
     .swiftcart {
         font-size: 20px;
     }
-    
+
+    .logged-in .drop-down-arrow {
+        display: inline-block;
+    }
+
+    .hamburger {
+        display: none;
+    }
+
+    .show .drop-down-menu {
+        display: flex;
+    }
+
 }
 
 @media screen and (min-width: 1080px) {
@@ -248,10 +270,6 @@ aside {
 
     .label {
         display: inline;
-    }
-
-    .hamburger {
-        display: none;
     }
 
 }

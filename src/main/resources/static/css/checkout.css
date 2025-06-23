@@ -24,6 +24,19 @@ main {
     box-sizing: border-box;
     padding: 24px;
     background-color: white;
+    gap: 16px;
+}
+
+#name {
+    font-weight: 600;
+}
+
+#pincode {
+    font-weight: 600;
+}
+
+#mobile-number {
+    font-weight: 600;
 }
 
 .btn-change-address {
@@ -78,7 +91,6 @@ button {
     box-sizing: border-box;
     padding: 8px 12px;
     height: 60px;
-    max-width: 480px;
 }
 
 .btn-pay {

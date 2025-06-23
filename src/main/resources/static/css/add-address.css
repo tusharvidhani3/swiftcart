@@ -77,6 +77,10 @@ div {
     max-width: 480px;
 }
 
+.btn-add-address {
+    border: none;
+}
+
 @media screen and (min-width: 768px) {
     
     form {
@@ -88,10 +92,6 @@ div {
 
     div {
         width: 40%;
-    }
-
-    .btn-add-address {
-        
     }
 
 }

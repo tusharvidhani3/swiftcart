@@ -14,13 +14,13 @@ function getProductDetails(productId) {
             "Content-Type": "application/json"
         }
     })
-    .then(res => res.json())
-    .then(product => {
-        productImage.src = product.image
-        productTitle.textContent = product.productName
-        productPrice.textContent = "₹ "+ product.price
-        productDescription.textContent = product.description
-    })
+        .then(res => res.json())
+        .then(product => {
+            productImage.src = product.image
+            productTitle.textContent = product.productName
+            productPrice.textContent = "₹ " + product.price
+            productDescription.textContent = product.description
+        })
 }
 
 getProductDetails(productId)
@@ -36,24 +36,30 @@ buyNowBtn.addEventListener('click', (e) => {
             "Content-Type": "application/json"
         }
     })
-    .then(response => response.json())
+        .then(response => response.json())
     // .then(cartItem => )
 })
 
 addToCartBtn.addEventListener('click', (e) => {
     e.stopPropagation()
-    fetch(`/api/cart/items`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({productId: productId})
-    })
-    .then(res => {
-        if(res.ok) {
-            toast.classList.add("show")
-            toast.textContent = "Item added to cart!"
-            setTimeout(() => toast.classList.remove("show"), 1500)
-        }
-    })
+    if (e.target.closest(".go-to-cart"))
+        window.location.href = "./cart.html"
+    else {
+        fetch(`/api/cart/items`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ productId: productId })
+        })
+            .then(res => {
+                if (res.ok) {
+                    toast.classList.add("show")
+                    toast.textContent = "Item added to cart!"
+                    setTimeout(() => toast.classList.remove("show"), 1500)
+                    addToCartBtn.textContent = "Go to Cart"
+                    addToCartBtn.classList.add("go-to-cart")
+                }
+            })
+    }
 })

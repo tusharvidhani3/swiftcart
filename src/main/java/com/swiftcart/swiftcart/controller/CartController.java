@@ -1,5 +1,8 @@
 package com.swiftcart.swiftcart.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -64,5 +67,15 @@ public class CartController {
     public ResponseEntity<Integer> getCartQtyCount(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
         return ResponseEntity.ok(cartService.getCartQuantityCount(userDetailsImpl.getUser()));
     }
+
+    @GetMapping("/summary")
+    public ResponseEntity<Map<String, Object>> getCartSummary(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
+        CartResponse cartResponse =  cartService.getCartResponse(userDetailsImpl.getUser().getUserId());
+        Map<String, Object> summary = new HashMap<>();
+        summary.put("totalPrice", cartResponse.getTotalPrice());
+        summary.put("cartItemsCount", cartResponse.getCartItems().size());
+        return ResponseEntity.ok(summary);
+    }
+    
 
 }

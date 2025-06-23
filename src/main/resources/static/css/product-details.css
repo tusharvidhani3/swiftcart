@@ -4,6 +4,7 @@ body {
     margin: 0;
     padding: 0;
     font-family: "Inter", sans-serif;
+    background-color: white;
 }
 
 main {
@@ -28,12 +29,12 @@ main {
     margin: 8px 16px;
 }
 
-.product-details img {
+.product-image {
     width: 100%;
 }
 
 .product-actions {
-    position: absolute;
+    position: fixed;
     display: flex;
     bottom: 0;
     left: 0;
@@ -67,6 +68,7 @@ main {
 
 .product-details .product-description {
     margin: 16px;
+    font-size: 16px;
 }
 
 #toast {
@@ -75,7 +77,7 @@ main {
     bottom: 100px;
     left: 50%;
     width: fit-content;
-    height: 32px;
+    height: 24px;
     border-radius: 16px;
     background-color: gray;
     color: white;
@@ -92,44 +94,59 @@ main {
     opacity: 1;
 }
 
+.product-image-container {
+    display: flex;
+    align-items: center;
+}
+
+.product-image {
+    width: 100%;
+}
+
 @media screen and (min-width: 768px) {
+
+    main {
+        margin-top: 0;
+    }
 
     .product-details {
         flex-direction: row;
-        align-items: center;
-        padding-top: 80px;
-        justify-content: center;
-        gap: 24px;
-        min-height: 80vh;
+        align-items: flex-start;
+        justify-content: flex-start;
+        padding: 20px;
     }
 
-    .product-details > div:first-child {
-        flex-basis: 30%;
+    .product-details>div:first-child {
+        flex-basis: 40%;
         display: flex;
         flex-direction: column;
         align-items: center;
+        justify-content: center;
         position: sticky;
-        gap: 8px;
+        top: 75px;
+        gap: 20px;
     }
 
-    .product-details > div {
+    .product-details>div:nth-child(2) {
+        padding-left: 16px;
+        flex-basis: 60%;
+    }
+
+    .product-details>div {
         height: 100%;
-    }
-
-    .product-details img {
-        width: 90%;
-        border: 1px solid #f0f0f0;
-        flex-basis: 90%;
     }
 
     .product-actions {
         position: static;
-        width: 100%;
+        max-width: 352px;
         justify-content: space-between;
+        height: 50px;
     }
 
     .btn-product-action {
-        flex-basis: 45%;
+        flex-basis: 48%;
+        height: 100%;
+        font-size: 18px;
     }
 
     .product-price {
@@ -139,6 +156,12 @@ main {
 
     .product-title {
         font-size: 18px;
+    }
+
+    .product-image-container {
+        width: 352px;
+        height: 352px;
+        border: 1px solid #f0f0f0;
     }
 
 }

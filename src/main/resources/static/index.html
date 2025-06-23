@@ -12,7 +12,7 @@
 <body>
     <header>
         <div class="header-left">
-        <img src="assets/icons/hamburger.svg" alt="hamburger menu" class="hamburger">
+        <button class="hamburger">☰</button>
         <a href="./index.html" class="swiftcart">
             <span>SwiftCart</span>
         </a>
@@ -25,7 +25,7 @@
             <div class="profile">
                 <button class="btn-profile"><img src="assets/icons/profile.svg" alt="profile icon"><span
                         class="btn-profile-txt">Login</span><img src="assets/icons/drop-down-arrow.svg" alt="drop down"
-                        class="drop-down"></button>
+                        class="drop-down-arrow"></button>
                 <ul class="drop-down-menu">
                     <li class="my-profile"><img src="assets/icons/my-profile.svg">My Profile</li>
                     <li class="logout"><img src="assets/icons/logout.svg">Logout</li>
@@ -39,13 +39,15 @@
     </header>
 
     <aside>
+        <nav>
         <div class="banner"></div>
         <ul class="side-menu">
-            <li>My Orders</li>
-            <li>My Cart</li>
-            <li>Sell on SwiftCart</li>
-            <li>My Account</li>
+            <li><a href="./orders.html">My Orders</a></li>
+            <li><a href="./cart.html">My Cart</a></li>
+            <li><a href="./register.html">Sell on SwiftCart</a></li>
+            <li><a href="./profile.html">My Account</a></li>
         </ul>
+        </nav>
     </aside>
 
     <main>
