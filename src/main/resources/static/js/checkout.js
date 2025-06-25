@@ -16,7 +16,7 @@ const address = {
     "state": document.getElementById("state"),
     "pincode": document.getElementById("pincode"),
     "mobileNumber": document.getElementById("mobile-number"),
-    "address-type": document.getElementById("address-type")
+    "addressType": document.getElementById("address-type")
 }
 
 function fetchShippingAddress(addressId) {
@@ -24,7 +24,11 @@ function fetchShippingAddress(addressId) {
         method: "GET",
         credentials: "include",
     })
-        .then(response => response.json())
+        .then(response => {
+            if(response.status === 403)
+                window.location.href = "./login.html"
+            return response.json()
+        })
         .then(addressData => {
             checkoutData = addressData
             for (const field in address)
@@ -54,8 +58,11 @@ payBtn.addEventListener("click", e => {
             "shippingAddressId": checkoutData.addressId
         })
     })
-        .then(() => {
-            console.log("Order placed")
+        .then(res => {
+            if(res.ok)
+                window.location.href = "./orders.html"
+            else
+            window.location.href = "./error.htm;"
         })
 })
 
@@ -72,7 +79,7 @@ function fetchCartSummary() {
         checkoutData.cartId = summary.cartId
         priceToPay.textContent = `₹ ${summary.totalPrice}`
     })
-    // .catch(() => window.location.href = "./error.html")
+    .catch(() => window.location.href = "./error.html")
 }
 
 fetchCartSummary()
