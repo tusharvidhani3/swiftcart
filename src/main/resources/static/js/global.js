@@ -2,12 +2,7 @@ const header = document.querySelector("header")
 
 export function setupHeader() {
 
-    const myProfile = header.getElementsByClassName("my-profile")[0]
     const logout = header.getElementsByClassName("logout")[0]
-    myProfile.addEventListener("click", () => {
-        window.location.href = "./profile.html"
-    })
-
     logout.addEventListener("click", () => {
         fetch("/api/auth/logout", {
             method: "POST",
@@ -55,6 +50,7 @@ export async function setupUser() {
                 window.isLoggedIn = true
                 fetchCartCount()
                 header.classList.add("logged-in")
+                if(window.innerWidth < 768)
                 profileBtn.addEventListener("click", () => window.location.href = "./profile.html")
                 profile.addEventListener("mouseenter", () => profile.classList.add("show"))
                 profile.addEventListener("mouseleave", () => profile.classList.remove("show"))
