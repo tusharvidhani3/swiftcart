@@ -147,8 +147,12 @@ header nav {
     left: -16px;
 }
 
+.drop-down-menu img {
+    width: 24px;
+    height: 24px;
+}
+
 .drop-down-menu li {
-    padding-inline: 8px;
     width: 100%;
     box-sizing: border-box;
     cursor: pointer;
@@ -156,7 +160,17 @@ header nav {
     height: 40px;
     display: flex;
     align-items: center;
+}
+
+.drop-down-menu a {
+    display: flex;
+    color: inherit;
+    text-decoration-line: none;
+    align-items: center;
     gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    padding-inline: 8px;
 }
 
 .drop-down-menu li:hover {
