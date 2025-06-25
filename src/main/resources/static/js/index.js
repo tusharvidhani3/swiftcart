@@ -68,7 +68,10 @@ productsContainer.addEventListener('click', (e) => {
                 if (res.ok) {
                     toast.classList.add("show")
                     toast.textContent = "Product added to cart"
-                    setTimeout(() => toast.classList.remove("show"), 1500)
+                    setTimeout(() => {
+                        toast.classList.remove("show")
+                        window.location.reload() // In React only cart Icon component needs to be re rendered to reflect the qty in cart
+                    }, 1500)
                 }
             })
     }
