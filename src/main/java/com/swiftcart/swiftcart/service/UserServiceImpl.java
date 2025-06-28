@@ -1,9 +1,9 @@
 package com.swiftcart.swiftcart.service;
 
-import java.util.Set;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -46,7 +46,7 @@ public class UserServiceImpl implements UserService {
         throw new BadRequestException("Email is required for seller registration");
         User user = modelMapper.map(registerRequest, User.class);
         Role role=roleRepo.getRoleByName(registerRequest.getRole());
-        user.setRoles(Set.of(role));
+        user.getRoles().add(role);
         user.setPassword(encoder.encode(registerRequest.getPassword()));
         userRepo.save(user);
     }
@@ -61,6 +61,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateUser(UserDTO userDTO) {
         userRepo.save(modelMapper.map(userDTO, User.class));
+    }
+
+    @Override
+    public Page<UserDTO> getAllUsers(Pageable pageable) {
+        return userRepo.findAll(pageable).map(user -> modelMapper.map(user, UserDTO.class));
     }
 
 }

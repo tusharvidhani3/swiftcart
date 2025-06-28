@@ -15,9 +15,10 @@ public interface OrderService {
     OrderResponse getOrder(Long orderId, User user);
     Page<OrderResponse> getOrdersForLoggedInCustomer(Long userId, Pageable pageable);
     Page<OrderResponse> getOrdersForLoggedInSeller(Long userId, Pageable pageable);
-    OrderResponse updateOrderStatus(User user, Long orderId, OrderStatus orderStatus);
+    OrderItemResponse updateOrderItemStatus(User user, Long orderId, OrderStatus orderStatus);
     OrderResponse placeBuyNowOrder(Long cartItemId, Long addressId, User user);
     Page<OrderResponse> getAllOrders(Pageable pageable);
-    OrderResponse cancelOrder(Long userId, Long orderId);
+    OrderResponse cancelOrder(Long orderId);
+    OrderItemResponse cancelOrderItem(Long userId, Long orderItemId);
     Page<OrderItemResponse> getOrderItemsForLoggedInCustomer(Long userId, Pageable pageable);
 }

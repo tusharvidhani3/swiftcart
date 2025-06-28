@@ -41,7 +41,6 @@ h2 {
     cursor: pointer;
     align-items: center;
     padding: 8px;
-    height: 80px;
 }
 
 .product-title {
@@ -54,9 +53,15 @@ h2 {
 }
 
 .order-item-card img {
-    height: 72px;
+    width: 100px;
+    aspect-ratio: 1/1;
+    object-fit: cover;
 }
 
 .ordered-on {
     color: #656565;
+}
+
+.order-item-card:hover {
+    box-shadow: 0 0 4px 4px #DBDBDB;
 }

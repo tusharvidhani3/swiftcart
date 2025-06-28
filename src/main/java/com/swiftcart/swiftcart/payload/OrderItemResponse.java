@@ -12,6 +12,7 @@ public class OrderItemResponse {
     private Long orderItemId;
     private Long orderId;
     private LocalDateTime placedAt;
+    private LocalDateTime deliveryAt;
     private ProductSnapshot product;
     private int quantity;
 }

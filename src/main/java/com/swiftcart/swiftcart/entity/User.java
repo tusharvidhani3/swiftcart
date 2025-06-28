@@ -1,5 +1,6 @@
 package com.swiftcart.swiftcart.entity;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.Column;
@@ -15,6 +16,7 @@ import lombok.Setter;
 
 @Entity
 @Getter
+@Setter
 public class User {
 
     @Id
@@ -22,29 +24,17 @@ public class User {
     @Column(name = "user_id")
     private Long userId;
 
-    @Column(name = "first_name")
-    @Setter
-    private String firstName;
-
-    @Column(name = "last_name")
-    @Setter
-    private String lastName;
-
     @Column(name = "mobile_no", unique = true)
-    @Setter
     @Pattern(regexp = "^[6-9]\\d{9}$", message = "Please enter a valid 10-digit mobile number")
     private String mobileNumber;
 
     @Email
     @Column(unique = true)
-    @Setter
     private String email;
 
-    @Setter
     @Getter
     private String password;
 
-    @Setter
     @ManyToMany
-    private Set<Role> roles;
+    private Set<Role> roles = new HashSet<>();
 }

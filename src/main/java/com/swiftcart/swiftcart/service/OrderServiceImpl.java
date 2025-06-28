@@ -20,9 +20,11 @@ import com.swiftcart.swiftcart.entity.Order;
 import com.swiftcart.swiftcart.entity.OrderItem;
 import com.swiftcart.swiftcart.entity.OrderStatus;
 import com.swiftcart.swiftcart.entity.User;
+import com.swiftcart.swiftcart.exception.BadRequestException;
 import com.swiftcart.swiftcart.exception.ResourceNotFoundException;
 import com.swiftcart.swiftcart.payload.AddressSnapshot;
 import com.swiftcart.swiftcart.payload.OrderItemResponse;
+import com.swiftcart.swiftcart.payload.OrderItemResponseForSeller;
 import com.swiftcart.swiftcart.payload.OrderResponse;
 import com.swiftcart.swiftcart.payload.PlaceOrderRequest;
 import com.swiftcart.swiftcart.payload.ProductSnapshot;
@@ -65,7 +67,6 @@ public class OrderServiceImpl implements OrderService {
         Cart cart = cartRepo.findByUser_UserId(userId)
         .orElseThrow(() -> new ResourceNotFoundException("Cart empty"));
         List<CartItem> cartItems = cartItemRepo.findAllByCart_CartId(cart.getCartId());
-        System.out.println(cartItems);
         if(cartItems.isEmpty())
         throw new ResourceNotFoundException("Order cannot be placed on empty cart");
         Address shippingAddress = addressRepo.findByAddressId(placeOrderRequest.getShippingAddressId())
@@ -73,7 +74,6 @@ public class OrderServiceImpl implements OrderService {
         if(!shippingAddress.getUser().getUserId().equals(userId))
         throw new AccessDeniedException("Unauthorized access to the address");
         Order order = new Order();
-        order.setOrderStatus(OrderStatus.PROCESSING);
         order.setPlacedAt(LocalDateTime.now());
         order.setShippingAddress(modelMapper.map(shippingAddress, AddressSnapshot.class));
         order.setUser(cart.getUser());
@@ -84,6 +84,7 @@ public class OrderServiceImpl implements OrderService {
             orderItem.setOrder(order);
             orderItem.setProduct(modelMapper.map(ci.getProduct(), ProductSnapshot.class));
             orderItem.setQuantity(ci.getQuantity());
+            orderItem.setOrderStatus(OrderStatus.PROCESSING);
             orderItems.add(orderItem);
             productService.updateStock(ci.getProduct().getProductId(), -orderItem.getQuantity());
             totalAmount += ci.getProduct().getPrice()*ci.getQuantity();
@@ -139,23 +140,38 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderResponse updateOrderStatus(User user, Long orderId, OrderStatus orderStatus) {
-        Order order = orderRepo.findByOrderId(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+    public OrderItemResponse updateOrderItemStatus(User user, Long orderItemId, OrderStatus orderStatus) {
+        OrderItem orderItem = orderItemRepo.findByOrderItemId(orderItemId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order Item not found"));
 
                 boolean isAdmin = user.getRoles().stream()
                 .anyMatch(role -> role.getName().equals("ROLE_ADMIN"));
-        if (!isAdmin && !order.getUser().getUserId().equals(user.getUserId()))
+        if (!isAdmin && !orderItem.getOrder().getUser().getUserId().equals(user.getUserId()))
             throw new AccessDeniedException("You are not allowed to perform this action");
         if (orderStatus == OrderStatus.CANCELLED) {
-            List<OrderItem> orderItems = orderItemRepo.findAllByOrder_OrderId(orderId);
-            orderItems.stream().forEach(orderItem -> {
-                productService.updateStock(orderItem.getProduct().getProductId(), orderItem.getQuantity());
-            });
+            productService.updateStock(orderItem.getProduct().getProductId(), orderItem.getQuantity());
         }
-        order.setOrderStatus(orderStatus);
-        order = orderRepo.save(order);
-        return modelMapper.map(order, OrderResponse.class);
+        orderItem.setOrderStatus(orderStatus);
+        orderItem = orderItemRepo.save(orderItem);
+        return modelMapper.map(orderItem, OrderItemResponse.class);
+    }
+
+    @Override
+    @Transactional
+    public OrderItemResponse cancelOrderItem(Long userId, Long orderItemId) {
+        OrderItem orderItem = orderItemRepo.findByOrderItemId(orderItemId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order Item not found"));
+        if (!orderItem.getOrder().getUser().getUserId().equals(userId))
+            throw new AccessDeniedException("You are not allowed to perform this action");
+        if(orderItem.getOrderStatus() == OrderStatus.PENDING || orderItem.getOrderStatus() == OrderStatus.PROCESSING || orderItem.getOrderStatus() == OrderStatus.SHIPPED) {
+            orderItem.setOrderStatus(OrderStatus.CANCELLED);
+            productService.updateStock(orderItem.getProduct().getProductId(), orderItem.getQuantity());
+            orderItem = orderItemRepo.save(orderItem);
+        }
+        else {
+            throw new BadRequestException("Cannot cancel an order item that is already delivered");
+        }
+        return modelMapper.map(orderItem, OrderItemResponse.class);
     }
 
     @Override
@@ -169,7 +185,6 @@ public class OrderServiceImpl implements OrderService {
             throw new AccessDeniedException("Access Denied: Something went wrong");
         Order order = new Order();
         order.setPlacedAt(LocalDateTime.now());
-        order.setOrderStatus(OrderStatus.PROCESSING);
         order.setShippingAddress(modelMapper.map(shippingAddress, AddressSnapshot.class));
         order.setTotalAmount(cartItem.getProduct().getPrice());
         order.setUser(user);
@@ -178,6 +193,7 @@ public class OrderServiceImpl implements OrderService {
         orderItem.setProduct(modelMapper.map(cartItem.getProduct(), ProductSnapshot.class));
         orderItem.setOrder(order);
         orderItem.setQuantity(cartItem.getQuantity());
+        orderItem.setOrderStatus(OrderStatus.PROCESSING);
         orderItemRepo.save(orderItem);
         productService.updateStock(cartItem.getProduct().getProductId(), -orderItem.getQuantity());
         return orderResponse;
@@ -185,23 +201,21 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderResponse cancelOrder(Long userId, Long orderId) {
+    public OrderResponse cancelOrder(Long orderId) {
         Order order = orderRepo.findByOrderId(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
-        if (!order.getUser().getUserId().equals(userId))
-            throw new AccessDeniedException("You are not allowed to perform this action");
-
         List<OrderItem> orderItems = orderItemRepo.findAllByOrder_OrderId(orderId);
         orderItems.stream().forEach(orderItem -> {
-            productService.updateStock(orderItem.getProduct().getProductId(), orderItem.getQuantity());
+                if(orderItem.getOrderStatus() == OrderStatus.PENDING || orderItem.getOrderStatus() == OrderStatus.PROCESSING || orderItem.getOrderStatus() == OrderStatus.SHIPPED) {
+                orderItem.setOrderStatus(OrderStatus.CANCELLED);
+                productService.updateStock(orderItem.getProduct().getProductId(), orderItem.getQuantity());
+                orderItem = orderItemRepo.save(orderItem);
+                }
+                else {
+                    throw new BadRequestException("Cannot cancel order, one or more item(s) delivered");
+                }
         });
-        if(order.getOrderStatus() == OrderStatus.PENDING || order.getOrderStatus() == OrderStatus.PROCESSING || order.getOrderStatus() == OrderStatus.SHIPPED)
-        order.setOrderStatus(OrderStatus.CANCELLED);
-        else {
-            
-        }
-        order = orderRepo.save(order);
         return modelMapper.map(order, OrderResponse.class);
     }
 
@@ -220,5 +234,9 @@ public class OrderServiceImpl implements OrderService {
         return orderItems;
 
     }
+
+    // public Page<OrderItemResponseForSeller> getOrderItemsForLoggedInSeller(Long sellerId, Pageable pageable) {
+    //     Page<OrderItemResponseForSeller> orderItems = orderItemRepo.findAllBySellerProductId(sellerId, pageable)
+    // }
 
 }

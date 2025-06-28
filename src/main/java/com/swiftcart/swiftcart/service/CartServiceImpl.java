@@ -2,6 +2,7 @@ package com.swiftcart.swiftcart.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -157,8 +158,15 @@ public class CartServiceImpl implements CartService {
     }
 
     public int getCartQuantityCount(User user) {
-        Long cartId = cartRepo.findByUser_UserId(user.getUserId()).get().getCartId();
-        Integer cartQuantityCount = cartItemRepo.getTotalQuantityByCartId(cartId);
+        Long cartId;
+        Integer cartQuantityCount;
+        try {
+        cartId = cartRepo.findByUser_UserId(user.getUserId()).get().getCartId();
+        cartQuantityCount = cartItemRepo.getTotalQuantityByCartId(cartId);
+        }
+        catch(NoSuchElementException ex) {
+            cartQuantityCount = 0;
+        }
         return cartQuantityCount!=null?cartQuantityCount:0;
     }
 

@@ -2,7 +2,6 @@ package com.swiftcart.swiftcart.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.swiftcart.swiftcart.entity.OrderStatus;
 import com.swiftcart.swiftcart.payload.OrderItemResponse;
 import com.swiftcart.swiftcart.payload.OrderResponse;
 import com.swiftcart.swiftcart.payload.PlaceOrderRequest;
@@ -69,18 +68,18 @@ public class OrderController {
         return ResponseEntity.ok(orders);
     }
     
-    @PatchMapping("/{orderId}/cancel")
+    @PatchMapping("/items/{orderItemId}/cancel")
     @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<OrderResponse> cancelOrder(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @PathVariable Long orderId) {
-        OrderResponse orderResponse=orderService.updateOrderStatus(userDetailsImpl.getUser(), orderId, OrderStatus.CANCELLED);
-        return ResponseEntity.ok(orderResponse);
+    public ResponseEntity<OrderItemResponse> cancelOrderItem(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @PathVariable Long orderId) {
+        OrderItemResponse orderItemResponse=orderService.cancelOrderItem(userDetailsImpl.getUser().getUserId(), orderId);
+        return ResponseEntity.ok(orderItemResponse);
     }
 
-    @PatchMapping("/{orderId}")
+    @PatchMapping("/items/{orderItemId}")
     @PreAuthorize("hasRole('SELLER')")
-    public ResponseEntity<OrderResponse> updateOrderStatus(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @RequestBody UpdateOrderStatusRequest req) {
-        OrderResponse orderResponse = orderService.updateOrderStatus(userDetailsImpl.getUser(), req.getOrderId(), req.getOrderStatus());
-        return ResponseEntity.ok(orderResponse);
+    public ResponseEntity<OrderItemResponse> updateOrderItemStatus(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @RequestBody UpdateOrderStatusRequest req) {
+        OrderItemResponse orderItemResponse = orderService.updateOrderItemStatus(userDetailsImpl.getUser(), req.getOrderId(), req.getOrderStatus());
+        return ResponseEntity.ok(orderItemResponse);
     }
     
     @GetMapping("/{orderId}")
@@ -101,6 +100,13 @@ public class OrderController {
     public ResponseEntity<Page<OrderResponse>> getAllOrders(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "placedAt") String sortBy) {
         Page<OrderResponse> orders= orderService.getAllOrders(PageRequest.of(page, size, Sort.by(sortBy).descending()));
         return ResponseEntity.ok(orders);
+    }
+
+    @PatchMapping("/{orderId}/cancel-full")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<OrderResponse> cancelOrder(@PathVariable Long orderId) {
+        OrderResponse orderResponse = orderService.cancelOrder(orderId);
+        return ResponseEntity.ok(orderResponse);
     }
 
 }

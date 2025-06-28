@@ -88,7 +88,6 @@ button {
 
 .product-image {
     width: 100px;
-    height: 100px;
     aspect-ratio: 1/1;
     object-fit: cover;
 }
@@ -272,7 +271,6 @@ button {
     main {
         flex-direction: row;
         margin-inline: auto;
-        /* max-width: 950px; */
         padding-inline: 24px;
         align-items: flex-start;
     }
@@ -317,5 +315,9 @@ button {
 
     .empty-cart p {
         display: block;
+    }
+
+    .cart-items-container {
+        margin-top: 0;
     }
 }

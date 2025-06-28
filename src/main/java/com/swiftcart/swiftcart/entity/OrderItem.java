@@ -6,6 +6,8 @@ import com.swiftcart.swiftcart.payload.ProductSnapshot;
 
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -37,6 +39,10 @@ public class OrderItem {
     private int quantity;
 
     @Setter
-    private LocalDateTime deliveredAt;
+    private LocalDateTime deliveryAt;
+
+    @Setter
+    @Enumerated(EnumType.STRING)
+    private OrderStatus orderStatus;
 
 }
