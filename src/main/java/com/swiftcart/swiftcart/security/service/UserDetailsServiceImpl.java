@@ -1,7 +1,5 @@
 package com.swiftcart.swiftcart.security.service;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,14 +12,12 @@ import com.swiftcart.swiftcart.security.UserDetailsImpl;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
-    UserRepo userRepo;
+    private UserRepo userRepo;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> user=userRepo.findByMobileNumberWithRoles(username);
-        if(user.isEmpty())
-        throw new UsernameNotFoundException("User not found");
-        return new UserDetailsImpl(user.get());
+        User user=userRepo.findByMobileNumberWithRoles(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return new UserDetailsImpl(user);
     }
 
 }
