@@ -14,21 +14,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.swiftcart.swiftcart.entity.Address;
-import com.swiftcart.swiftcart.entity.Cart;
 import com.swiftcart.swiftcart.entity.CartItem;
 import com.swiftcart.swiftcart.entity.Order;
 import com.swiftcart.swiftcart.entity.OrderItem;
 import com.swiftcart.swiftcart.entity.OrderStatus;
 import com.swiftcart.swiftcart.entity.User;
+import com.swiftcart.swiftcart.exception.BadRequestException;
 import com.swiftcart.swiftcart.exception.ResourceNotFoundException;
 import com.swiftcart.swiftcart.payload.AddressSnapshot;
 import com.swiftcart.swiftcart.payload.OrderItemResponse;
+import com.swiftcart.swiftcart.payload.OrderResponseForSeller;
 import com.swiftcart.swiftcart.payload.OrderResponse;
 import com.swiftcart.swiftcart.payload.PlaceOrderRequest;
-import com.swiftcart.swiftcart.payload.ProductSnapshot;
-import com.swiftcart.swiftcart.repository.AddressRepo;
-import com.swiftcart.swiftcart.repository.CartItemRepo;
-import com.swiftcart.swiftcart.repository.CartRepo;
+import com.swiftcart.swiftcart.payload.ProductResponse;
 import com.swiftcart.swiftcart.repository.OrderItemRepo;
 import com.swiftcart.swiftcart.repository.OrderRepo;
 
@@ -36,54 +34,44 @@ import com.swiftcart.swiftcart.repository.OrderRepo;
 public class OrderServiceImpl implements OrderService {
 
     @Autowired
-    OrderItemRepo orderItemRepo;
+    private OrderItemRepo orderItemRepo;
 
     @Autowired
-    OrderRepo orderRepo;
+    private OrderRepo orderRepo;
 
     @Autowired
-    CartRepo cartRepo;
+    private ModelMapper modelMapper;
 
     @Autowired
-    ModelMapper modelMapper;
+    private ProductService productService;
 
     @Autowired
-    CartItemRepo cartItemRepo;
+    private CartService cartService;
 
     @Autowired
-    ProductService productService;
-
-    @Autowired
-    AddressRepo addressRepo;
-
-    @Autowired
-    CartService cartService;
+    private AddressService addressService;
 
     @Override
     @Transactional
     public OrderResponse placeOrder(PlaceOrderRequest placeOrderRequest, Long userId) {
-        Cart cart = cartRepo.findByUser_UserId(userId)
-        .orElseThrow(() -> new ResourceNotFoundException("Cart empty"));
-        List<CartItem> cartItems = cartItemRepo.findAllByCart_CartId(cart.getCartId());
-        System.out.println(cartItems);
+        List<CartItem> cartItems = cartService.getCartItemsByUserId(userId);
         if(cartItems.isEmpty())
         throw new ResourceNotFoundException("Order cannot be placed on empty cart");
-        Address shippingAddress = addressRepo.findByAddressId(placeOrderRequest.getShippingAddressId())
-        .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
+        Address shippingAddress = addressService.getAddressByAddressId(placeOrderRequest.getShippingAddressId());
         if(!shippingAddress.getUser().getUserId().equals(userId))
         throw new AccessDeniedException("Unauthorized access to the address");
         Order order = new Order();
-        order.setOrderStatus(OrderStatus.PROCESSING);
         order.setPlacedAt(LocalDateTime.now());
         order.setShippingAddress(modelMapper.map(shippingAddress, AddressSnapshot.class));
-        order.setUser(cart.getUser());
+        order.setUser(shippingAddress.getUser());
         List<OrderItem> orderItems = new ArrayList<>();
         double totalAmount = 0;
         for (CartItem ci : cartItems) {
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(order);
-            orderItem.setProduct(modelMapper.map(ci.getProduct(), ProductSnapshot.class));
+            orderItem.setProduct(ci.getProduct());
             orderItem.setQuantity(ci.getQuantity());
+            orderItem.setOrderStatus(OrderStatus.PROCESSING);
             orderItems.add(orderItem);
             productService.updateStock(ci.getProduct().getProductId(), -orderItem.getQuantity());
             totalAmount += ci.getProduct().getPrice()*ci.getQuantity();
@@ -91,25 +79,23 @@ public class OrderServiceImpl implements OrderService {
         order.setTotalAmount(totalAmount);
         orderItemRepo.saveAll(orderItems);
         order = orderRepo.save(order);
-        cartItemRepo.deleteAllByCart_CartId(cart.getCartId());
+        cartService.deleteCartItemsByUserId(userId);
         return modelMapper.map(order, OrderResponse.class);
     }
 
     @Override
     public OrderResponse getOrder(Long orderId, User user) {
-        // Allow admin but allow customer or seller to view only if it belongs to them i.e. ordered by that customer or in multi-seller system allow access to orderitems that belongs to the seller not the full order 
         Order order = orderRepo.findByOrderId(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
-        boolean isAdminOrSeller = user.getRoles().stream()
-                .anyMatch(role -> role.getName().equals("ROLE_ADMIN") || role.getName().equals("ROLE_SELLER"));
-        if (!isAdminOrSeller && !order.getUser().getUserId().equals(user.getUserId())) // since this is currently single seller system, seller-orderItem.product relationship is not established and the seller is allowed to view all the orders without verification
+        String role = user.getRole().getName();
+        boolean isAdminOrSeller = role.equals("ROLE_ADMIN") || role.equals("ROLE_SELLER");
+        if (!isAdminOrSeller && !order.getUser().getUserId().equals(user.getUserId()))
             throw new AccessDeniedException("You are not authorized to access this order");
         List<OrderItemResponse> orderItems = orderItemRepo.findAllByOrder_OrderId(orderId).stream().map(orderItem -> {
             OrderItemResponse orderItemResponse = new OrderItemResponse();
-            orderItemResponse.setOrderId(orderId);
             orderItemResponse.setOrderItemId(orderItem.getOrderItemId());
             orderItemResponse.setPlacedAt(order.getPlacedAt());
-            orderItemResponse.setProduct(orderItem.getProduct());
+            orderItemResponse.setProduct(modelMapper.map(orderItem.getProduct(), ProductResponse.class));
             orderItemResponse.setQuantity(orderItem.getQuantity());
             return orderItemResponse;
         })
@@ -120,64 +106,66 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public Page<OrderResponse> getOrdersForLoggedInCustomer(Long userId, Pageable pageable) {
+    public Page<OrderResponse> getOrdersForAuthenticatedUser(Long userId, Pageable pageable) {
         return orderRepo.findAllByUser_UserId(userId, pageable)
                 .map(order -> modelMapper.map(order, OrderResponse.class));
     }
 
     @Override
-    public Page<OrderResponse> getOrdersForLoggedInSeller(Long userId, Pageable pageable) {
-        return getAllOrders(pageable) // since there is single seller all orders belong to him
-                .map(order -> modelMapper.map(order, OrderResponse.class));
-    }
-
-    @Override
-    public Page<OrderResponse> getAllOrders(Pageable pageable) {
+    public Page<OrderResponseForSeller> getAllOrders(Pageable pageable) {
         return orderRepo.findAll(pageable)
-                .map(order -> modelMapper.map(order, OrderResponse.class));
+                .map(order -> modelMapper.map(order, OrderResponseForSeller.class));
     }
 
     @Override
     @Transactional
-    public OrderResponse updateOrderStatus(User user, Long orderId, OrderStatus orderStatus) {
-        Order order = orderRepo.findByOrderId(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
-
-                boolean isAdmin = user.getRoles().stream()
-                .anyMatch(role -> role.getName().equals("ROLE_ADMIN"));
-        if (!isAdmin && !order.getUser().getUserId().equals(user.getUserId()))
-            throw new AccessDeniedException("You are not allowed to perform this action");
+    public OrderItemResponse updateOrderItemStatus(User user, Long orderItemId, OrderStatus orderStatus) {
+        OrderItem orderItem = orderItemRepo.findByOrderItemId(orderItemId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order Item not found"));
         if (orderStatus == OrderStatus.CANCELLED) {
-            List<OrderItem> orderItems = orderItemRepo.findAllByOrder_OrderId(orderId);
-            orderItems.stream().forEach(orderItem -> {
-                productService.updateStock(orderItem.getProduct().getProductId(), orderItem.getQuantity());
-            });
+            productService.updateStock(orderItem.getProduct().getProductId(), orderItem.getQuantity());
         }
-        order.setOrderStatus(orderStatus);
-        order = orderRepo.save(order);
-        return modelMapper.map(order, OrderResponse.class);
+        orderItem.setOrderStatus(orderStatus);
+        orderItem = orderItemRepo.save(orderItem);
+        return modelMapper.map(orderItem, OrderItemResponse.class);
+    }
+
+    @Override
+    @Transactional
+    public OrderItemResponse cancelOrderItem(Long userId, Long orderItemId) {
+        OrderItem orderItem = orderItemRepo.findByOrderItemId(orderItemId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order Item not found"));
+        if (!orderItem.getOrder().getUser().getUserId().equals(userId))
+            throw new AccessDeniedException("You are not allowed to perform this action");
+        if(orderItem.getOrderStatus() == OrderStatus.PENDING || orderItem.getOrderStatus() == OrderStatus.PROCESSING || orderItem.getOrderStatus() == OrderStatus.SHIPPED) {
+            orderItem.setOrderStatus(OrderStatus.CANCELLED);
+            productService.updateStock(orderItem.getProduct().getProductId(), orderItem.getQuantity());
+            orderItem = orderItemRepo.save(orderItem);
+        }
+        else {
+            throw new BadRequestException("Cannot cancel an order item that is already delivered");
+        }
+        return modelMapper.map(orderItem, OrderItemResponse.class);
     }
 
     @Override
     @Transactional
     public OrderResponse placeBuyNowOrder(Long cartItemId, Long shippingAddressId, User user) {
-        CartItem cartItem = cartItemRepo.findByCartItemId(cartItemId).get();
-        Address shippingAddress = addressRepo.findByAddressId(shippingAddressId)
-        .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
-        if (cartItem.getCart().getUser().getUserId() != user.getUserId()
-                || shippingAddress.getUser().getUserId() != user.getUserId())
+        CartItem cartItem = cartService.getCartItemByCartItemId(cartItemId);
+        Address shippingAddress = addressService.getAddressByAddressId(shippingAddressId);
+        if (cartItem.getCart().getUser().getUserId() != user.getUserId() || shippingAddress.getUser().getUserId() != user.getUserId())
             throw new AccessDeniedException("Access Denied: Something went wrong");
         Order order = new Order();
         order.setPlacedAt(LocalDateTime.now());
-        order.setOrderStatus(OrderStatus.PROCESSING);
         order.setShippingAddress(modelMapper.map(shippingAddress, AddressSnapshot.class));
         order.setTotalAmount(cartItem.getProduct().getPrice());
         order.setUser(user);
         OrderResponse orderResponse = modelMapper.map(orderRepo.save(order), OrderResponse.class);
         OrderItem orderItem = new OrderItem();
-        orderItem.setProduct(modelMapper.map(cartItem.getProduct(), ProductSnapshot.class));
+        orderItem.setProduct(cartItem.getProduct());
         orderItem.setOrder(order);
         orderItem.setQuantity(cartItem.getQuantity());
+        orderItem.setOrderStatus(OrderStatus.PROCESSING);
         orderItemRepo.save(orderItem);
         productService.updateStock(cartItem.getProduct().getProductId(), -orderItem.getQuantity());
         return orderResponse;
@@ -185,40 +173,22 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderResponse cancelOrder(Long userId, Long orderId) {
+    public OrderResponse cancelOrder(Long orderId) {
         Order order = orderRepo.findByOrderId(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
-        if (!order.getUser().getUserId().equals(userId))
-            throw new AccessDeniedException("You are not allowed to perform this action");
-
         List<OrderItem> orderItems = orderItemRepo.findAllByOrder_OrderId(orderId);
         orderItems.stream().forEach(orderItem -> {
-            productService.updateStock(orderItem.getProduct().getProductId(), orderItem.getQuantity());
+                if(orderItem.getOrderStatus() == OrderStatus.PENDING || orderItem.getOrderStatus() == OrderStatus.PROCESSING || orderItem.getOrderStatus() == OrderStatus.SHIPPED) {
+                orderItem.setOrderStatus(OrderStatus.CANCELLED);
+                productService.updateStock(orderItem.getProduct().getProductId(), orderItem.getQuantity());
+                orderItem = orderItemRepo.save(orderItem);
+                }
+                else {
+                    throw new BadRequestException("Cannot cancel order, one or more item(s) delivered");
+                }
         });
-        if(order.getOrderStatus() == OrderStatus.PENDING || order.getOrderStatus() == OrderStatus.PROCESSING || order.getOrderStatus() == OrderStatus.SHIPPED)
-        order.setOrderStatus(OrderStatus.CANCELLED);
-        else {
-            
-        }
-        order = orderRepo.save(order);
         return modelMapper.map(order, OrderResponse.class);
-    }
-
-    @Override
-    public Page<OrderItemResponse> getOrderItemsForLoggedInCustomer(Long userId, Pageable pageable) {
-        Page<OrderItemResponse> orderItems = orderItemRepo.findAllByOrder_User_UserId(userId, pageable)
-                                                     .map(orderItem -> {
-                                                        OrderItemResponse orderItemResponse = new OrderItemResponse();
-                                                        orderItemResponse.setOrderId(orderItem.getOrder().getOrderId());
-                                                        orderItemResponse.setOrderItemId(orderItem.getOrderItemId());
-                                                        orderItemResponse.setProduct(modelMapper.map(orderItem.getProduct(), ProductSnapshot.class));
-                                                        orderItemResponse.setQuantity(orderItem.getQuantity());
-                                                        orderItemResponse.setPlacedAt(orderItem.getOrder().getPlacedAt());
-                                                        return orderItemResponse;
-                                                     });
-        return orderItems;
-
     }
 
 }

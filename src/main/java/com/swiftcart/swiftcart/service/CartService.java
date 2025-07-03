@@ -1,5 +1,8 @@
 package com.swiftcart.swiftcart.service;
 
+import java.util.List;
+
+import com.swiftcart.swiftcart.entity.CartItem;
 import com.swiftcart.swiftcart.entity.User;
 import com.swiftcart.swiftcart.payload.BuyNowPreview;
 import com.swiftcart.swiftcart.payload.CartResponse;
@@ -11,5 +14,8 @@ public interface CartService {
     public void updateQuantity(Long userId, Long cartItemId, int quantity);
     public CartResponse getCartResponse(Long userId);
     public BuyNowPreview createBuyNowPreview(Long productId, User user);
-    public int getCartQuantityCount(User user);
+    public int getCartQuantityCount(Long userId);
+    List<CartItem> getCartItemsByUserId(Long userId);
+    void deleteCartItemsByUserId(Long userId);
+    CartItem getCartItemByCartItemId(Long cartItemId);
 }

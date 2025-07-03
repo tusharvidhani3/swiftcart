@@ -1,5 +1,7 @@
 package com.swiftcart.swiftcart.payload;
 
+import java.util.List;
+
 import jakarta.validation.constraints.DecimalMin;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,7 +14,9 @@ public class ProductResponse {
     private String productName;
     @DecimalMin("1.0")
     private double price;
-    private String image;
+    @DecimalMin("1.0")
+    private double mrp;
+    private List<String> imageUrls;
     private String category;
     private String description;
     private String stock;

@@ -41,7 +41,7 @@ export async function setupUser() {
     const profileBtn = header.querySelector(".btn-profile")
     const profile = header.getElementsByClassName("profile")[0]
 
-    await fetch("/api/user/me", {
+    await fetch("/api/users/me", {
         method: "GET",
         credentials: "include"
     })
@@ -62,10 +62,10 @@ export async function setupUser() {
                 })
             }
         })
-        .then((res) => {
-            if (res) {
+        .then(userData => {
+            if (userData) {
                 const profileBtnTxt = header.querySelector(".btn-profile-txt")
-                if (res.firstName) {
+                if (userData.firstName) {
                     profileBtnTxt.textContent = res.firstName
                 }
                 else

@@ -14,7 +14,6 @@ productForm.addEventListener("submit", e => {
         [JSON.stringify(productData)], { type: "application/json" }
     ))
     formData.append("productImage", productForm.querySelector('input[type="file"]').files[0])
-    console.log(productData)
     fetch("/api/products", {
         method: "POST",
         credentials: "include",

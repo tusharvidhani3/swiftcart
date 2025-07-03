@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PlaceOrderRequest {
 
-    private Long cartId;
     private PaymentMethod paymentMethod;
     private Long shippingAddressId;
 }

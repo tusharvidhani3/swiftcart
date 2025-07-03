@@ -20,11 +20,9 @@ public interface CartItemRepo extends JpaRepository<CartItem,Integer> {
 
     public Optional<CartItem> findByCart_User_UserIdAndProduct_ProductId(Long userId, Long productId);
 
-    public int deleteByCartItemId(Long cartItemId);
+    public void deleteByCartItemId(Long cartItemId);
 
     public Optional<CartItem> findByCartItemId(Long cartItemId);
-
-    public void deleteAllByCart_CartId(Long cartId);
 
     @Modifying
     @Query("UPDATE CartItem c SET c.quantity = :quantity WHERE c.cartItemId = :cartItemId")
@@ -32,4 +30,6 @@ public interface CartItemRepo extends JpaRepository<CartItem,Integer> {
 
     @Query("SELECT SUM(ci.quantity) FROM CartItem ci WHERE ci.cart.cartId = :cartId")
     public Integer getTotalQuantityByCartId(@Param("cartId") Long cartId);
+
+    public void deleteAllByCart_User_UserId(Long userId);
 }

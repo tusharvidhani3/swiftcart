@@ -19,17 +19,16 @@ import com.swiftcart.swiftcart.repository.AddressRepo;
 public class AddressServiceImpl implements AddressService {
 
     @Autowired
-    AddressRepo addressRepo;
+    private AddressRepo addressRepo;
 
     @Autowired
-    ModelMapper modelMapper;
+    private ModelMapper modelMapper;
 
     @Override
     @Transactional
     public AddressDTO addAddress(AddressDTO addressDTO, User user) {
         Address address=modelMapper.map(addressDTO, Address.class);
         address.setUser(user);
-        user.getRoles().stream().anyMatch(role -> role.getName().equals("ROLE_CUSTOMER"));
         if(addressRepo.countByUser_UserId(user.getUserId()) == 0)
         address.setIsDefaultShipping(true);
         address=addressRepo.save(address);
@@ -92,6 +91,11 @@ public class AddressServiceImpl implements AddressService {
         Address address = addressRepo.findDefaultShippingAddress(userId)
         .orElseThrow(() -> new ResourceNotFoundException("No address added"));
         return modelMapper.map(address, AddressDTO.class);
+    }
+
+    @Override
+    public Address getAddressByAddressId(Long addressId) {
+        return addressRepo.findByAddressId(addressId).orElseThrow(() -> new ResourceNotFoundException("Address not found"));
     }
 
 }

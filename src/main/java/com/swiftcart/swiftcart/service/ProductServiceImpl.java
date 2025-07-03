@@ -41,6 +41,7 @@ public class ProductServiceImpl implements ProductService {
         product.setProductName(createProductRequest.getProductName());
         product.setPrice(createProductRequest.getPrice());
         product.setMrp(createProductRequest.getMrp());
+        product.setStock(createProductRequest.getStock());
         product.setCategory(createProductRequest.getCategory());
         List<String> relativePaths = productImages.stream().map(productImage -> {
             String fullPath = storageService.store(productImage, uploadDir);
@@ -55,7 +56,6 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public void deleteProduct(Long productId) {
-        // In multi-seller system only allow seller to delete seller-product only if it belongs to that seller and admin to delete product
         productRepo.deleteByProductId(productId);
     }
 
@@ -97,7 +97,6 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public ProductResponse updateStock(Long productId, int change) {
-        // In multi-seller system allow only stock field in seller-product and allow change by the owner of seller-product to update the stock
         Product product = productRepo.findByProductId(productId)
         .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         if(product.getStock() + change < 0)
