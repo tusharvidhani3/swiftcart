@@ -1,5 +1,8 @@
 package com.swiftcart.swiftcart.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,28 +23,31 @@ import com.swiftcart.swiftcart.repository.ProductRepo;
 public class ProductServiceImpl implements ProductService {
 
     @Autowired
-    ModelMapper modelMapper;
+    private ModelMapper modelMapper;
 
     @Autowired
-    StorageService storageService;
+    private StorageService storageService;
 
     @Value("${product.images.directory}")
-    String uploadDir;
+    private String uploadDir;
 
     @Autowired
-    ProductRepo productRepo;
+    private ProductRepo productRepo;
 
     @Override
     @Transactional
-    public ProductResponse createProduct(CreateProductRequest createProductRequest, MultipartFile productImage) {
+    public ProductResponse createProduct(CreateProductRequest createProductRequest, List<MultipartFile> productImages) {
         Product product=new Product();
         product.setProductName(createProductRequest.getProductName());
         product.setPrice(createProductRequest.getPrice());
+        product.setMrp(createProductRequest.getMrp());
         product.setCategory(createProductRequest.getCategory());
-        product.setStock(0);
-        String fullPath = storageService.store(productImage, uploadDir);
-        int relativeStartIndex = fullPath.indexOf("uploads/");
-        product.setImage(fullPath.substring(relativeStartIndex));
+        List<String> relativePaths = productImages.stream().map(productImage -> {
+            String fullPath = storageService.store(productImage, uploadDir);
+            int relativeStartIndex = fullPath.indexOf("uploads/");
+            return fullPath.substring(relativeStartIndex);
+        }).collect(Collectors.toList());
+        product.setImageUrls(relativePaths);
         productRepo.save(product);
         return modelMapper.map(product, ProductResponse.class);
     }

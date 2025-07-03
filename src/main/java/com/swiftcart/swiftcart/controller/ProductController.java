@@ -1,5 +1,7 @@
 package com.swiftcart.swiftcart.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,7 +35,7 @@ import jakarta.validation.Valid;
 public class ProductController {
 
     @Autowired
-    ProductService productService;
+    private ProductService productService;
 
     @GetMapping
     public Page<ProductResponse> getProducts(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "productId") String sortBy) {
@@ -50,8 +52,8 @@ public class ProductController {
 
     @PostMapping
     @PreAuthorize("hasRole('SELLER')")
-    public ResponseEntity<ProductResponse> createProduct(@RequestPart @Valid CreateProductRequest createProductRequest, @RequestPart MultipartFile productImage) {
-        ProductResponse productResponse=productService.createProduct(createProductRequest, productImage);
+    public ResponseEntity<ProductResponse> createProduct(@RequestPart @Valid CreateProductRequest createProductRequest, @RequestPart List<MultipartFile> productImages) {
+        ProductResponse productResponse=productService.createProduct(createProductRequest, productImages);
         return new ResponseEntity<>(productResponse, HttpStatus.CREATED);
     }
 
