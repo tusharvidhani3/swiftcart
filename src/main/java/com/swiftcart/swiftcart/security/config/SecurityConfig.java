@@ -23,7 +23,7 @@ import com.swiftcart.swiftcart.security.service.UserDetailsServiceImpl;
 public class SecurityConfig {
 
     @Autowired
-    JwtAuthenticationFilter jwtAuthenticationFilter;
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

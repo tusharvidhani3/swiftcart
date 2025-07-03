@@ -2,6 +2,7 @@ package com.swiftcart.swiftcart.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -33,19 +34,19 @@ public class CartServiceImpl implements CartService {
     private EntityManager entityManager;
 
     @Autowired
-    CartItemRepo cartItemRepo;
+    private CartItemRepo cartItemRepo;
 
     @Autowired
-    CartRepo cartRepo;
+    private CartRepo cartRepo;
 
     @Autowired
     ProductRepo productRepo;
 
     @Autowired
-    ModelMapper modelMapper;
+    private ModelMapper modelMapper;
 
     @Autowired
-    AddressService addressService;
+    private AddressService addressService;
 
     @Override
     @Transactional
@@ -128,11 +129,11 @@ public class CartServiceImpl implements CartService {
                 productId)
                 .orElseGet(() -> {
                     CartItem ci = new CartItem();
-            ci.setCart(cartRepo.findByUser_UserId(user.getUserId()).orElseGet(() -> createNewCartForUser(user)));
-            ci.setProduct(productRepo.findByProductId(productId).orElseThrow(() -> new ResourceNotFoundException("Product not found")));
-            ci.setQuantity(1);
-            cartItemRepo.save(ci);
-            return ci;
+                    ci.setCart(cartRepo.findByUser_UserId(user.getUserId()).orElseGet(() -> createNewCartForUser(user)));
+                    ci.setProduct(productRepo.findByProductId(productId).orElseThrow(() -> new ResourceNotFoundException("Product not found")));
+                    ci.setQuantity(1);
+                    cartItemRepo.save(ci);
+                    return ci;
                 });
         BuyNowPreview buyNowPreview = new BuyNowPreview();
         buyNowPreview.setCartItemDTO(modelMapper.map(cartItem, CartItemDTO.class));
@@ -156,10 +157,32 @@ public class CartServiceImpl implements CartService {
         return cartResponse;
     }
 
-    public int getCartQuantityCount(User user) {
-        Long cartId = cartRepo.findByUser_UserId(user.getUserId()).get().getCartId();
-        Integer cartQuantityCount = cartItemRepo.getTotalQuantityByCartId(cartId);
+    public int getCartQuantityCount(Long userId) {
+        Long cartId;
+        Integer cartQuantityCount;
+        try {
+        cartId = cartRepo.findByUser_UserId(userId).get().getCartId();
+        cartQuantityCount = cartItemRepo.getTotalQuantityByCartId(cartId);
+        }
+        catch(NoSuchElementException ex) {
+            cartQuantityCount = 0;
+        }
         return cartQuantityCount!=null?cartQuantityCount:0;
+    }
+
+    @Override
+    public List<CartItem> getCartItemsByUserId(Long userId) {
+        return cartItemRepo.findAllByCart_User_UserId(userId);
+    }
+
+    @Override
+    public void deleteCartItemsByUserId(Long userId) {
+        cartItemRepo.deleteAllByCart_User_UserId(userId);
+    }
+
+    @Override
+    public CartItem getCartItemByCartItemId(Long cartItemId) {
+        return cartItemRepo.findByCartItemId(cartItemId).orElseThrow(() -> new ResourceNotFoundException("No cart item found with this cart item id"));
     }
 
 }

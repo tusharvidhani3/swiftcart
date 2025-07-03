@@ -1,13 +1,22 @@
 const profileForm = document.getElementById("profile-form")
 
-profileForm.addEventListener("submit", () => {
+profileForm.addEventListener("submit", e => {
+    e.preventDefault()
     const profileFormData = new FormData(profileForm)
-    fetch("/api/")
-    Object.fromEntries(profileFormData)
+    fetch("/api/customer", {
+        method: "PUT",
+        headers: {
+            "Content-type": "application/json"
+        },
+        credentials: "include",
+        body: JSON.stringify(Object.fromEntries(profileFormData.entries()))
+    })
+    // .then(() => window.location.reload())
+
 })
 
 function fetchUserData() {
-    fetch("/api/user/me", {
+    fetch("/api/users/me", {
         method: "GET",
         credentials: "include",
     })
@@ -20,7 +29,7 @@ function fetchUserData() {
     .then(userData => {
         for(const field in userData) {
             if(field !== "userId")
-        document.getElementById(field).value = userData[field]
+                document.getElementById(field).value = userData[field]
         }
 
         profileForm.addEventListener("input", e => {

@@ -9,7 +9,11 @@ fetch("/api/orders/items", {
     method: "GET",
     credentials: "include"
 })
-.then(res => res.json())
+.then(res => {
+    if(res.status === 403)
+        window.location.href = "./login.html"
+    return res.json()
+})
 .then(orderItemsPage => {
     const orderItems = orderItemsPage.content
     const ordersFragment = document.createDocumentFragment()

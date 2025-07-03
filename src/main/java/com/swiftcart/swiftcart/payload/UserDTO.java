@@ -25,4 +25,6 @@ public class UserDTO {
 	@Email(message = "Please enter a valid email address")
     private String email;
 
+    private String role;
+
 }

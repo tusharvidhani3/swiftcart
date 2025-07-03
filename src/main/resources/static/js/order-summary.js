@@ -17,7 +17,6 @@ fetch(`/api/orders/${orderId}`, {
 })
 .then(res => res.json())
 .then(orderResponse => {
-    console.log(orderResponse)
     orderIdSpan.textContent = orderId
     const date = new Date(orderResponse.placedAt)
     orderDate.textContent = `${date.getDate()}-${months[date.getMonth()]}-${date.getFullYear()}`

@@ -2,10 +2,9 @@ package com.swiftcart.swiftcart.entity;
 
 import java.time.LocalDateTime;
 
-import com.swiftcart.swiftcart.payload.ProductSnapshot;
-
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -24,9 +23,9 @@ public class OrderItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderItemId;
 
-    @Embedded
     @Setter
-    private ProductSnapshot product;
+    @ManyToOne
+    private Product product;
 
     @ManyToOne
     @JoinColumn(name = "order_id")
@@ -37,6 +36,13 @@ public class OrderItem {
     private int quantity;
 
     @Setter
-    private LocalDateTime deliveredAt;
+    private LocalDateTime deliveryAt;
+
+    @Setter
+    @Enumerated(EnumType.STRING)
+    private OrderStatus orderStatus;
+
+    @Setter
+    private boolean active;
 
 }

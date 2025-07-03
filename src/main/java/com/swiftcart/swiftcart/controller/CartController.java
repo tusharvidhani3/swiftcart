@@ -32,7 +32,7 @@ import jakarta.validation.Valid;
 public class CartController {
 
     @Autowired
-    CartService cartService;
+    private CartService cartService;
 
     @GetMapping
     public ResponseEntity<CartResponse> getCart(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
@@ -65,7 +65,7 @@ public class CartController {
 
     @GetMapping("/count")
     public ResponseEntity<Integer> getCartQtyCount(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        return ResponseEntity.ok(cartService.getCartQuantityCount(userDetailsImpl.getUser()));
+        return ResponseEntity.ok(cartService.getCartQuantityCount(userDetailsImpl.getUser().getUserId()));
     }
 
     @GetMapping("/summary")

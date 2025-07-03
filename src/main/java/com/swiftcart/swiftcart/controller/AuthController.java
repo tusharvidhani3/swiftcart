@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.swiftcart.swiftcart.payload.LoginRequest;
-import com.swiftcart.swiftcart.payload.RegisterRequest;
 import com.swiftcart.swiftcart.payload.UserDTO;
 import com.swiftcart.swiftcart.security.UserDetailsImpl;
 import com.swiftcart.swiftcart.security.service.JwtService;
@@ -42,9 +41,9 @@ public class AuthController {
     private ModelMapper modelMapper;
 
     @PostMapping(value = {"/register", "/signup"})
-    public ResponseEntity<UserDTO> register(@RequestBody @Valid RegisterRequest registerReq) {
+    public ResponseEntity<UserDTO> register(@RequestBody @Valid LoginRequest registerReq) {
         userService.register(registerReq);
-        UserDetailsImpl userDetailsImpl = userService.authenticate(modelMapper.map(registerReq, LoginRequest.class));
+        UserDetailsImpl userDetailsImpl = userService.authenticate(registerReq);
         UserDTO userDTO = modelMapper.map(userDetailsImpl.getUser(), UserDTO.class);
         String jwt = jwtService.generateToken(userDetailsImpl);
         String refreshToken = tokenService.generateRefreshToken(userDetailsImpl.getUser());

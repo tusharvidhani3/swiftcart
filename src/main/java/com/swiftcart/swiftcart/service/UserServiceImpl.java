@@ -40,12 +40,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void register(RegisterRequest registerRequest) {
-        if(registerRequest.getRole().equals("ROLE_SELLER") && registerRequest.getEmail() == null)
-        throw new BadRequestException("Email is required for seller registration");
+    public void register(LoginRequest registerRequest) {
         User user = modelMapper.map(registerRequest, User.class);
-        Role role=roleRepo.getRoleByName(registerRequest.getRole());
-        user.setRoles(Set.of(role));
+        Role role=roleRepo.getRoleByName("ROLE_USER");
+        user.setRole(role);
         user.setPassword(encoder.encode(registerRequest.getPassword()));
         userRepo.save(user);
     }

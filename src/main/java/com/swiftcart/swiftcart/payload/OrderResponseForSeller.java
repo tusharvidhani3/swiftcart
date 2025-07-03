@@ -8,12 +8,14 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class OrderResponse {
+public class OrderResponseForSeller {
 
     private Long orderId;
-    private AddressSnapshot shippingAddress;
-    private double totalAmount;
     private LocalDateTime placedAt;
-    private List<OrderItemResponse> orderItems;
+    private double totalAmount;
     private PaymentDTO payment;
+    private String buyerName;
+    private AddressSnapshot address;
+    private List<OrderItemResponse> orderItems;
+
 }
