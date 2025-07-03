@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +20,7 @@ import com.swiftcart.swiftcart.payload.RegisterRequest;
 import com.swiftcart.swiftcart.payload.UserDTO;
 import com.swiftcart.swiftcart.security.UserDetailsImpl;
 import com.swiftcart.swiftcart.security.service.JwtService;
+import com.swiftcart.swiftcart.service.TokenService;
 import com.swiftcart.swiftcart.service.UserService;
 
 import jakarta.validation.Valid;
@@ -34,6 +36,9 @@ public class AuthController {
     private JwtService jwtService;
 
     @Autowired
+    private TokenService tokenService;
+
+    @Autowired
     private ModelMapper modelMapper;
 
     @PostMapping(value = {"/register", "/signup"})
@@ -42,16 +47,28 @@ public class AuthController {
         UserDetailsImpl userDetailsImpl = userService.authenticate(modelMapper.map(registerReq, LoginRequest.class));
         UserDTO userDTO = modelMapper.map(userDetailsImpl.getUser(), UserDTO.class);
         String jwt = jwtService.generateToken(userDetailsImpl);
-        ResponseCookie cookie = ResponseCookie.from("jwt", jwt)
+        String refreshToken = tokenService.generateRefreshToken(userDetailsImpl.getUser());
+        ResponseCookie accessCookie = ResponseCookie.from("access_token", jwt)
             .httpOnly(true)
-            .secure(true) // set to false if you're testing on localhost without HTTPS
+            .secure(true)
             .path("/")
             .maxAge(Duration.ofMinutes(60))
             .sameSite("Strict")
             .build();
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-            .header(HttpHeaders.SET_COOKIE, cookie.toString())
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken)
+            .httpOnly(true)
+            .secure(true)
+            .path("/api/auth")
+            .maxAge(Duration.ofDays(30))
+            .sameSite("Strict")
+            .build();
+
+        return ResponseEntity.ok()
+            .headers(headers -> {
+                headers.add(HttpHeaders.SET_COOKIE, accessCookie.toString());
+                headers.add(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+            })
             .body(userDTO);
     }
 
@@ -60,31 +77,89 @@ public class AuthController {
         UserDetailsImpl userDetailsImpl = userService.authenticate(loginReq);
         UserDTO userDTO = modelMapper.map(userDetailsImpl.getUser(), UserDTO.class);
         String jwt = jwtService.generateToken(userDetailsImpl);
-        ResponseCookie cookie = ResponseCookie.from("jwt", jwt)
+        String refreshToken = tokenService.generateRefreshToken(userDetailsImpl.getUser());
+        ResponseCookie accessCookie = ResponseCookie.from("access_token", jwt)
             .httpOnly(true)
-            .secure(true) // set to false if you're testing on localhost without HTTPS
+            .secure(true)
             .path("/")
             .maxAge(Duration.ofMinutes(60))
             .sameSite("Strict")
             .build();
 
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken)
+            .httpOnly(true)
+            .secure(true)
+            .path("/api/auth")
+            .maxAge(Duration.ofDays(30))
+            .sameSite("Strict")
+            .build();
+
         return ResponseEntity.ok()
-            .header(HttpHeaders.SET_COOKIE, cookie.toString())
+            .headers(headers -> {
+                headers.add(HttpHeaders.SET_COOKIE, accessCookie.toString());
+                headers.add(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+            })
             .body(userDTO);
     }
 
     @PostMapping(value = {"/logout", "/signout"})
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Void> logout() {
-        ResponseCookie cookie = ResponseCookie.from("jwt", null)
+    public ResponseEntity<Void> logout(@CookieValue(value = "refresh_token", required = false) String refreshToken) {
+        if(refreshToken != null)
+        tokenService.invalidateRefreshToken(refreshToken);
+        ResponseCookie accessCookie = ResponseCookie.from("access_token", null)
             .httpOnly(true)
             .secure(true)
             .path("/")
             .maxAge(0)
             .sameSite("Strict")
             .build();
+
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", null)
+            .httpOnly(true)
+            .secure(true)
+            .path("/api/auth")
+            .maxAge(0)
+            .sameSite("Strict")
+            .build();
         
-        return ResponseEntity.noContent().header(HttpHeaders.SET_COOKIE, cookie.toString()).build();
+        return ResponseEntity
+        .noContent()
+        .headers(headers -> {
+            headers.add(HttpHeaders.SET_COOKIE, accessCookie.toString());
+            headers.add(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+        })
+        .build();
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<Void> refreshAccessToken(@CookieValue(name = "refresh_token", required = false) String refreshToken) {
+        if (refreshToken == null || !tokenService.isValid(refreshToken))
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
+        String newRefreshToken = tokenService.rotateRefreshToken(refreshToken);
+        String newAccessToken = tokenService.generateAccessToken(newRefreshToken);
+        ResponseCookie accessCookie = ResponseCookie.from("access_token", newAccessToken)
+            .httpOnly(true)
+            .secure(true)
+            .path("/")
+            .maxAge(Duration.ofMinutes(60))
+            .sameSite("Strict")
+            .build();
+        
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", newRefreshToken)
+            .httpOnly(true)
+            .secure(true)
+            .path("/api/auth")
+            .maxAge(Duration.ofDays(30))
+            .sameSite("Strict")
+            .build();
+        return ResponseEntity.ok()
+            .headers(headers -> {
+                headers.add(HttpHeaders.SET_COOKIE, accessCookie.toString());
+                headers.add(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+            })
+            .build();
     }
 
 }

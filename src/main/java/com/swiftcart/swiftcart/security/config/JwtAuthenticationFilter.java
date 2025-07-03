@@ -43,7 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             username = jwtService.extractUsername(jwtToken);
         } catch (ExpiredJwtException ex) {
-            ResponseCookie cookie = ResponseCookie.from("jwt", null)
+            ResponseCookie cookie = ResponseCookie.from("access_token", null)
                     .httpOnly(true)
                     .secure(true)
                     .path("/")
