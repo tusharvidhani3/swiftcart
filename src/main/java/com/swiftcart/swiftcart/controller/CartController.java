@@ -32,7 +32,7 @@ import jakarta.validation.Valid;
 public class CartController {
 
     @Autowired
-    CartService cartService;
+    private CartService cartService;
 
     @GetMapping
     public ResponseEntity<CartResponse> getCart(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
@@ -41,7 +41,7 @@ public class CartController {
     
     @PostMapping("/items")
     public ResponseEntity<CartResponse> addProductToCart(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @RequestBody @Valid AddToCartRequest addToCartRequest) {
-        CartResponse cartResponse=cartService.addProductToCart(userDetailsImpl.getUser(), addToCartRequest.getProductId(), addToCartRequest.getQuantity());
+        CartResponse cartResponse=cartService.addProductToCart(userDetailsImpl.getUser().getUserId(), addToCartRequest.getSellerProductId(), addToCartRequest.getQuantity());
         return ResponseEntity.status(HttpStatus.CREATED).body(cartResponse);
     }
 
@@ -59,13 +59,13 @@ public class CartController {
 
     @PostMapping("/checkout/buy-now/product/{productId}")
     public ResponseEntity<BuyNowPreview> buyNow(@PathVariable Long productId, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        BuyNowPreview buyNowPreview = cartService.createBuyNowPreview(productId, userDetailsImpl.getUser());
+        BuyNowPreview buyNowPreview = cartService.createBuyNowPreview(productId, userDetailsImpl.getUser().getUserId());
         return new ResponseEntity<>(buyNowPreview, HttpStatus.OK);
     }
 
     @GetMapping("/count")
     public ResponseEntity<Integer> getCartQtyCount(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        return ResponseEntity.ok(cartService.getCartQuantityCount(userDetailsImpl.getUser()));
+        return ResponseEntity.ok(cartService.getCartQuantityCount(userDetailsImpl.getUser().getUserId()));
     }
 
     @GetMapping("/summary")

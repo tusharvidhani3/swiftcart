@@ -19,10 +19,10 @@ import com.swiftcart.swiftcart.repository.AddressRepo;
 public class AddressServiceImpl implements AddressService {
 
     @Autowired
-    AddressRepo addressRepo;
+    private AddressRepo addressRepo;
 
     @Autowired
-    ModelMapper modelMapper;
+    private ModelMapper modelMapper;
 
     @Override
     @Transactional
@@ -92,6 +92,11 @@ public class AddressServiceImpl implements AddressService {
         Address address = addressRepo.findDefaultShippingAddress(userId)
         .orElseThrow(() -> new ResourceNotFoundException("No address added"));
         return modelMapper.map(address, AddressDTO.class);
+    }
+
+    @Override
+    public Address getAddressByAddressId(Long addressId) {
+        return addressRepo.findByAddressId(addressId).orElseThrow(() -> new ResourceNotFoundException("Address not found"));
     }
 
 }

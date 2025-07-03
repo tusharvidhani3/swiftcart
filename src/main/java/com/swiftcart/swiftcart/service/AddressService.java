@@ -2,6 +2,7 @@ package com.swiftcart.swiftcart.service;
 
 import java.util.List;
 
+import com.swiftcart.swiftcart.entity.Address;
 import com.swiftcart.swiftcart.entity.User;
 import com.swiftcart.swiftcart.payload.AddressDTO;
 
@@ -14,4 +15,5 @@ public interface AddressService {
     public AddressDTO updateAddress(AddressDTO addressDTO, User user);
     public AddressDTO changeDefaultAddress(Long addressId, Long userId);
     public AddressDTO getDefaultAddressForUser(Long userId);
+    Address getAddressByAddressId(Long addressId);
 }

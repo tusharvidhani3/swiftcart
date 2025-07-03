@@ -2,7 +2,7 @@ const urlParams = new URLSearchParams(window.location.search)
 const isEditMode = urlParams.get("mode") == "edit"
 const addressToEdit = JSON.parse(sessionStorage.getItem("addressToEdit"))
 
-if (addressToEdit) {
+if (isEditMode && addressToEdit) {
     document.getElementsByClassName("btn-add-address")[0].textContent = "Edit Address"
     const fields = {
         name: 'name',

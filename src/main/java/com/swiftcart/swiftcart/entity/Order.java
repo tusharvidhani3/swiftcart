@@ -6,8 +6,6 @@ import com.swiftcart.swiftcart.payload.AddressSnapshot;
 
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -28,9 +26,9 @@ public class Order {
     private Long orderId;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "customer_id")
     @Setter
-    private User user;
+    private Customer customer;
 
     @Setter
     @Embedded
@@ -38,10 +36,6 @@ public class Order {
 
     @Setter
     private double totalAmount;
-
-    @Setter
-    @Enumerated(EnumType.STRING)
-    private OrderStatus orderStatus;
 
     @Setter
     private LocalDateTime placedAt;

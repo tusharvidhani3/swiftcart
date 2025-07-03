@@ -1,8 +1,9 @@
 package com.swiftcart.swiftcart.controller;
 
 import java.time.Duration;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -16,8 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.swiftcart.swiftcart.payload.LoginRequest;
-import com.swiftcart.swiftcart.payload.RegisterRequest;
-import com.swiftcart.swiftcart.payload.UserDTO;
 import com.swiftcart.swiftcart.security.UserDetailsImpl;
 import com.swiftcart.swiftcart.security.service.JwtService;
 import com.swiftcart.swiftcart.service.TokenService;
@@ -38,44 +37,10 @@ public class AuthController {
     @Autowired
     private TokenService tokenService;
 
-    @Autowired
-    private ModelMapper modelMapper;
-
-    @PostMapping(value = {"/register", "/signup"})
-    public ResponseEntity<UserDTO> register(@RequestBody @Valid RegisterRequest registerReq) {
-        userService.register(registerReq);
-        UserDetailsImpl userDetailsImpl = userService.authenticate(modelMapper.map(registerReq, LoginRequest.class));
-        UserDTO userDTO = modelMapper.map(userDetailsImpl.getUser(), UserDTO.class);
-        String jwt = jwtService.generateToken(userDetailsImpl);
-        String refreshToken = tokenService.generateRefreshToken(userDetailsImpl.getUser());
-        ResponseCookie accessCookie = ResponseCookie.from("access_token", jwt)
-            .httpOnly(true)
-            .secure(true)
-            .path("/")
-            .maxAge(Duration.ofMinutes(60))
-            .sameSite("Strict")
-            .build();
-
-        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken)
-            .httpOnly(true)
-            .secure(true)
-            .path("/api/auth")
-            .maxAge(Duration.ofDays(30))
-            .sameSite("Strict")
-            .build();
-
-        return ResponseEntity.ok()
-            .headers(headers -> {
-                headers.add(HttpHeaders.SET_COOKIE, accessCookie.toString());
-                headers.add(HttpHeaders.SET_COOKIE, refreshCookie.toString());
-            })
-            .body(userDTO);
-    }
-
     @PostMapping(value = {"/login", "/signin"})
-    public ResponseEntity<UserDTO> login(@RequestBody @Valid LoginRequest loginReq) {
+    public ResponseEntity<Set<String>> login(@RequestBody @Valid LoginRequest loginReq) {
         UserDetailsImpl userDetailsImpl = userService.authenticate(loginReq);
-        UserDTO userDTO = modelMapper.map(userDetailsImpl.getUser(), UserDTO.class);
+        Set<String> roles = userDetailsImpl.getUser().getRoles().stream().map(role -> role.getName()).collect(Collectors.toSet());
         String jwt = jwtService.generateToken(userDetailsImpl);
         String refreshToken = tokenService.generateRefreshToken(userDetailsImpl.getUser());
         ResponseCookie accessCookie = ResponseCookie.from("access_token", jwt)
@@ -99,7 +64,7 @@ public class AuthController {
                 headers.add(HttpHeaders.SET_COOKIE, accessCookie.toString());
                 headers.add(HttpHeaders.SET_COOKIE, refreshCookie.toString());
             })
-            .body(userDTO);
+            .body(roles);
     }
 
     @PostMapping(value = {"/logout", "/signout"})

@@ -12,6 +12,6 @@ import com.swiftcart.swiftcart.entity.Order;
 @Repository
 public interface OrderRepo extends JpaRepository<Order, Long> {
 
-    public Page<Order> findAllByUser_UserId(Long userId, Pageable pageable);
+    public Page<Order> findAllByCustomer_User_UserId(Long userId, Pageable pageable);
     public Optional<Order> findByOrderId(Long orderId);
 }

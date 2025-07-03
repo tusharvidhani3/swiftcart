@@ -18,5 +18,4 @@ public interface ProductService {
     public ProductResponse updateProduct(Long productId, CreateProductRequest productRequest);
     public Page<ProductResponse> searchProducts(String keyword, Pageable pageable);
     public Page<ProductResponse> getProductsByCategory(String categoryId, Pageable pageable);
-    public ProductResponse updateStock(Long productId, int change);
 }

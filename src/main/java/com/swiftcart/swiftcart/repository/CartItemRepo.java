@@ -14,17 +14,16 @@ import com.swiftcart.swiftcart.entity.CartItem;
 @Repository
 public interface CartItemRepo extends JpaRepository<CartItem,Integer> {
 
-    public List<CartItem> findAllByCart_User_UserId(Long userId);
+    public List<CartItem> findAllByCart_Customer_CustomerId(Long userId);
 
     public List<CartItem> findAllByCart_CartId(Long cartId);
 
-    public Optional<CartItem> findByCart_User_UserIdAndProduct_ProductId(Long userId, Long productId);
+    public Optional<CartItem> findByCart_Customer_CustomerIdAndSellerProduct_SellerProductId(Long customerId, Long sellerProductId);
 
-    public int deleteByCartItemId(Long cartItemId);
+    public void deleteAllByCart_Customer_CustomerId(Long customerId);
+    public void deleteByCartItemId(Long cartItemId);
 
     public Optional<CartItem> findByCartItemId(Long cartItemId);
-
-    public void deleteAllByCart_CartId(Long cartId);
 
     @Modifying
     @Query("UPDATE CartItem c SET c.quantity = :quantity WHERE c.cartItemId = :cartItemId")

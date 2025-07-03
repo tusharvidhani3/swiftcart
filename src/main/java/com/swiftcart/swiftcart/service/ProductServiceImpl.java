@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.swiftcart.swiftcart.entity.Product;
-import com.swiftcart.swiftcart.exception.InsufficientStockException;
 import com.swiftcart.swiftcart.exception.ResourceNotFoundException;
 import com.swiftcart.swiftcart.payload.CreateProductRequest;
 import com.swiftcart.swiftcart.payload.ProductResponse;
@@ -39,7 +38,6 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponse createProduct(CreateProductRequest createProductRequest, List<MultipartFile> productImages) {
         Product product=new Product();
         product.setProductName(createProductRequest.getProductName());
-        product.setPrice(createProductRequest.getPrice());
         product.setMrp(createProductRequest.getMrp());
         product.setCategory(createProductRequest.getCategory());
         List<String> relativePaths = productImages.stream().map(productImage -> {
@@ -92,19 +90,6 @@ public class ProductServiceImpl implements ProductService {
     public Page<ProductResponse> getProductsByCategory(String category, Pageable pageable) {
         Page<ProductResponse> productPage = productRepo.findByCategory(category, pageable);
         return productPage;
-    }
-
-    @Override
-    @Transactional
-    public ProductResponse updateStock(Long productId, int change) {
-        // In multi-seller system allow only stock field in seller-product and allow change by the owner of seller-product to update the stock
-        Product product = productRepo.findByProductId(productId)
-        .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
-        if(product.getStock() + change < 0)
-        throw new InsufficientStockException("Stock cannot be negative");
-        product.setStock(product.getStock() + change);
-        product = productRepo.save(product);
-        return modelMapper.map(product, ProductResponse.class);
     }
 
 }

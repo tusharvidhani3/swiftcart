@@ -10,7 +10,7 @@ import com.swiftcart.swiftcart.entity.Cart;
 @Repository
 public interface CartRepo extends JpaRepository<Cart,Integer> {
 
-    public Optional<Cart> findByUser_UserId(Long userId);
+    public Optional<Cart> findByCustomer_CustomerId(Long customerId);
+    public Optional<Cart> findByCustomer_User_UserId(Long userId);
     public Cart findByCartId(Long cartId);
-    // public User findUserByCartId(Long cartId);
 }

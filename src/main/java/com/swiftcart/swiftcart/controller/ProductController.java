@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -25,7 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.swiftcart.swiftcart.payload.CreateProductRequest;
 import com.swiftcart.swiftcart.payload.ProductResponse;
-import com.swiftcart.swiftcart.payload.UpdateProductStockRequest;
 import com.swiftcart.swiftcart.service.ProductService;
 
 import jakarta.validation.Valid;
@@ -78,10 +76,4 @@ public class ProductController {
         return ResponseEntity.ok(productResponse);
     }
 
-    @PatchMapping("/{productId}")
-    @PreAuthorize("hasRole('SELLER')")
-    public ResponseEntity<ProductResponse> updateProductStock(@RequestBody @Valid UpdateProductStockRequest req) {
-        ProductResponse productResponse = productService.updateStock(req.getProductId(), req.getChangeInQty());
-        return ResponseEntity.ok(productResponse);
-    }
 }

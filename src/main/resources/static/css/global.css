@@ -140,7 +140,7 @@ header nav {
     align-items: flex-start;
     padding-left: 0;
     top: 24px;
-    width: 150%;
+    width: max-content;
     border-radius: 8px;
     box-shadow: 0 4px 16px 0 rgba(0, 0, 0, .2);
     overflow: hidden;

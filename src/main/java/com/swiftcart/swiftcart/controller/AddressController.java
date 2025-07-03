@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class AddressController {
 
     @Autowired
-    AddressService addressService;
+    private AddressService addressService;
 
     @GetMapping
     public ResponseEntity<List<AddressDTO>> getLoggedInUserAddresses(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {

@@ -40,5 +40,10 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<String>(ex.getMessage(), HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(IllegalActionException.class)
+    public ResponseEntity<String> handleIllegalAction(IllegalActionException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+
 }
 //ApiError class with timestamp, message and status

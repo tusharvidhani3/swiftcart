@@ -25,7 +25,4 @@ public interface ProductRepo extends JpaRepository<Product,Integer> {
     public Page<Product> searchProducts(@Param("keyword") String keyword, Pageable pageable);
     public Page<ProductResponse> findByCategory(String category, Pageable pageable);
 
-    @Modifying
-    @Query("UPDATE Product p SET p.stock = p.stock + :change WHERE p.productId = :productId AND p.stock + :change >= 0")
-    public void updateStock(@Param("productId") Long productId, @Param("change") int change);
 }

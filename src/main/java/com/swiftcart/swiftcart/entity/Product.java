@@ -1,5 +1,7 @@
 package com.swiftcart.swiftcart.entity;
 
+import java.util.List;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,15 +19,12 @@ public class Product {
     @Setter
     private String productName;
     @Setter
-    private double price;
+    private double mrp;
     @Setter
-    private String image;
+    private List<String> imageUrls;
     @Setter
     private String category;
     @Setter
     private String description;
-    @Setter
-    private Integer stock;
 
-    // private Integer minimumOrderQty;
 }
