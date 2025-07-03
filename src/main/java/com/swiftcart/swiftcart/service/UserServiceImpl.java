@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void register(LoginRequest registerRequest) {
         User user = modelMapper.map(registerRequest, User.class);
-        Role role=roleRepo.getRoleByName("ROLE_USER");
+        Role role=roleRepo.getRoleByName("ROLE_CUSTOMER");
         user.setRole(role);
         user.setPassword(encoder.encode(registerRequest.getPassword()));
         userRepo.save(user);
@@ -56,8 +56,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void updateUser(UserDTO userDTO) {
-        userRepo.save(modelMapper.map(userDTO, User.class));
+        userRepo.updateUser(userDTO.getUserId(), userDTO.getEmail(), userDTO.getMobileNumber(), userDTO.getFirstName(), userDTO.getLastName());
     }
 
     @Override
