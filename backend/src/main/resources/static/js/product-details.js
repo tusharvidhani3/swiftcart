@@ -16,7 +16,7 @@ function getProductDetails(productId) {
     })
         .then(res => res.json())
         .then(product => {
-            productImage.src = product.image
+            productImage.src = product.imageUrls[0]
             productTitle.textContent = product.productName
             productPrice.textContent = "₹ " + product.price
             productDescription.textContent = product.description

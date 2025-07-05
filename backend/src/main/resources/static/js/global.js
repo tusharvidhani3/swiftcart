@@ -45,7 +45,7 @@ export async function setupUser() {
         method: "GET",
         credentials: "include"
     })
-        .then((response) => {
+        .then(response => {
             if (response.ok) {
                 window.isLoggedIn = true
                 fetchCartCount()
@@ -56,9 +56,20 @@ export async function setupUser() {
                 profile.addEventListener("mouseleave", () => profile.classList.remove("show"))
                 return response.json()
             }
-            else {
-                profileBtn.addEventListener("click", () => {
-                    window.location.href = "./login.html"
+            else if(response.status === 403) {
+                fetch("/api/auth/refresh-token", {
+                    method: "POST",
+                    credentials: "include"
+                })
+                .then(res => {
+                    if(res.ok){
+                        window.location.reload()
+                    }
+                    else {
+                        profileBtn.addEventListener("click", () => {
+                            window.location.href = "./login.html"
+                        })
+                    }
                 })
             }
         })
@@ -66,7 +77,7 @@ export async function setupUser() {
             if (userData) {
                 const profileBtnTxt = header.querySelector(".btn-profile-txt")
                 if (userData.firstName) {
-                    profileBtnTxt.textContent = res.firstName
+                    profileBtnTxt.textContent = userData.firstName
                 }
                 else
                     profileBtnTxt.textContent = "User"

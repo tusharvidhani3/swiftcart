@@ -129,14 +129,6 @@ a {
     font-size: 20px;
 }
 
-.field-email {
-    display: none;
-}
-
-.register-seller .field-email {
-    display: block;
-}
-
 @media screen and (min-width: 768px) {
 
     main {
