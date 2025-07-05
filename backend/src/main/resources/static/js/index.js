@@ -35,7 +35,7 @@ function getProducts(keyword = "") {
             products.content.forEach(product => {
                 const productCard = productTemplate.content.children[0].cloneNode(true)
                 const productImage = productCard.querySelector(".product-image")
-                productImage.setAttribute("src", product.image)
+                productImage.setAttribute("src", product.imageUrls[0])
                 const productTitle = productCard.querySelector(".product-title")
                 productTitle.textContent = product.productName
                 const productPrice = productCard.querySelector(".product-price")

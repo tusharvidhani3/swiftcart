@@ -18,8 +18,6 @@
         <div class="header-right">
             <a href="./cart.html" class="cart"><img src="assets/icons/cart.svg" alt="cart"><span class="label">Cart</span><span
                     class="cart-count"></span></a>
-            <a href="./register.html?user=seller" class="become-a-seller"><img src="assets/icons/store.svg"
-                    alt="store"><span class="label">Become&nbsp;a&nbsp;Seller</span></a>
         </div>
     </header>
 
@@ -36,18 +34,12 @@
                 <div class="mobile-number"><span class="country-code">+91</span> <input type="tel" minlength="10" maxlength="10" inputmode="numeric" id="mobile-number" name="mobileNumber" oninput="this.value = this.value.replace(/[^0-9]/g, '')"></div>
                 <p class="error">Mobile number is required</p>
             </div>
-            <div class="field field-email">
-                <label for="email">Enter email</label>
-                <input type="email" id="email" name="email">
-                <p class="error">Email is required</p>
-            </div>
             <div class="field">
                 <label for="password">Enter password</label>
                 <input type="password" id="password" name="password">
                 <p class="error">Password is required</p>
             </div>
                 <a href="./login.html?mode=register">New User&quest; Click Here to Register</a>
-                <a href="./login.html?mode=register&user=seller">New Seller&quest; Click Here to Start Selling</a>
             <button class="btn-login">Login</button>
         </form>
     </main>
