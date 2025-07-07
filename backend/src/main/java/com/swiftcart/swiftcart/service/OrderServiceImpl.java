@@ -57,7 +57,7 @@ public class OrderServiceImpl implements OrderService {
         List<CartItem> cartItems = cartService.getCartItemsByUserId(userId);
         if(cartItems.isEmpty())
         throw new ResourceNotFoundException("Order cannot be placed on empty cart");
-        Address shippingAddress = addressService.getAddressByAddressId(placeOrderRequest.getShippingAddressId());
+        Address shippingAddress = addressService.getAddressById(placeOrderRequest.getShippingAddressId());
         if(!shippingAddress.getUser().getUserId().equals(userId))
         throw new AccessDeniedException("Unauthorized access to the address");
         Order order = new Order();
@@ -152,7 +152,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderResponse placeBuyNowOrder(Long cartItemId, Long shippingAddressId, User user) {
         CartItem cartItem = cartService.getCartItemByCartItemId(cartItemId);
-        Address shippingAddress = addressService.getAddressByAddressId(shippingAddressId);
+        Address shippingAddress = addressService.getAddressById(shippingAddressId);
         if (cartItem.getCart().getUser().getUserId() != user.getUserId() || shippingAddress.getUser().getUserId() != user.getUserId())
             throw new AccessDeniedException("Access Denied: Something went wrong");
         Order order = new Order();

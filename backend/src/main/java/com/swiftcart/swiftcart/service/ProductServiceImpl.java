@@ -66,7 +66,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse getProductById(Long productId) {
+    public ProductResponse getProduct(Long productId) {
         Product product=productRepo.findByProductId(productId)
         .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         return modelMapper.map(product, ProductResponse.class);
@@ -104,6 +104,12 @@ public class ProductServiceImpl implements ProductService {
         product.setStock(product.getStock() + change);
         product = productRepo.save(product);
         return modelMapper.map(product, ProductResponse.class);
+    }
+
+    @Override
+    public Product getProductById(Long productId) {
+        Product product = productRepo.findByProductId(productId).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+        return product;
     }
 
 }

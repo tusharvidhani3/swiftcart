@@ -15,5 +15,5 @@ public interface AddressService {
     public AddressDTO updateAddress(AddressDTO addressDTO, User user);
     public AddressDTO changeDefaultAddress(Long addressId, Long userId);
     public AddressDTO getDefaultAddressForUser(Long userId);
-    Address getAddressByAddressId(Long addressId);
+    Address getAddressById(Long addressId);
 }

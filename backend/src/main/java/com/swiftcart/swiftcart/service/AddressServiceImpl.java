@@ -94,8 +94,8 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public Address getAddressByAddressId(Long addressId) {
-        return addressRepo.findByAddressId(addressId).orElseThrow(() -> new ResourceNotFoundException("Address not found"));
+    public Address getAddressById(Long addressId) {
+        return addressRepo.findById(addressId).orElseThrow(() -> new ResourceNotFoundException("Address not found"));
     }
 
 }

@@ -22,7 +22,6 @@ import com.swiftcart.swiftcart.payload.CartResponse;
 import com.swiftcart.swiftcart.payload.CartItemDTO;
 import com.swiftcart.swiftcart.repository.CartItemRepo;
 import com.swiftcart.swiftcart.repository.CartRepo;
-import com.swiftcart.swiftcart.repository.ProductRepo;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -40,7 +39,7 @@ public class CartServiceImpl implements CartService {
     private CartRepo cartRepo;
 
     @Autowired
-    ProductRepo productRepo;
+    ProductService productService;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -130,7 +129,7 @@ public class CartServiceImpl implements CartService {
                 .orElseGet(() -> {
                     CartItem ci = new CartItem();
                     ci.setCart(cartRepo.findByUser_UserId(user.getUserId()).orElseGet(() -> createNewCartForUser(user)));
-                    ci.setProduct(productRepo.findByProductId(productId).orElseThrow(() -> new ResourceNotFoundException("Product not found")));
+                    ci.setProduct(productService.getProductById(productId));
                     ci.setQuantity(1);
                     cartItemRepo.save(ci);
                     return ci;
@@ -144,8 +143,7 @@ public class CartServiceImpl implements CartService {
     private CartResponse createCartItemAndGenerateCartResponse(Cart cart, Long productId, int quantity) {
         CartItem cartItem = new CartItem();
         cartItem.setCart(cart);
-        Product product = productRepo.findByProductId(productId)
-        .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+        Product product = productService.getProductById(productId);
         if (product.getStock() < quantity)
             throw new InsufficientStockException("You cannot order more quantity than available");
 
