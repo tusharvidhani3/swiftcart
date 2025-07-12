@@ -9,11 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.swiftcart.swiftcart.common.security.UserDetailsImpl;
 import com.swiftcart.swiftcart.features.user.User;
-
-import jakarta.transaction.Transactional;
 
 @Service
 public class RefreshTokenServiceImpl implements RefreshTokenService {
