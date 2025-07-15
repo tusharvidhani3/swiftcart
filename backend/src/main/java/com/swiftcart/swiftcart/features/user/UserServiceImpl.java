@@ -9,11 +9,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.swiftcart.swiftcart.common.security.UserDetailsImpl;
 import com.swiftcart.swiftcart.features.auth.LoginRequest;
-
-import jakarta.transaction.Transactional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -52,8 +51,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void updateUser(UserDTO userDTO) {
-        userRepo.updateUser(userDTO.getUserId(), userDTO.getEmail(), userDTO.getMobileNumber(), userDTO.getFirstName(), userDTO.getLastName());
+    public UserDTO updateUser(UserDTO userDTO) {
+        User user = userRepo.findByUserId(userDTO.getUserId()).get();
+        modelMapper.map(userDTO, user);
+        userRepo.save(user);
+        return modelMapper.map(user, UserDTO.class);
     }
 
     @Override

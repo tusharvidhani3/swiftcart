@@ -35,10 +35,10 @@ public class UserController {
     }
 
     @PutMapping
-    public ResponseEntity<Void> updateUserInfo(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @RequestBody UserDTO userDTO) {
+    public ResponseEntity<UserDTO> updateUserInfo(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @RequestBody UserDTO userDTO) {
         userDTO.setUserId(userDetailsImpl.getUser().getUserId());
-        userService.updateUser(userDTO);
-        return ResponseEntity.ok().build();
+        UserDTO updatedUserDTO = userService.updateUser(userDTO);
+        return ResponseEntity.ok(updatedUserDTO);
     }
 
     @GetMapping
