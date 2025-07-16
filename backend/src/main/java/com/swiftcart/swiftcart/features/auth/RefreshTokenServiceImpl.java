@@ -7,13 +7,10 @@ import java.util.Base64;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.swiftcart.swiftcart.common.security.UserDetailsImpl;
 import com.swiftcart.swiftcart.features.user.User;
-
-import jakarta.transaction.Transactional;
 
 @Service
 public class RefreshTokenServiceImpl implements RefreshTokenService {
@@ -39,8 +36,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     public String generateAccessToken(String token) {
         RefreshToken refreshToken = refreshTokenRepo.findByToken(token);
         User user = refreshToken.getUser();
-        UserDetails userDetails = new UserDetailsImpl(user);
-        return jwtService.generateToken(userDetails);
+        return jwtService.generateToken(user.getUserId(), user.getRole().getName());
     }
 
     @Override

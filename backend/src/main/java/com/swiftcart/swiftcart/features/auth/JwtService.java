@@ -8,8 +8,9 @@ import java.util.function.Function;
 import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+
+import com.swiftcart.swiftcart.common.security.UserDetailsImpl;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -27,20 +28,20 @@ public class JwtService {
     @Value("${application.security.jwt.expiration}")
     private long expiration;
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(Long userId, String role) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("mobileNumber", userDetails.getUsername());
-        claims.put("roles", userDetails.getAuthorities());
+        claims.put("userId", userId);
+        claims.put("role", role);
         return Jwts.builder()
                 .claims(claims)
-                .subject(userDetails.getUsername())
+                .subject(userId.toString())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSignInKey())
                 .compact();
     }
 
-    public String extractUsername(String token) {
+    public String extractUserId(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
@@ -57,10 +58,10 @@ public class JwtService {
                 .getPayload();
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
+    public boolean isTokenValid(String token, UserDetailsImpl userDetailsImpl) {
         Date expirationDate = extractExpiration(token);
-        String username = extractUsername(token);
-        return userDetails.getUsername().equals(username) && !expirationDate.before(new Date());
+        String userId = extractUserId(token);
+        return userDetailsImpl.getUser().getUserId().toString().equals(userId) && !expirationDate.before(new Date());
     }
 
     private Date extractExpiration(String token) {

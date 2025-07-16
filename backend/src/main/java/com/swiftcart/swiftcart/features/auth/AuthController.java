@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.swiftcart.swiftcart.common.security.UserDetailsImpl;
+import com.swiftcart.swiftcart.features.user.User;
 import com.swiftcart.swiftcart.features.user.UserDTO;
 import com.swiftcart.swiftcart.features.user.UserService;
 
@@ -41,8 +42,9 @@ public class AuthController {
     public ResponseEntity<UserDTO> register(@RequestBody @Valid LoginRequest registerReq) {
         userService.register(registerReq);
         UserDetailsImpl userDetailsImpl = userService.authenticate(registerReq);
-        UserDTO userDTO = modelMapper.map(userDetailsImpl.getUser(), UserDTO.class);
-        String jwt = jwtService.generateToken(userDetailsImpl);
+        User user = userDetailsImpl.getUser();
+        UserDTO userDTO = modelMapper.map(user, UserDTO.class);
+        String jwt = jwtService.generateToken(user.getUserId(), user.getRole().getName());
         String refreshToken = tokenService.generateRefreshToken(userDetailsImpl.getUser());
         ResponseCookie accessCookie = ResponseCookie.from("access_token", jwt)
             .httpOnly(true)
@@ -71,8 +73,9 @@ public class AuthController {
     @PostMapping(value = {"/login", "/signin"})
     public ResponseEntity<UserDTO> login(@RequestBody @Valid LoginRequest loginReq) {
         UserDetailsImpl userDetailsImpl = userService.authenticate(loginReq);
-        UserDTO userDTO = modelMapper.map(userDetailsImpl.getUser(), UserDTO.class);
-        String jwt = jwtService.generateToken(userDetailsImpl);
+        User user = userDetailsImpl.getUser();
+        UserDTO userDTO = modelMapper.map(user, UserDTO.class);
+        String jwt = jwtService.generateToken(user.getUserId(), user.getRole().getName());
         String refreshToken = tokenService.generateRefreshToken(userDetailsImpl.getUser());
         ResponseCookie accessCookie = ResponseCookie.from("access_token", jwt)
             .httpOnly(true)
