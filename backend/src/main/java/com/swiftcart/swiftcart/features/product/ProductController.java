@@ -53,7 +53,7 @@ public class ProductController {
     }
 
     @GetMapping(params = "keyword")
-    public ResponseEntity<Page<ProductResponse>> searchProducts(@RequestParam String keyword, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "productId") String sortBy) {
+    public ResponseEntity<Page<ProductResponse>> searchProducts(@RequestParam String keyword, @RequestParam(defaultValue = "") String category, @RequestParam(defaultValue = "0") long minPrice, @RequestParam(defaultValue = "10000000") long maxPrice, @RequestParam(defaultValue = "asc") String sortOrder, @RequestParam(defaultValue = "true") boolean inStock, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "productId") String sortBy) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).ascending());
         Page<ProductResponse> productPage = productService.searchProducts(keyword, pageable);
         return new ResponseEntity<Page<ProductResponse>>(productPage, HttpStatus.OK);

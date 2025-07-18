@@ -18,14 +18,8 @@ import com.swiftcart.swiftcart.features.product.Product;
 import com.swiftcart.swiftcart.features.product.ProductService;
 import com.swiftcart.swiftcart.features.user.User;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-
 @Service
 public class CartServiceImpl implements CartService {
-
-    @PersistenceContext
-    private EntityManager entityManager;
 
     @Autowired
     private CartItemRepo cartItemRepo;
@@ -70,25 +64,27 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
-    public void removeProductFromCart(Long userId, Long cartItemId) {
+    public CartResponse removeProductFromCart(Long userId, Long cartItemId) {
         CartItem cartItem = cartItemRepo.findByCartItemId(cartItemId)
         .orElseThrow(() -> new ResourceNotFoundException("Cart item not found"));
         if (!cartItem.getCart().getUser().getUserId().equals(userId))
             throw new AccessDeniedException("Unauthorized access to this cart item");
-        cartItemRepo.deleteByCartItemId(cartItemId);
+        cartItemRepo.delete(cartItem);
+        return getCartResponse(userId);
     }
 
     @Override
     @Transactional
-    public void updateQuantity(Long userId, Long cartItemId, int quantity) {
+    public CartResponse updateQuantity(Long userId, Long cartItemId, int quantity) {
         CartItem cartItem = cartItemRepo.findByCartItemId(cartItemId)
         .orElseThrow(() -> new ResourceNotFoundException("Cart item not found"));
         if (!cartItem.getCart().getUser().getUserId().equals(userId))
             throw new AccessDeniedException("Unauthorized access to this cart item");
         if (cartItem.getProduct().getStock() < quantity)
             throw new InsufficientStockException("Cannot add more items. Stock limit reached");
-        cartItemRepo.updateQuantity(cartItemId, quantity);
-        entityManager.clear();
+        cartItem.setQuantity(quantity);
+        cartItemRepo.save(cartItem);
+        return getCartResponse(userId);
     }
 
     @Override

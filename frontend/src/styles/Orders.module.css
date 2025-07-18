@@ -1,0 +1,46 @@
+.yourOrders {
+    align-self: flex-start;
+    font-size: 20px;
+    margin: 0 20px;
+}
+
+.ordersContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+
+}
+
+.orderItemCard {
+    display: flex;
+    padding: 12px;
+    background-color: white;
+    gap: 12px;
+    cursor: pointer;
+    align-items: center;
+    padding: 8px;
+}
+
+.productTitle {
+    font-size: 16px;
+    margin: 8px;
+}
+
+.productTitle + div {
+    margin: 8px;
+}
+
+.orderItemCard img {
+    width: 100px;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+}
+
+.orderedOn {
+    color: #656565;
+}
+
+.orderItemCard:hover {
+    box-shadow: 0 0 4px 4px #DBDBDB;
+}

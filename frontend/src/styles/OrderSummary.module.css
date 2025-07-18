@@ -1,0 +1,146 @@
+.section {
+    width: 90%;
+}
+
+.section h2 {
+    font-size: 20px;
+    margin: 12px;
+}
+
+.section h3 {
+    font-size: 18px;
+}
+
+.orderDetails {
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    background-color: white;
+}
+
+.orderDetails > div {
+    display: flex;
+    justify-content: space-between;
+}
+
+.productsOrdered {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.productsOrdered > div {
+    display: flex;
+}
+
+.orderItem {
+    display: flex;
+    background-color: white;
+    flex-direction: column;
+}
+
+.orderItem > div {
+    display: flex;
+    align-items: center;
+    justify-content: stretch;
+}
+
+.orderItem img {
+    width: 128px;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+}
+
+.productTitle {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.itemTotal {
+    font-size: 18px;
+    margin-block: 8px;
+    font-weight: 600;
+}
+
+.productQty {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+    background-color: white;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    top: 96px;
+    left: 104px;
+}
+
+.productQty.show {
+    display: flex;
+}
+
+.productDetails {
+    position: relative;
+    gap: 24px;
+    padding: 10px;
+}
+
+.itemActions {
+    display: flex;
+    width: 100%;
+}
+
+.itemActions > button {
+    flex-basis: 50%;
+    background-color: white;
+    height: 40px;
+    font-size: 16px;
+    font-weight: 600;
+    border: 1px solid rgba(128, 128, 128, 0.5);
+    cursor: pointer;
+    font-family: "Inter";
+}
+
+.paymentInfo {
+    background-color: white;
+    padding: 12px;
+}
+
+.paymentInfo h3, .payment-info p {
+    margin: 8px;
+}
+
+.shipTo {
+    background-color: white;
+    padding: 12px;
+}
+
+.priceDetails {
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+}
+
+.priceDetails > div {
+    display: flex;
+    justify-content: space-between;
+}
+
+.orderSummaryTotal {
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.shipTo p {
+    margin: 0;
+}
+
+.orderTotal {
+    color: #BD0F0F;
+}
+
+.orderItem > div:first-child {
+    cursor: pointer;
+}
