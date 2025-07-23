@@ -1,3 +1,4 @@
+debugger
 const urlParams = new URLSearchParams(window.location.search)
 const mode = urlParams.get("mode")
 const loginBtn = document.getElementsByClassName("btn-login")[0]

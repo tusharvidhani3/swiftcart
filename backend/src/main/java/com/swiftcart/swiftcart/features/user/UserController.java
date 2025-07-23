@@ -30,7 +30,9 @@ public class UserController {
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserDTO> getLoggedInUser(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        UserDTO userDTO = modelMapper.map(userDetailsImpl.getUser(), UserDTO.class);
+        User user = userDetailsImpl.getUser();
+        UserDTO userDTO = modelMapper.map(user, UserDTO.class);
+        userDTO.setRole(user.getRole().getName());
         return ResponseEntity.ok(userDTO);
     }
 

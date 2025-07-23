@@ -18,14 +18,8 @@ import com.swiftcart.swiftcart.features.product.Product;
 import com.swiftcart.swiftcart.features.product.ProductService;
 import com.swiftcart.swiftcart.features.user.User;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-
 @Service
 public class CartServiceImpl implements CartService {
-
-    @PersistenceContext
-    private EntityManager entityManager;
 
     @Autowired
     private CartItemRepo cartItemRepo;
@@ -47,48 +41,51 @@ public class CartServiceImpl implements CartService {
     public CartResponse addProductToCart(User user, Long productId, int quantity) {
         Optional<Cart> cartOptional = cartRepo.findByUser_UserId(user.getUserId());
         Cart cart = null;
+        CartItem cartItem = null;
         if (cartOptional.isEmpty()) {
             cart = createNewCartForUser(user);
-            return createCartItemAndGenerateCartResponse(cart, productId, quantity);
+            cartItem = createCartItem(cart, productId, quantity);
         }
         else 
         cart = cartOptional.get();
         Optional<CartItem> cartItemOptional = cartItemRepo.findByCart_User_UserIdAndProduct_ProductId(user.getUserId(),
                 productId);
         if (cartItemOptional.isEmpty())
-            return createCartItemAndGenerateCartResponse(cart, productId, quantity);
+            cartItem = createCartItem(cart, productId, quantity);
         else {
-            CartItem cartItem = cartItemOptional.get();
+            cartItem = cartItemOptional.get();
             int updatedQty = cartItem.getQuantity() + quantity;
             if (cartItem.getProduct().getStock() < updatedQty)
             throw new InsufficientStockException("Cannot add more items. Stock limit reached");
             cartItem.setQuantity(updatedQty);
             cartItemRepo.save(cartItem);
-            return getCartResponse(user.getUserId());
         }
+        return getCartResponse(user.getUserId());
     }
 
     @Override
     @Transactional
-    public void removeProductFromCart(Long userId, Long cartItemId) {
+    public CartResponse removeProductFromCart(Long userId, Long cartItemId) {
         CartItem cartItem = cartItemRepo.findByCartItemId(cartItemId)
         .orElseThrow(() -> new ResourceNotFoundException("Cart item not found"));
         if (!cartItem.getCart().getUser().getUserId().equals(userId))
             throw new AccessDeniedException("Unauthorized access to this cart item");
-        cartItemRepo.deleteByCartItemId(cartItemId);
+        cartItemRepo.delete(cartItem);
+        return getCartResponse(userId);
     }
 
     @Override
     @Transactional
-    public void updateQuantity(Long userId, Long cartItemId, int quantity) {
+    public CartResponse updateQuantity(Long userId, Long cartItemId, int quantity) {
         CartItem cartItem = cartItemRepo.findByCartItemId(cartItemId)
         .orElseThrow(() -> new ResourceNotFoundException("Cart item not found"));
         if (!cartItem.getCart().getUser().getUserId().equals(userId))
             throw new AccessDeniedException("Unauthorized access to this cart item");
         if (cartItem.getProduct().getStock() < quantity)
             throw new InsufficientStockException("Cannot add more items. Stock limit reached");
-        cartItemRepo.updateQuantity(cartItemId, quantity);
-        entityManager.clear();
+        cartItem.setQuantity(quantity);
+        cartItemRepo.save(cartItem);
+        return getCartResponse(userId);
     }
 
     @Override
@@ -135,19 +132,15 @@ public class CartServiceImpl implements CartService {
         return buyNowPreview;
     }
 
-    private CartResponse createCartItemAndGenerateCartResponse(Cart cart, Long productId, int quantity) {
+    private CartItem createCartItem(Cart cart, Long productId, int quantity) {
         CartItem cartItem = new CartItem();
         cartItem.setCart(cart);
         Product product = productService.getProductById(productId);
         if (product.getStock() < quantity)
             throw new InsufficientStockException("You cannot order more quantity than available");
-
         cartItem.setProduct(product);
         cartItem.setQuantity(quantity);
-        cartItemRepo.save(cartItem);
-        CartResponse cartResponse = modelMapper.map(cart, CartResponse.class);
-        cartResponse.setCartItems(List.of(modelMapper.map(cartItem, CartItemDTO.class)));
-        return cartResponse;
+        return cartItemRepo.save(cartItem);
     }
 
     public int getCartQuantityCount(Long userId) {

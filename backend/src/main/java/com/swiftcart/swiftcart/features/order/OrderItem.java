@@ -42,7 +42,7 @@ public class OrderItem {
 
     @Setter
     @Enumerated(EnumType.STRING)
-    private OrderStatus orderStatus;
+    private OrderStatus orderItemStatus;
 
     @Setter
     private boolean active;

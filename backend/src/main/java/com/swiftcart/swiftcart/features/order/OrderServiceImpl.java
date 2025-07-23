@@ -65,7 +65,8 @@ public class OrderServiceImpl implements OrderService {
             orderItem.setOrder(order);
             orderItem.setProduct(ci.getProduct());
             orderItem.setQuantity(ci.getQuantity());
-            orderItem.setOrderStatus(OrderStatus.PROCESSING);
+            orderItem.setOrderItemStatus(OrderStatus.PROCESSING);
+            orderItem.setDeliveryAt(LocalDateTime.now().plusWeeks(1).withHour(20).withMinute(0).withSecond(0).withNano(0));
             orderItems.add(orderItem);
             productService.updateStock(ci.getProduct().getProductId(), -orderItem.getQuantity());
             totalAmount += ci.getProduct().getPrice()*ci.getQuantity();
@@ -88,9 +89,9 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItemResponse> orderItems = orderItemRepo.findAllByOrder_OrderId(orderId).stream().map(orderItem -> {
             OrderItemResponse orderItemResponse = new OrderItemResponse();
             orderItemResponse.setOrderItemId(orderItem.getOrderItemId());
-            orderItemResponse.setPlacedAt(order.getPlacedAt());
             orderItemResponse.setProduct(modelMapper.map(orderItem.getProduct(), ProductResponse.class));
             orderItemResponse.setQuantity(orderItem.getQuantity());
+            orderItemResponse.setOrderItemStatus(orderItem.getOrderItemStatus());
             return orderItemResponse;
         })
         .collect(Collectors.toList());
@@ -102,13 +103,25 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Page<OrderResponse> getOrdersForAuthenticatedUser(Long userId, Pageable pageable) {
         return orderRepo.findAllByUser_UserId(userId, pageable)
-                .map(order -> modelMapper.map(order, OrderResponse.class));
+                .map(order -> {
+                    OrderResponse orderResponse = modelMapper.map(order, OrderResponse.class);
+                    List<OrderItem> orderItems = orderItemRepo.findAllByOrder_OrderId(order.getOrderId());
+                    List<OrderItemResponse> orderItemResponseList = orderItems.stream().map(orderItem -> modelMapper.map(orderItem, OrderItemResponse.class)).collect(Collectors.toList());
+                    orderResponse.setOrderItems(orderItemResponseList);
+                    return orderResponse;
+                });
     }
 
     @Override
     public Page<OrderResponseForSeller> getAllOrders(Pageable pageable) {
         return orderRepo.findAll(pageable)
-                .map(order -> modelMapper.map(order, OrderResponseForSeller.class));
+                .map(order -> {
+                    OrderResponseForSeller orderResponseForSeller = modelMapper.map(order, OrderResponseForSeller.class);
+                    List<OrderItem> orderItems = orderItemRepo.findAllByOrder_OrderId(order.getOrderId());
+                    List<OrderItemResponse> orderItemResponseList = orderItems.stream().map(orderItem -> modelMapper.map(orderItem, OrderItemResponse.class)).collect(Collectors.toList());
+                    orderResponseForSeller.setOrderItems(orderItemResponseList);
+                    return orderResponseForSeller;
+                });
     }
 
     @Override
@@ -119,7 +132,7 @@ public class OrderServiceImpl implements OrderService {
         if (orderStatus == OrderStatus.CANCELLED) {
             productService.updateStock(orderItem.getProduct().getProductId(), orderItem.getQuantity());
         }
-        orderItem.setOrderStatus(orderStatus);
+        orderItem.setOrderItemStatus(orderStatus);
         orderItem = orderItemRepo.save(orderItem);
         return modelMapper.map(orderItem, OrderItemResponse.class);
     }
@@ -131,8 +144,8 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new ResourceNotFoundException("Order Item not found"));
         if (!orderItem.getOrder().getUser().getUserId().equals(userId))
             throw new AccessDeniedException("You are not allowed to perform this action");
-        if(orderItem.getOrderStatus() == OrderStatus.PENDING || orderItem.getOrderStatus() == OrderStatus.PROCESSING || orderItem.getOrderStatus() == OrderStatus.SHIPPED) {
-            orderItem.setOrderStatus(OrderStatus.CANCELLED);
+        if(orderItem.getOrderItemStatus() == OrderStatus.PENDING || orderItem.getOrderItemStatus() == OrderStatus.PROCESSING || orderItem.getOrderItemStatus() == OrderStatus.SHIPPED) {
+            orderItem.setOrderItemStatus(OrderStatus.CANCELLED);
             productService.updateStock(orderItem.getProduct().getProductId(), orderItem.getQuantity());
             orderItem = orderItemRepo.save(orderItem);
         }
@@ -159,7 +172,8 @@ public class OrderServiceImpl implements OrderService {
         orderItem.setProduct(cartItem.getProduct());
         orderItem.setOrder(order);
         orderItem.setQuantity(cartItem.getQuantity());
-        orderItem.setOrderStatus(OrderStatus.PROCESSING);
+        orderItem.setOrderItemStatus(OrderStatus.PROCESSING);
+        orderItem.setDeliveryAt(LocalDateTime.now().plusWeeks(1).withHour(20).withMinute(0).withSecond(0).withNano(0));
         orderItemRepo.save(orderItem);
         productService.updateStock(cartItem.getProduct().getProductId(), -orderItem.getQuantity());
         return orderResponse;
@@ -173,8 +187,8 @@ public class OrderServiceImpl implements OrderService {
 
         List<OrderItem> orderItems = orderItemRepo.findAllByOrder_OrderId(orderId);
         orderItems.stream().forEach(orderItem -> {
-                if(orderItem.getOrderStatus() == OrderStatus.PENDING || orderItem.getOrderStatus() == OrderStatus.PROCESSING || orderItem.getOrderStatus() == OrderStatus.SHIPPED) {
-                orderItem.setOrderStatus(OrderStatus.CANCELLED);
+                if(orderItem.getOrderItemStatus() == OrderStatus.PENDING || orderItem.getOrderItemStatus() == OrderStatus.PROCESSING || orderItem.getOrderItemStatus() == OrderStatus.SHIPPED) {
+                orderItem.setOrderItemStatus(OrderStatus.CANCELLED);
                 productService.updateStock(orderItem.getProduct().getProductId(), orderItem.getQuantity());
                 orderItem = orderItemRepo.save(orderItem);
                 }

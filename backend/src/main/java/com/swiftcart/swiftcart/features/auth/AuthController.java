@@ -44,6 +44,7 @@ public class AuthController {
         UserDetailsImpl userDetailsImpl = userService.authenticate(registerReq);
         User user = userDetailsImpl.getUser();
         UserDTO userDTO = modelMapper.map(user, UserDTO.class);
+        userDTO.setRole(user.getRole().getName());
         String jwt = jwtService.generateToken(user.getUserId(), user.getRole().getName());
         String refreshToken = tokenService.generateRefreshToken(userDetailsImpl.getUser());
         ResponseCookie accessCookie = ResponseCookie.from("access_token", jwt)
@@ -75,6 +76,7 @@ public class AuthController {
         UserDetailsImpl userDetailsImpl = userService.authenticate(loginReq);
         User user = userDetailsImpl.getUser();
         UserDTO userDTO = modelMapper.map(user, UserDTO.class);
+        userDTO.setRole(user.getRole().getName());
         String jwt = jwtService.generateToken(user.getUserId(), user.getRole().getName());
         String refreshToken = tokenService.generateRefreshToken(userDetailsImpl.getUser());
         ResponseCookie accessCookie = ResponseCookie.from("access_token", jwt)
