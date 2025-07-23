@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(InsufficientStockException.class)
-    public ResponseEntity<String> handleInsufficientStock(InstantiationException ex) {
+    public ResponseEntity<String> handleInsufficientStock(InsufficientStockException ex) {
         return new ResponseEntity<String>(ex.getMessage(), HttpStatus.CONFLICT);
     }
 
