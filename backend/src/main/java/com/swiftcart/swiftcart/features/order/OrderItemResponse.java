@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 public class OrderItemResponse {
 
     private Long orderItemId;
-    private LocalDateTime placedAt;
     private LocalDateTime deliveryAt;
     private ProductResponse product;
+    private OrderStatus orderItemStatus;
     private int quantity;
 }
