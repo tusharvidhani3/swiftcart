@@ -6,6 +6,7 @@ import com.swiftcart.swiftcart.features.address.AddressSnapshot;
 import com.swiftcart.swiftcart.features.payment.Payment;
 import com.swiftcart.swiftcart.features.user.User;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -43,6 +44,6 @@ public class Order {
     private LocalDateTime placedAt;
 
     @Setter
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private Payment payment;
 }

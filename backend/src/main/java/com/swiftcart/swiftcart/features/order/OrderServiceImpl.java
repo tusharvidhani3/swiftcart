@@ -18,6 +18,7 @@ import com.swiftcart.swiftcart.features.address.AddressService;
 import com.swiftcart.swiftcart.features.address.AddressSnapshot;
 import com.swiftcart.swiftcart.features.cart.CartItem;
 import com.swiftcart.swiftcart.features.cart.CartService;
+import com.swiftcart.swiftcart.features.payment.Payment;
 import com.swiftcart.swiftcart.common.exception.BadRequestException;
 import com.swiftcart.swiftcart.common.exception.ResourceNotFoundException;
 import com.swiftcart.swiftcart.features.product.ProductResponse;
@@ -58,6 +59,9 @@ public class OrderServiceImpl implements OrderService {
         order.setPlacedAt(LocalDateTime.now());
         order.setShippingAddress(modelMapper.map(shippingAddress, AddressSnapshot.class));
         order.setUser(shippingAddress.getUser());
+        Payment payment = new Payment();
+        payment.setPaymentMethod(placeOrderRequest.getPaymentMethod());
+        order.setPayment(payment);
         List<OrderItem> orderItems = new ArrayList<>();
         double totalAmount = 0;
         for (CartItem ci : cartItems) {
@@ -167,6 +171,9 @@ public class OrderServiceImpl implements OrderService {
         order.setTotalAmount(cartItem.getProduct().getPrice());
         order.setUser(user);
         order = orderRepo.save(order);
+        Payment payment = new Payment();
+        payment.setPaymentMethod(placeBuyNowOrderRequest.getPaymentMethod());
+        order.setPayment(payment);
         OrderItem orderItem = new OrderItem();
         orderItem.setProduct(cartItem.getProduct());
         orderItem.setOrder(order);
