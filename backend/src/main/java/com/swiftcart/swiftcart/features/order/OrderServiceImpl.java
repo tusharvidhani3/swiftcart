@@ -70,6 +70,7 @@ public class OrderServiceImpl implements OrderService {
             orderItem.setProduct(ci.getProduct());
             orderItem.setQuantity(ci.getQuantity());
             orderItem.setOrderItemStatus(OrderStatus.PROCESSING);
+            orderItem.setDeliveryAt(LocalDateTime.now().plusWeeks(1).withHour(20).withMinute(0).withSecond(0).withNano(0));
             orderItems.add(orderItem);
             productService.updateStock(ci.getProduct().getProductId(), -orderItem.getQuantity());
             totalAmount += ci.getProduct().getPrice()*ci.getQuantity();
@@ -179,6 +180,7 @@ public class OrderServiceImpl implements OrderService {
         orderItem.setOrder(order);
         orderItem.setQuantity(cartItem.getQuantity());
         orderItem.setOrderItemStatus(OrderStatus.PROCESSING);
+        orderItem.setDeliveryAt(LocalDateTime.now().plusWeeks(1).withHour(20).withMinute(0).withSecond(0).withNano(0));
         orderItemRepo.save(orderItem);
         productService.updateStock(cartItem.getProduct().getProductId(), -orderItem.getQuantity());
         OrderResponse orderResponse = modelMapper.map(order, OrderResponse.class);
