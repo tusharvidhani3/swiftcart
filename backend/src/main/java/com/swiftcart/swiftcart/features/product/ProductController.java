@@ -31,13 +31,6 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
-
-    @GetMapping
-    public Page<ProductResponse> getProducts(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "productId") String sortBy) {
-        Pageable pageable=PageRequest.of(page, size, Sort.by(sortBy).ascending());
-        Page<ProductResponse> productPage=productService.getAllProducts(pageable);
-        return productPage;
-    }
     
     @GetMapping("/{productId}")
     public ResponseEntity<ProductResponse> getProduct(@PathVariable Long productId) {
@@ -52,10 +45,10 @@ public class ProductController {
         return new ResponseEntity<>(productResponse, HttpStatus.CREATED);
     }
 
-    @GetMapping(params = "keyword")
-    public ResponseEntity<Page<ProductResponse>> searchProducts(@RequestParam String keyword, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "productId") String sortBy) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).ascending());
-        Page<ProductResponse> productPage = productService.searchProducts(keyword, pageable);
+    @GetMapping
+    public ResponseEntity<Page<ProductResponse>> searchProducts(@RequestParam(defaultValue = "") String keyword, @RequestParam(defaultValue = "") String category, @RequestParam(defaultValue = "0") long minPrice, @RequestParam(defaultValue = "10000000") long maxPrice, @RequestParam(defaultValue = "asc") String sortOrder, @RequestParam(defaultValue = "true") boolean inStock, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "productId") String sortBy) {
+        Pageable pageable = PageRequest.of(page, size, sortBy.equals("desc")? Sort.by(sortBy).descending() : Sort.by(sortBy));
+        Page<ProductResponse> productPage = productService.searchProducts(keyword, pageable, category, minPrice, maxPrice, inStock);
         return new ResponseEntity<Page<ProductResponse>>(productPage, HttpStatus.OK);
     }
 

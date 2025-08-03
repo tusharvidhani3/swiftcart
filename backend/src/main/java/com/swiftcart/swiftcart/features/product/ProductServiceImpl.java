@@ -58,12 +58,6 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<ProductResponse> getAllProducts(Pageable pageable) {
-        Page<ProductResponse> productResponsePage=productRepo.findAll(pageable).map(product -> modelMapper.map(product, ProductResponse.class));
-        return productResponsePage;
-    }
-
-    @Override
     public ProductResponse getProduct(Long productId) {
         Product product=productRepo.findByProductId(productId)
         .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
@@ -81,14 +75,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<ProductResponse> searchProducts(String keyword, Pageable pageable) {
-        Page<ProductResponse> productPage = productRepo.searchProducts(keyword, pageable).map(product -> modelMapper.map(product, ProductResponse.class));
-        return productPage;
-    }
-
-    @Override
-    public Page<ProductResponse> getProductsByCategory(String category, Pageable pageable) {
-        Page<ProductResponse> productPage = productRepo.findByCategory(category, pageable);
+    public Page<ProductResponse> searchProducts(String keyword, Pageable pageable, String category, long minPrice, long maxPrice, boolean inStock) {
+        Page<ProductResponse> productPage = productRepo.searchProducts(keyword, pageable, minPrice, maxPrice, category, inStock).map(product -> modelMapper.map(product, ProductResponse.class));
         return productPage;
     }
 
