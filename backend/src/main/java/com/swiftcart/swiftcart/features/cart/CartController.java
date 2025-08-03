@@ -42,20 +42,20 @@ public class CartController {
 
     @PutMapping("/items/{cartItemId}")
     public ResponseEntity<CartResponse> updateQty(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @PathVariable Long cartItemId, @RequestBody @Valid UpdateCartItemQtyRequest req){
-        cartService.updateQuantity(userDetailsImpl.getUser().getUserId(), cartItemId, req.getQuantity());
-        return ResponseEntity.ok(cartService.getCartResponse(userDetailsImpl.getUser().getUserId()));
+        CartResponse cartResponse = cartService.updateQuantity(userDetailsImpl.getUser().getUserId(), cartItemId, req.getQuantity());
+        return ResponseEntity.ok(cartResponse);
     }
 
     @DeleteMapping("/items/{cartItemId}")
     public ResponseEntity<CartResponse> removeProductFromCart(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @PathVariable Long cartItemId) {
-        cartService.removeProductFromCart(userDetailsImpl.getUser().getUserId(), cartItemId);
-        return ResponseEntity.ok(cartService.getCartResponse(userDetailsImpl.getUser().getUserId()));
+        CartResponse cartResponse = cartService.removeProductFromCart(userDetailsImpl.getUser().getUserId(), cartItemId);
+        return ResponseEntity.ok(cartResponse);
     }
 
     @PostMapping("/checkout/buy-now/product/{productId}")
-    public ResponseEntity<BuyNowPreview> buyNow(@PathVariable Long productId, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        BuyNowPreview buyNowPreview = cartService.createBuyNowPreview(productId, userDetailsImpl.getUser());
-        return new ResponseEntity<>(buyNowPreview, HttpStatus.OK);
+    public ResponseEntity<CartResponse> buyNow(@PathVariable Long productId, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
+        CartResponse cartResponse = cartService.initiateBuyNow(productId, userDetailsImpl.getUser());
+        return ResponseEntity.ok(cartResponse);
     }
 
     @GetMapping("/count")

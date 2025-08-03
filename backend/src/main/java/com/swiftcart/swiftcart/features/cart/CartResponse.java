@@ -11,5 +11,5 @@ public class CartResponse {
 
     private Long cartId;
     private double totalPrice;
-    private List<CartItemDTO> cartItems;
+    private List<CartItemResponse> cartItems;
 }

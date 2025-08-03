@@ -68,17 +68,17 @@ public class OrderController {
         return new ResponseEntity<OrderResponse>(orderResponse, HttpStatus.OK);
     }
 
-    @PostMapping("/checkout/buy-now/cartitem/{cartItemId}/address/{addressId}")
+    @PostMapping("/checkout/buy-now")
     @PreAuthorize("hasRole('CUSTOMER')") // Can allow Admin also to place order on user's behalf
-    public ResponseEntity<OrderResponse> placeBuyNowOrder(@PathVariable Long cartItemId, @PathVariable Long addressId, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        OrderResponse orderResponse = orderService.placeBuyNowOrder(cartItemId, addressId, userDetailsImpl.getUser());
+    public ResponseEntity<OrderResponse> placeBuyNowOrder(@RequestBody PlaceBuyNowOrderRequest placeBuyNowOrderRequest, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
+        OrderResponse orderResponse = orderService.placeBuyNowOrder(placeBuyNowOrderRequest, userDetailsImpl.getUser());
         return ResponseEntity.created(URI.create("/orders/"+orderResponse.getOrderId())).body(orderResponse);
     }
 
     @GetMapping("/all")
     @PreAuthorize("hasAnyRole('SELLER','ADMIN')")
     public ResponseEntity<Page<OrderResponseForSeller>> getAllOrders(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "placedAt") String sortBy) {
-        Page<OrderResponseForSeller> orders= orderService.getAllOrders(PageRequest.of(page, size, Sort.by(sortBy).descending()));
+        Page<OrderResponseForSeller> orders = orderService.getAllOrders(PageRequest.of(page, size, Sort.by(sortBy).descending()));
         return ResponseEntity.ok(orders);
     }
 

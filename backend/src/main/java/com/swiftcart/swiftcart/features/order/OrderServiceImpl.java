@@ -144,9 +144,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderResponse placeBuyNowOrder(Long cartItemId, Long shippingAddressId, User user) {
-        CartItem cartItem = cartService.getCartItemByCartItemId(cartItemId);
-        Address shippingAddress = addressService.getAddressById(shippingAddressId);
+    public OrderResponse placeBuyNowOrder(PlaceBuyNowOrderRequest placeBuyNowOrderRequest, User user) {
+        CartItem cartItem = cartService.getCartItemByCartItemId(placeBuyNowOrderRequest.getCartItemId());
+        Address shippingAddress = addressService.getAddressById(placeBuyNowOrderRequest.getShippingAddressId());
         if (cartItem.getCart().getUser().getUserId() != user.getUserId() || shippingAddress.getUser().getUserId() != user.getUserId())
             throw new AccessDeniedException("Access Denied: Something went wrong");
         Order order = new Order();
@@ -154,7 +154,7 @@ public class OrderServiceImpl implements OrderService {
         order.setShippingAddress(modelMapper.map(shippingAddress, AddressSnapshot.class));
         order.setTotalAmount(cartItem.getProduct().getPrice());
         order.setUser(user);
-        OrderResponse orderResponse = modelMapper.map(orderRepo.save(order), OrderResponse.class);
+        order = orderRepo.save(order);
         OrderItem orderItem = new OrderItem();
         orderItem.setProduct(cartItem.getProduct());
         orderItem.setOrder(order);
@@ -162,6 +162,7 @@ public class OrderServiceImpl implements OrderService {
         orderItem.setOrderStatus(OrderStatus.PROCESSING);
         orderItemRepo.save(orderItem);
         productService.updateStock(cartItem.getProduct().getProductId(), -orderItem.getQuantity());
+        OrderResponse orderResponse = modelMapper.map(order, OrderResponse.class);
         return orderResponse;
     }
 
@@ -175,8 +176,8 @@ public class OrderServiceImpl implements OrderService {
         orderItems.stream().forEach(orderItem -> {
                 if(orderItem.getOrderStatus() == OrderStatus.PENDING || orderItem.getOrderStatus() == OrderStatus.PROCESSING || orderItem.getOrderStatus() == OrderStatus.SHIPPED) {
                 orderItem.setOrderStatus(OrderStatus.CANCELLED);
-                productService.updateStock(orderItem.getProduct().getProductId(), orderItem.getQuantity());
-                orderItem = orderItemRepo.save(orderItem);
+                    productService.updateStock(orderItem.getProduct().getProductId(), orderItem.getQuantity());
+                    orderItem = orderItemRepo.save(orderItem);
                 }
                 else {
                     throw new BadRequestException("Cannot cancel order, one or more item(s) delivered");
