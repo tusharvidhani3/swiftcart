@@ -102,13 +102,25 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Page<OrderResponse> getOrdersForAuthenticatedUser(Long userId, Pageable pageable) {
         return orderRepo.findAllByUser_UserId(userId, pageable)
-                .map(order -> modelMapper.map(order, OrderResponse.class));
+                .map(order -> {
+                    OrderResponse orderResponse = modelMapper.map(order, OrderResponse.class);
+                    List<OrderItem> orderItems = orderItemRepo.findAllByOrder_OrderId(order.getOrderId());
+                    List<OrderItemResponse> orderItemResponseList = orderItems.stream().map(orderItem -> modelMapper.map(orderItem, OrderItemResponse.class)).collect(Collectors.toList());
+                    orderResponse.setOrderItems(orderItemResponseList);
+                    return orderResponse;
+                });
     }
 
     @Override
     public Page<OrderResponseForSeller> getAllOrders(Pageable pageable) {
         return orderRepo.findAll(pageable)
-                .map(order -> modelMapper.map(order, OrderResponseForSeller.class));
+                .map(order -> {
+                    OrderResponseForSeller orderResponseForSeller = modelMapper.map(order, OrderResponseForSeller.class);
+                    List<OrderItem> orderItems = orderItemRepo.findAllByOrder_OrderId(order.getOrderId());
+                    List<OrderItemResponse> orderItemResponseList = orderItems.stream().map(orderItem -> modelMapper.map(orderItem, OrderItemResponse.class)).collect(Collectors.toList());
+                    orderResponseForSeller.setOrderItems(orderItemResponseList);
+                    return orderResponseForSeller;
+                });
     }
 
     @Override
