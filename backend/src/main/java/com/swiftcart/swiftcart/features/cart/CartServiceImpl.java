@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.swiftcart.swiftcart.common.exception.InsufficientStockException;
 import com.swiftcart.swiftcart.common.exception.ResourceNotFoundException;
 import com.swiftcart.swiftcart.features.product.Product;
+import com.swiftcart.swiftcart.features.product.ProductResponse;
 import com.swiftcart.swiftcart.features.product.ProductService;
 import com.swiftcart.swiftcart.features.user.User;
 
@@ -91,7 +92,12 @@ public class CartServiceImpl implements CartService {
         List<CartItemResponse> cartItemResponses = new ArrayList<>();
         for (CartItem ci : cartItems) {
             totalPrice += ci.getProduct().getPrice() * ci.getQuantity();
-            cartItemResponses.add(modelMapper.map(ci, CartItemResponse.class));
+            List<String> productImages = productService.getProductImages(ci.getProduct().getProductId());
+            ProductResponse productResponse = modelMapper.map(ci.getProduct(), ProductResponse.class);
+            productResponse.setImageUrls(productImages);
+            CartItemResponse cartItemResponse = modelMapper.map(ci, CartItemResponse.class);
+            cartItemResponse.setProduct(productResponse);
+            cartItemResponses.add(cartItemResponse);
         }
         CartResponse cartResponse = new CartResponse();
         Cart cart = cartRepo.findByUser_UserId(userId)

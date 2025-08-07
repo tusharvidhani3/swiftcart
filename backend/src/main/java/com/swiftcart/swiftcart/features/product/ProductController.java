@@ -46,7 +46,7 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<ProductResponse>> searchProducts(@RequestParam(defaultValue = "") String keyword, @RequestParam(defaultValue = "") String category, @RequestParam(defaultValue = "0") long minPrice, @RequestParam(defaultValue = "10000000") long maxPrice, @RequestParam(defaultValue = "asc") String sortOrder, @RequestParam(defaultValue = "true") boolean inStock, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "productId") String sortBy) {
+    public ResponseEntity<Page<ProductResponse>> searchProducts(@RequestParam(defaultValue = "") String keyword, @RequestParam(defaultValue = "") String category, @RequestParam(defaultValue = "0") long minPrice, @RequestParam(defaultValue = "10000000") long maxPrice, @RequestParam(defaultValue = "asc") String sortOrder, @RequestParam(defaultValue = "true") boolean inStock, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "100") int size, @RequestParam(defaultValue = "productId") String sortBy) {
         Pageable pageable = PageRequest.of(page, size, sortBy.equals("desc")? Sort.by(sortBy).descending() : Sort.by(sortBy));
         Page<ProductResponse> productPage = productService.searchProducts(keyword, pageable, category, minPrice, maxPrice, inStock);
         return new ResponseEntity<Page<ProductResponse>>(productPage, HttpStatus.OK);
@@ -61,8 +61,8 @@ public class ProductController {
 
     @PutMapping("/{productId}")
     @PreAuthorize("hasRole('SELLER')")
-    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long productId,@RequestBody @Valid CreateProductRequest productRequest) {
-        ProductResponse productResponse = productService.updateProduct(productId, productRequest);
+    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long productId,@RequestBody @Valid CreateProductRequest productRequest, @RequestPart List<MultipartFile> productImages) {
+        ProductResponse productResponse = productService.updateProduct(productId, productRequest, productImages);
         return ResponseEntity.ok(productResponse);
     }
 

@@ -93,7 +93,9 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItemResponse> orderItems = orderItemRepo.findAllByOrder_OrderId(orderId).stream().map(orderItem -> {
             OrderItemResponse orderItemResponse = new OrderItemResponse();
             orderItemResponse.setOrderItemId(orderItem.getOrderItemId());
-            orderItemResponse.setProduct(modelMapper.map(orderItem.getProduct(), ProductResponse.class));
+            ProductResponse productResponse = modelMapper.map(orderItem.getProduct(), ProductResponse.class);
+            productResponse.setImageUrls(productService.getProductImages(orderItem.getProduct().getProductId()));
+            orderItemResponse.setProduct(productResponse);
             orderItemResponse.setQuantity(orderItem.getQuantity());
             orderItemResponse.setOrderItemStatus(orderItem.getOrderItemStatus());
             return orderItemResponse;
@@ -110,7 +112,13 @@ public class OrderServiceImpl implements OrderService {
                 .map(order -> {
                     OrderResponse orderResponse = modelMapper.map(order, OrderResponse.class);
                     List<OrderItem> orderItems = orderItemRepo.findAllByOrder_OrderId(order.getOrderId());
-                    List<OrderItemResponse> orderItemResponseList = orderItems.stream().map(orderItem -> modelMapper.map(orderItem, OrderItemResponse.class)).collect(Collectors.toList());
+                    List<OrderItemResponse> orderItemResponseList = orderItems.stream().map(orderItem -> {
+                        ProductResponse productResponse = modelMapper.map(orderItem.getProduct(), ProductResponse.class);
+                        productResponse.setImageUrls(productService.getProductImages(orderItem.getProduct().getProductId()));
+                        OrderItemResponse orderItemResponse = modelMapper.map(orderItem, OrderItemResponse.class);
+                        orderItemResponse.setProduct(productResponse);
+                        return orderItemResponse;
+                    }).collect(Collectors.toList());
                     orderResponse.setOrderItems(orderItemResponseList);
                     return orderResponse;
                 });
@@ -122,7 +130,13 @@ public class OrderServiceImpl implements OrderService {
                 .map(order -> {
                     OrderResponseForSeller orderResponseForSeller = modelMapper.map(order, OrderResponseForSeller.class);
                     List<OrderItem> orderItems = orderItemRepo.findAllByOrder_OrderId(order.getOrderId());
-                    List<OrderItemResponse> orderItemResponseList = orderItems.stream().map(orderItem -> modelMapper.map(orderItem, OrderItemResponse.class)).collect(Collectors.toList());
+                    List<OrderItemResponse> orderItemResponseList = orderItems.stream().map(orderItem -> {
+                        ProductResponse productResponse = modelMapper.map(orderItem.getProduct(), ProductResponse.class);
+                        productResponse.setImageUrls(productService.getProductImages(orderItem.getProduct().getProductId()));
+                        OrderItemResponse orderItemResponse = modelMapper.map(orderItem, OrderItemResponse.class);
+                        orderItemResponse.setProduct(productResponse);
+                        return orderItemResponse;
+                    }).collect(Collectors.toList());
                     orderResponseForSeller.setOrderItems(orderItemResponseList);
                     return orderResponseForSeller;
                 });
