@@ -49,8 +49,8 @@ public class OrderController {
     
     @PatchMapping("/items/{orderItemId}/cancel")
     @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<OrderItemResponse> cancelOrderItem(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @PathVariable Long orderId) {
-        OrderItemResponse orderItemResponse=orderService.cancelOrderItem(userDetailsImpl.getUser().getUserId(), orderId);
+    public ResponseEntity<OrderItemResponse> cancelOrderItem(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @PathVariable Long orderItemId) {
+        OrderItemResponse orderItemResponse=orderService.cancelOrderItem(userDetailsImpl.getUser().getUserId(), orderItemId);
         return ResponseEntity.ok(orderItemResponse);
     }
 
