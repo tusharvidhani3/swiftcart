@@ -98,6 +98,7 @@ public class OrderServiceImpl implements OrderService {
             orderItemResponse.setProduct(productResponse);
             orderItemResponse.setQuantity(orderItem.getQuantity());
             orderItemResponse.setOrderItemStatus(orderItem.getOrderItemStatus());
+            orderItemResponse.setDeliveryAt(orderItem.getDeliveryAt());
             return orderItemResponse;
         })
         .collect(Collectors.toList());
