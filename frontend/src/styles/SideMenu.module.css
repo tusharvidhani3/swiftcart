@@ -1,0 +1,51 @@
+.sideMenu {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    left: 0;
+    height: 100vh;
+    transform: translateX(-100%);
+    background-color: white;
+    pointer-events: none;
+    z-index: 3;
+    align-items: center;
+    justify-content: center;
+    width: 220px;
+    transition: transform 0.3s ease-in-out;
+}
+
+.sideMenu.open {
+    transform: translateX(0);
+    pointer-events: all;
+}
+
+.navLinks {
+    display: flex;
+    flex-direction: column;
+}
+
+.navLinks > a {
+    height: 50px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.navLinks > a > img {
+    height: 24px;
+}
+
+.btnClose {
+    visibility: hidden;
+    position: absolute;
+    right: -20px;
+    top: 20px;
+}
+
+.open .btnClose {
+    visibility: visible;
+}
+
+.btnClose img {
+    width: 32px;
+}

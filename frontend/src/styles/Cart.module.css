@@ -1,0 +1,164 @@
+.btnChangeAddress {
+    color: #2874f0;
+    border: 1px solid #e0e0e0;
+    background-color: inherit;
+    padding: 8px;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.cartItemsContainer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.cartItem {
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    background-color: white;
+    gap: 12px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.productPreview {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+}
+
+.productTitle {
+    font-size: 16px;
+    margin-block: 8px;
+    font-weight: 500;
+}
+
+.productPrice {
+    font-size: 20px;
+    margin: 8px;
+    font-weight: 600;
+}
+
+.productImage {
+    width: 100px;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+}
+
+.cartItemActions {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    height: 24px;
+    margin-inline: 4px;
+}
+
+.cartItem button {
+    background-color: white;
+}
+
+.btnQty {
+    padding: 0;
+    width: 24px;
+    border: 0;
+    height: 100%;
+}
+
+.btnQty img {
+    width: 100%;
+    height: 100%;
+}
+
+.btnRemove {
+    border-radius: 16px;
+    border: 1.5px solid gray;
+    height: 100%;
+    font-size: 16px;
+}
+
+.grayedOut {
+    display: none;
+}
+
+.cartEmpty {
+    justify-content: center;
+    align-items: center;
+}
+
+.emptyCart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+}
+
+.emptyCart img {
+    width: 256px;
+}
+
+.emptyCart h2 {
+    margin-block: 20px 0;
+    font-size: 22px;
+}
+
+.shopNow {
+    margin-top: 32px;
+    text-decoration-line: none;
+    font-size: 16px;
+    color: black;
+    background-color: var(--accent-color);
+    font-weight: 600;
+    display: flex;
+    height: 40px;
+    border-radius: 8px;
+    width: 200px;
+    justify-content: center;
+    align-items: center;
+}
+
+.emptyCart p {
+    display: none;
+    margin-block: 10px 0;
+}
+
+@media screen and (min-width: 768px) {
+
+    .productTitle {
+        font-size: 18px;
+    }
+
+}
+
+@media screen and (min-width: 1080px) {
+
+    .productTitle {
+        font-size: 20px;
+    }
+
+    .cartItemsContainer {
+        flex-basis: 70%;
+    }
+
+    .shopNow {
+        margin-top: 20px;
+        height: 48px;
+        border-radius: 0;
+    }
+
+    .emptyCart p {
+        display: block;
+    }
+
+    .cartItemsContainer {
+        margin-top: 0;
+    }
+}

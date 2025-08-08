@@ -1,0 +1,101 @@
+#profileForm {
+    display: flex;
+    gap: 20px;
+    background-color: white;
+    flex-direction: column;
+    align-items: center;
+    padding-block: 20px;
+    width: 100%;
+}
+
+#profileForm div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    width: 90%;
+}
+
+#profileForm .name {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+#profileForm .name div {
+    width: 100%;
+}
+
+#profileForm label {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+#profileForm input {
+    width: 100%;
+    height: 40px;
+    font-size: 18px;
+    font-family: inherit;
+    border-top: 0;
+    border-inline: 0;
+    border-color: #c2c2c2;
+}
+
+#profileForm input:focus {
+    outline: none;
+    border-color: blue;
+}
+
+.btnSaveChanges {
+    display: none;
+    align-self: center;
+    border: none;
+    background-color: var(--accent-color);
+    font-size: 16px;
+    font-family: inherit;
+    height: 40px;
+    font-weight: 600;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transform: translateX(-32px);
+    cursor: pointer;
+    padding-inline: 12px;
+}
+
+.changed .btnSaveChanges {
+    display: flex;
+}
+
+.profileInfoTitle {
+    font-size: 20px;
+}
+
+@media screen and (min-width: 768px) {
+
+    #profileForm {
+        align-items: flex-start;
+        justify-content: center;
+        padding-left: 64px;
+        gap: 32px;
+        min-height: 80vh;
+        padding-block: 0;
+    }
+    
+    #profileForm .name {
+        flex-direction: row;
+        justify-content: space-between;
+        padding-right: 64px;
+        box-sizing: border-box;
+        width: 100%;
+        gap: 32px;
+    }
+
+    #profileForm .name > div {
+        width: 45%;
+    }
+
+    #profileForm div {
+        width: 40%;
+    }
+}

@@ -1,0 +1,246 @@
+.addressesContainer,
+.selectMode.addressesContainer {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    font-size: 16px;
+    font-weight: 500;
+    gap: 16px;
+    width: 100%;
+    box-sizing: border-box;
+    align-items: center;
+}
+
+.addressCard,
+.selectMode .addressCard {
+    background-color: white;
+    border-radius: 12px;
+    padding: 16px;
+    position: relative;
+    min-height: 128px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+    width: 90%;
+    flex-direction: column;
+}
+
+.addressSubcard {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    height: 100%;
+}
+
+.selectMode .addressSubcard {
+    flex-direction: row;
+}
+
+.address {
+    width: 80%;
+    padding-bottom: 16px;
+}
+
+.threeDotsMenu {
+    position: absolute;
+    top: 16px;
+    right: 12px;
+    cursor: pointer;
+}
+
+.open .options {
+    display: flex;
+}
+
+.options {
+    display: none;
+    list-style: none;
+    background-color: white;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-inline: 8px;
+    gap: 4px;
+    font-size: 14px;
+    position: absolute;
+    right: 40%;
+    top: -50%;
+    box-shadow: 0 2px 4px 2px rgba(128, 128, 128, 0.5);
+}
+
+.options li {
+    width: max-content;
+    height: 20px;
+    margin-block: 4px;
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+}
+
+.options li:hover {
+    color: blue;
+    /* background-color: rgba(0, 0, 255, 0.116); */
+}
+
+.options li img {
+    width: 20px;
+}
+
+.btnAddAddress {
+    bottom: 12px;
+    border: 2px solid black;
+    border-radius: 12px;
+    height: 50px;
+    background-color: white;
+    font-size: 20px;
+    font-weight: 700;
+    width: 90%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+.selectMode .setDefault {
+    display: none;
+}
+
+.selectMode .delete {
+    display: none;
+}
+
+.selectMode .btnAddAddress {
+    order: 1;
+}
+
+.customRadio {
+    display: none;
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    border: 2px solid gray;
+    padding: 2px;
+}
+
+.selectMode .customRadio {
+    display: block;
+}
+
+#selected .customRadio {
+    background-color: blue;
+    background-clip: content-box;
+    border-color: blue;
+}
+
+.btnDeliverAddress {
+    bottom: 12px;
+    width: 100%;
+    height: 50px;
+    background-color: #FF9800;
+    border-radius: 8px;
+    border: 0;
+    font-family: inherit;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.defaultBadge {
+    display: inline-block;
+    background-color: #9DD3F7;
+    border-radius: 4px;
+    padding: 1px 6px;
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+.selectMode .addressCard {
+    cursor: pointer;
+}
+
+.selectMode #selected {
+    background-color: #F5FAFF;
+}
+
+.addressType {
+    background-color: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: gray;
+    line-height: 1.8;
+    margin-left: 6px;
+}
+
+@media screen and (min-width: 768px) {
+
+    .addressesContainer {
+        flex-direction: row;
+        padding-inline: 80px;
+        margin-inline: auto;
+        flex-wrap: wrap;
+        align-items: stretch;
+    }
+
+    .addressCard {
+        min-height: 200px;
+        flex-basis: 30%;
+        min-width: 280px;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .selectMode .addressCard {
+        width: 100%;
+    }
+
+    .threeDots {
+        display: none;
+    }
+
+    .threeDotsMenu {
+        top: unset;
+        right: unset;
+        position: static;
+        /* width: 100%; */
+    }
+
+    .options {
+        display: flex;
+        position: static;
+        flex-direction: row;
+        box-shadow: none;
+        gap: 14px;
+        align-items: center;
+        margin: 0;
+        /* justify-content: space-evenly; */
+    }
+
+    .options li {
+        color: blue;
+    }
+
+    .options li:hover {
+        text-decoration-line: underline;
+
+    }
+
+    .btnAddAddress {
+        display: flex;
+        flex-direction: column;
+        flex-basis: 30%;
+        min-width: 280px;
+        height: unset;
+    }
+
+    .selectMode .btnAddAddress {
+        flex-direction: row;
+        height: 50px;
+        flex-basis: auto;
+    }
+
+    .btnDeliverAddress {
+        width: 92%;
+        margin-left: auto;
+    }
+}

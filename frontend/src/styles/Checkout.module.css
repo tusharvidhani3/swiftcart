@@ -1,0 +1,146 @@
+.addressPreview {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 24px;
+    background-color: white;
+    gap: 16px;
+    flex-direction: column;
+}
+
+.deliverTo {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+}
+
+#name {
+    font-weight: 600;
+}
+
+#addressType {
+    background-color: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: gray;
+    line-height: 1.8;
+    margin-left: 6px;
+}
+
+.btnChangeAddress {
+    color: #3206C3;
+    border: 1px solid gray;
+    background-color: inherit;
+    padding: 8px;
+}
+
+.priceDetails {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    padding: 12px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.paymentMethod h2 {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.priceDetails > div {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.priceToPay {
+    font-size: 20px;
+    margin: 0;
+}
+
+.totalAmount {
+    font-weight: 600;
+}
+
+.checkout {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    background-color: white;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 12px;
+    height: 60px;
+}
+
+.btnPay {
+    background-color: var(--accent-color);
+    border: 0;
+    border-radius: 4px;
+    height: 100%;
+    font-size: 18px;
+    font-weight: 700;
+    padding-inline: 12px;
+}
+
+.priceToPay {
+    font-size: 20px;
+    margin: 0;
+}
+
+#paymentForm label {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+}
+
+#paymentForm input {
+    margin: 0;
+    width: 20px;
+    height: 20px;
+    /* accent-color: red; */
+}
+
+.paymentMethod {
+    background-color: white;
+    width: 100%;
+    padding: 12px;
+    box-sizing: border-box;
+}
+
+@media screen and (min-width: 768px) {
+
+    .addressPreview {
+        align-items: flex-start;
+        transition: height 0.3s ease-in-out;
+    }
+
+    .addressPreview h2 {
+        margin: 0;
+    }
+    
+    .addressSelectorMenu {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .addressCard {
+        align-items: flex-start;
+    }
+}
+
+@media screen and (min-width: 1080px) {
+    
+    .addressPreview {
+        /* height: 100%; */
+    }
+}

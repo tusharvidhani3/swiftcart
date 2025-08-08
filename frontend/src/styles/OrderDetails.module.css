@@ -1,0 +1,250 @@
+.section {
+    width: 90%;
+}
+
+.section > div {
+    border: 1px solid gray;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: white;
+}
+
+.section h2 {
+    font-size: 20px;
+    margin: 12px;
+}
+
+.section h3 {
+    font-size: 18px;
+}
+
+.orderData {
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+}
+
+.orderData > div {
+    display: flex;
+    justify-content: space-between;
+}
+
+.productsOrdered {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.productsOrdered > div {
+    display: flex;
+}
+
+.orderItem {
+    display: flex;
+    flex-direction: column;
+    padding: 8px 12px;
+}
+
+.orderItemInfo {
+    display: flex;
+    flex-direction: column;
+}
+
+.orderItemInfo > div {
+    display: flex;
+    justify-content: stretch;
+}
+
+.orderItemInfo img {
+    width: 128px;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+}
+
+.productTitle {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.itemTotal {
+    font-size: 16px;
+    margin-block: 8px;
+    font-weight: 500;
+}
+
+.status {
+    font-weight: 600;
+    font-size: 16px;
+    margin-block: 8px;
+}
+
+.productQty {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+    background-color: white;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    top: 96px;
+    left: 104px;
+}
+
+.productQty.show {
+    display: flex;
+}
+
+.productDetails {
+    position: relative;
+    gap: 24px;
+    padding: 10px;
+    cursor: pointer;
+    padding-left: 0;
+}
+
+.itemActions {
+    display: flex;
+    width: 100%;
+}
+
+.itemActions > button {
+    flex-basis: 50%;
+    background-color: white;
+    height: 40px;
+    font-size: 16px;
+    font-weight: 600;
+    border: 1px solid rgba(128, 128, 128, 0.5);
+    cursor: pointer;
+    font-family: "Inter";
+    border-radius: 0;
+}
+
+.paymentMethod {
+    padding: 12px;
+}
+
+.shipTo {
+    padding: 12px;
+}
+
+.orderSummary {
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+}
+
+.orderSummary > div {
+    display: flex;
+    justify-content: space-between;
+}
+
+.orderSummaryTotal {
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.orderTotal {
+    color: #BD0F0F;
+}
+
+.orderItemInfo > div:first-child {
+    cursor: pointer;
+}
+
+.productInfo {
+    align-self: flex-start;
+}
+
+.orderStatus {
+    font-weight: 700;
+    margin-left: 20px;
+}
+
+@media screen and (min-width: 768px) {
+    
+    
+}
+
+@media screen and (min-width: 1080px) {
+    
+    .section > div {
+        border: none;
+        border-radius: 0;
+        padding-block: 8px;
+    }
+
+    .orderInfo {
+        display: flex;
+        background-color: white;
+        justify-content: space-around;
+        border: 1px solid gray;
+        border-radius: 8px;
+        overflow: hidden;
+        padding: 16px;
+        width: 90%;
+        box-sizing: border-box;
+    }
+
+    .orderData {
+        background-color: unset;
+        flex-direction: row;
+        gap: 12px;
+        padding: 0;
+        align-self: flex-start;
+        margin-left: 64px;
+    }
+
+    .orderData > div {
+        gap: 8px;
+    }
+
+    .section h2 {
+        margin-block: 4px;
+        font-size: 18px;
+    }
+
+    .orderDetailsTitle {
+        font-size: 28px;
+        font-weight: 600;
+        align-self: flex-start;
+        margin-left: 64px;
+        margin-block: 0;
+    }
+
+    .orderItemInfo {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .orderItemInfo .itemActions {
+        flex-direction: column;
+        gap: 8px;
+        padding-right: 24px;
+        max-width: 250px;
+    }
+
+    .itemActions > button {
+        width: 100%;
+        flex-basis: unset;
+        border-radius: 16px;
+        height: 32px;
+        border: 1px solid #888C8C;
+    }
+
+    .section > .productsOrdered {
+        border: 1px solid gray;
+        border-radius: 8px;
+    }
+
+    .section {
+        flex-basis: 28%;
+    }
+
+    .productDetails {
+        flex-basis: 85%;
+        padding-right: 16px;
+    }
+
+}
