@@ -3,6 +3,7 @@ import ProductsContainer from "./ProductsContainer";
 import SearchSummary from "./SearchSummary";
 import { useOutletContext } from "react-router";
 import SearchFilters from "./SearchFilters";
+import { apiBaseUrl } from "../config";
 
 export default function Home() {
 
@@ -14,12 +15,12 @@ export default function Home() {
         minPrice: "",
         maxPrice: "",
         sortBy: "price",
-        sortOrder: "",
+        sortOrder: "desc",
         inStock: true
     })
 
     async function fetchProducts({ category, minPrice, maxPrice, sortBy, sortOrder, inStock }) {
-        const baseUrl = "http://localhost:8080/api/products"
+        const baseUrl = `${apiBaseUrl}/api/products`
         const filters = []
         if (keyword) filters.push(`keyword=${keyword}`)
         if (category) filters.push(`category=${category}`)
@@ -49,7 +50,7 @@ export default function Home() {
     return (
         <>
             <SearchSummary {...searchSummary} />
-            <SearchFilters searchFilters={searchFilters} setSearchFilters={setSearchFilters} />
+            {(keyword || searchFilters.category) && <SearchFilters searchFilters={searchFilters} setSearchFilters={setSearchFilters} />}
             <ProductsContainer products={products} />
         </>
     )

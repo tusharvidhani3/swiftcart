@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import styles from '../styles/Orders.module.css'
 import OrderCard from "./OrderCard";
 import { useAuthFetch } from "../hooks/useAuthFetch";
+import { apiBaseUrl } from "../config";
 
 export default function Orders() {
 
@@ -9,7 +10,7 @@ export default function Orders() {
     const { authFetch } = useAuthFetch()
 
     async function getOrders() {
-        const res = await authFetch("http://localhost:8080/api/orders", {
+        const res = await authFetch(`${apiBaseUrl}/api/orders`, {
             method: "GET"
         })
         const ordersPage = await res.json()

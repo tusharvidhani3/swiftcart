@@ -6,6 +6,7 @@ import ToastContext from '../contexts/ToastContext'
 import { useNavigate } from 'react-router'
 import CartContext from '../contexts/CartContext'
 import { useAuthFetch } from '../hooks/useAuthFetch'
+import { apiBaseUrl } from '../config'
 
 export default function CartItem({ cartItemId, product, quantity }) {
 
@@ -15,7 +16,7 @@ export default function CartItem({ cartItemId, product, quantity }) {
     const {authFetch} = useAuthFetch()
 
     async function changeQty(changeInQty) {
-        const res = await authFetch(`http://localhost:8080/api/cart/items/${cartItemId}`, {
+        const res = await authFetch(`${apiBaseUrl}/api/cart/items/${cartItemId}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
@@ -32,7 +33,7 @@ export default function CartItem({ cartItemId, product, quantity }) {
     }
 
     async function removeCartItem() {
-        const res = await authFetch(`http://localhost:8080/api/cart/items/${cartItemId}`, {
+        const res = await authFetch(`${apiBaseUrl}/api/cart/items/${cartItemId}`, {
             method: "DELETE",
         })
         const cartResponse = await res.json()

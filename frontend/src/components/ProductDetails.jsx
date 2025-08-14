@@ -6,6 +6,7 @@ import CartContext from '../contexts/CartContext'
 import { useAuthFetch } from '../hooks/useAuthFetch'
 import CheckoutContext from '../contexts/CheckoutContext'
 import ProductImageGallery from './ProductImageGallery'
+import { apiBaseUrl } from '../config'
 
 export default function ProductDetails() {
 
@@ -16,10 +17,9 @@ export default function ProductDetails() {
     const { authFetch } = useAuthFetch()
     const { setCheckoutCart, setBuyNow } = useContext(CheckoutContext)
     const navigate = useNavigate()
-    console.log(product?.imageUrls)
 
     async function fetchProduct() {
-        const res = await fetch(`http://localhost:8080/api/products/${productId}`, {
+        const res = await fetch(`${apiBaseUrl}/api/products/${productId}`, {
             method: "GET",
             credentials: "include"
         })
@@ -28,7 +28,7 @@ export default function ProductDetails() {
     }
 
     async function buyNow() {
-        const res = await authFetch(`http://localhost:8080/api/cart/checkout/buy-now/product/${productId}`, {
+        const res = await authFetch(`${apiBaseUrl}/api/cart/checkout/buy-now/product/${productId}`, {
             method: 'POST'
         })
         const cartResponse = await res.json()

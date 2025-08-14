@@ -3,16 +3,19 @@ import styles from '../styles/AuthForm.module.css'
 import shoppingIcon from '../assets/icons/shopping-icon.svg'
 import { useContext, useEffect, useState } from 'react'
 import UserContext from '../contexts/UserContext'
+import { apiBaseUrl } from '../config'
 
 export default function AuthForm({ mode }) {
 
     const { userInfo, setUserInfo, handleLogin } = useContext(UserContext)
     const [authForm, setAuthForm] = useState()
+    // const [searchParams] = useSearchParams()
+    // const redirectTo = searchParams.get('redirectTo')
     const navigate = useNavigate()
     useEffect(() => {
         if (userInfo) {
             if(userInfo.role === 'ROLE_CUSTOMER')
-                navigate('/')
+                navigate(`/`)
             else if(userInfo.role === 'ROLE_SELLER')
                 navigate('/seller/dashboard')
         }
@@ -21,7 +24,7 @@ export default function AuthForm({ mode }) {
     const isRegisterMode = mode === "register"
 
     async function register() {
-        const res = await fetch('http://localhost:8080/api/auth/register', {
+        const res = await fetch(`${apiBaseUrl}/api/auth/register`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

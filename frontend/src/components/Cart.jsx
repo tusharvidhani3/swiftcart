@@ -20,7 +20,6 @@ export default function Cart() {
         setCheckoutCart(cart)
     }, [cart])
     
-    console.log(cart)
     return cart?.cartItems.length ? (
         <>
             <CartItemsContainer />

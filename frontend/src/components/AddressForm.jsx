@@ -3,6 +3,7 @@ import styles from '../styles/AddressForm.module.css'
 import AddressesContext from '../contexts/AddressesContext'
 import { useNavigate } from 'react-router'
 import { useAuthFetch } from '../hooks/useAuthFetch'
+import { apiBaseUrl } from '../config'
 
 export default function AddAddress({ isEditMode }) {
 
@@ -23,7 +24,7 @@ export default function AddAddress({ isEditMode }) {
     }, [isEditMode])
 
     async function handleAddAddress() {
-        const res = await authFetch('http://localhost:8080/api/addresses', {
+        const res = await authFetch(`${apiBaseUrl}/api/addresses`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -36,7 +37,7 @@ export default function AddAddress({ isEditMode }) {
     }
 
     async function handleEditAddress() {
-        const res = await authFetch(`http://localhost:8080/api/addresses/${editingAddress.addressId}`, {
+        const res = await authFetch(`${apiBaseUrl}/api/addresses/${editingAddress.addressId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'

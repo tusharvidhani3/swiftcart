@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router';
 import { useAuthFetch } from '../hooks/useAuthFetch';
 import plusIcon from '../assets/icons/plus.svg'
 import cancelXIcon from '../assets/icons/cancel-x.png'
+import { apiBaseUrl } from '../config';
 
 export default function CreateProductListing() {
 
@@ -89,7 +90,7 @@ export default function CreateProductListing() {
         for (let i = 0; i < selectedFiles.length; i++) {
             formData.append("productImages", selectedFiles[i]);
         }
-        const res = authFetch("http://localhost:8080/api/products", {
+        const res = authFetch(`${apiBaseUrl}/api/products`, {
             method: "POST",
             body: formData
         })
