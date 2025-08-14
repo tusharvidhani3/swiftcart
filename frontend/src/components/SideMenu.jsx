@@ -3,6 +3,7 @@ import myProfile from "../assets/icons/my-profile.svg";
 import orders from "../assets/icons/orders.svg";
 import locationIcon from '../assets/icons/location.svg'
 import logout from "../assets/icons/logout.svg";
+import login from '../assets/icons/login.svg'
 import cartIcon from "../assets/icons/cart.svg";
 import closeIcon from '../assets/icons/close-x.svg'
 import styles from '../styles/SideMenu.module.css'
@@ -11,7 +12,7 @@ import UserContext from "../contexts/UserContext";
 
 export default function SideMenu({ isSideMenuOpen, setSideMenuOpen }) {
 
-    const { handleLogout } = useContext(UserContext)
+    const { userInfo, handleLogout } = useContext(UserContext)
 
     return (
         <aside className={`${styles.sideMenu} ${isSideMenuOpen?styles.open:''}`} onClick={e => {
@@ -25,7 +26,7 @@ export default function SideMenu({ isSideMenuOpen, setSideMenuOpen }) {
                 <Link to="/cart"><img src={cartIcon} />Cart</Link>
                 <Link to="/profile"><img src={myProfile} />Profile</Link>
                 <Link to="/addresses" className={styles.addresses}><img src={locationIcon} />Saved Addresses</Link>
-                <Link onClick={handleLogout}><img src={logout} />Logout</Link>
+                {userInfo ? <Link onClick={handleLogout}><img src={logout} />Logout</Link> : <Link to="/auth/login"><img src={login} />Login</Link>}
             </nav>
             <button className={styles.btnClose} onClick={e => {
                 e.stopPropagation()
