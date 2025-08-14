@@ -64,6 +64,7 @@
     font-weight: 600;
     width: 90%;
     padding-inline: 16px;
+    margin-top: 48px;
 }
 
 .btnAddToCart {
@@ -89,6 +90,7 @@
     box-sizing: border-box;
     height: 48px;
     top: 108px;
+    z-index: 1
 }
 
 .sortBy, .filter {
@@ -101,9 +103,65 @@
 
 .btnSort, .btnFilter {
     width: 100%;
-    /* height: 100%; */
+    height: 100%;
     background-color: white;
     border: 1px solid gray;
+    border-radius: 0;
+    gap: 12px;
+}
+
+.btnSort img, .btnFilter img {
+    width: 20px;
+    height: 18px;
+}
+
+.sortByDropDown {
+    background-color: white;
+    bottom: 0;
+    width: 100%;
+    position: fixed;
+    z-index: 2;
+    transform: translateY(100%);
+    transition: transform 0.3s ease-in-out;
+}
+
+.sortByDropDown.open {
+    transform: translateY(0);
+}
+
+.sortByDropDownList {
+    list-style-type: none;
+    padding-inline: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    height: 180px;
+}
+
+.sortByDropDownList li {
+    display: flex;
+    justify-content: space-between;
+}
+
+.backdropOverlay {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.sortByTitle {
+    color: #878787;
+    border-bottom: 1px solid #eaeaea;
+    padding: 8px 12px;
+    font-size: 14px;
+    margin: 0;
+}
+
+.customRadio {
+    width: 20px;
+    height: 20px;
 }
 
 @media screen and (min-width: 768px) {

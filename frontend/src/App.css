@@ -93,7 +93,6 @@ main {
 .authForm {
   justify-content: center;
   min-height: 550px;
-  padding-block: 80px 16px;
   height: 100vh;
   flex-direction: row;
   gap: 0;
@@ -152,6 +151,7 @@ nav {
   .authForm {
     max-width: 820px;
     margin: auto;
+    padding-block: 80px 16px;
   }
 
   .profile {
