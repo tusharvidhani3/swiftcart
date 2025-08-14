@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import styles from "../styles/Profile.module.css";
 import UserContext from "../contexts/UserContext";
 import { useAuthFetch } from "../hooks/useAuthFetch";
+import { apiBaseUrl } from "../config";
 
 export default function Profile() {
 
@@ -19,7 +20,7 @@ export default function Profile() {
 
     async function updateProfile(profileForm) {
         const profileFormData = new FormData(profileForm)
-        const res = await authFetch("http://localhost:8080/api/users", {
+        const res = await authFetch(`${apiBaseUrl}/api/users`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
@@ -30,7 +31,7 @@ export default function Profile() {
         setUserInfo(updatedUserInfo)
     }
 
-    return modifiedUserInfo?(
+    return (
         <form className={isFormModified ? styles.changed : ""} id={styles.profileForm} onSubmit={e => {
             e.preventDefault()
             updateProfile(e.currentTarget)
@@ -81,5 +82,5 @@ export default function Profile() {
             </div>
             <button className={styles.btnSaveChanges}>Save changes</button>
         </form>
-    ):"loading..."
+    )
 }

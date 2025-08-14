@@ -12,6 +12,7 @@ import useMediaQuery from "../hooks/useMediaQuery"
 import ManageAddresses from "./ManageAddresses"
 import CheckoutContext from "../contexts/CheckoutContext"
 import CartContext from "../contexts/CartContext"
+import { apiBaseUrl } from "../config"
 
 export default function Checkout() {
 
@@ -26,7 +27,7 @@ export default function Checkout() {
     const isMobile = useMediaQuery('(max-width: 767px)')
 
     async function getDefaultAddress() {
-        const res = await authFetch('http://localhost:8080/api/addresses/default', {
+        const res = await authFetch(`${apiBaseUrl}/api/addresses/default`, {
             method: 'GET'
         })
         const defaultAddress = await res.json()
@@ -41,7 +42,7 @@ export default function Checkout() {
     }, [])
 
     async function placeOrder() {
-        const res = await authFetch('http://localhost:8080/api/orders/checkout', {
+        const res = await authFetch(`${apiBaseUrl}/api/orders/checkout`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -59,7 +60,7 @@ export default function Checkout() {
     }
 
     async function placeBuyNowOrder() {
-        const res = await authFetch(`http://localhost:8080/api/orders/checkout/buy-now`, {
+        const res = await authFetch(`${apiBaseUrl}/api/orders/checkout/buy-now`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -78,7 +79,7 @@ export default function Checkout() {
 
     async function getAddresses() {
 
-        const res = await authFetch("http://localhost:8080/api/addresses", {
+        const res = await authFetch(`${apiBaseUrl}:8080/api/addresses`, {
             method: "GET"
         })
         const addressList = await res.json()

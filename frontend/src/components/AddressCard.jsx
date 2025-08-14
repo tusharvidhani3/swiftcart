@@ -6,6 +6,7 @@ import AddressesContext from '../contexts/AddressesContext'
 import { useAuthFetch } from '../hooks/useAuthFetch'
 import pencilEditIcon from '../assets/icons/edit-pencil.svg'
 import useMediaQuery from '../hooks/useMediaQuery'
+import { apiBaseUrl } from '../config'
 
 export default function AddressCard({ address, threeDotsMenuOpenId, setThreeDotsMenuOpenId, desktopSelectStyles, isSelectMode, setShowAddressSelector }) {
 
@@ -17,7 +18,7 @@ export default function AddressCard({ address, threeDotsMenuOpenId, setThreeDots
     // const isMobile = useMediaQuery('(max-width: 767px)')
 
     async function deleteAddress() {
-        const res = await authFetch(`http://localhost:8080/api/addresses/${addressId}`, { method: 'DELETE' })
+        const res = await authFetch(`${apiBaseUrl}/api/addresses/${addressId}`, { method: 'DELETE' })
         if (res.ok) {
             setAddresses(addresses.filter(address => address.addressId != addressId))
             navigate('/addresses')
@@ -25,7 +26,7 @@ export default function AddressCard({ address, threeDotsMenuOpenId, setThreeDots
     }
 
     async function changeDefaultAddress() {
-        const res = await authFetch(`http://localhost:8080/api/addresses/${addressId}/default`, { method: 'PUT' })
+        const res = await authFetch(`${apiBaseUrl}/api/addresses/${addressId}/default`, { method: 'PUT' })
         if (res.ok) {
             setAddresses(addresses => addresses.map(addressData => ({ ...addressData, isDefaultShipping: addressData.addressId === addressId })))
         }

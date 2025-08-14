@@ -4,6 +4,7 @@ import { useAuthFetch } from '../hooks/useAuthFetch'
 import { useEffect, useState } from 'react'
 import OrderItemDetailsCard from './OrderItemDetailsCard'
 import useMediaQuery from '../hooks/useMediaQuery'
+import { apiBaseUrl } from '../config'
 
 export default function OrderDetails() {
 
@@ -13,7 +14,7 @@ export default function OrderDetails() {
     const isDesktop = useMediaQuery('(min-width: 1080px)')
 
     async function getOrder() {
-        const res = await authFetch(`http://localhost:8080/api/orders/${orderId}`, {
+        const res = await authFetch(`${apiBaseUrl}/api/orders/${orderId}`, {
             method: 'GET',
         })
         const orderResponse = await res.json()

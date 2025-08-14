@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router'
 import { useAuthFetch } from '../hooks/useAuthFetch'
 import styles from '../styles/OrderDetails.module.css'
 import { generateStatus } from './OrderItemCard'
+import { apiBaseUrl } from '../config'
 
 export default function OrderItemDetailsCard({ orderItemId, product, orderItemStatus, deliveryAt, quantity, orders, setOrders }) {
 
@@ -10,7 +11,7 @@ export default function OrderItemDetailsCard({ orderItemId, product, orderItemSt
 
     async function cancelOrderItem() {
         
-        const res = await authFetch(`http://localhost:8080/api/orders/items/${orderItemId}/cancel`, {
+        const res = await authFetch(`${apiBaseUrl}/api/orders/items/${orderItemId}/cancel`, {
             method: 'PATCH',
             credentials: 'include'
         })
@@ -18,9 +19,17 @@ export default function OrderItemDetailsCard({ orderItemId, product, orderItemSt
         if(res.ok) {
             const cancelledOrderItem = await res.json()
             setOrders(orders => orders.map(order => {
-                if(order.orderId === cancelledOrderItem.orderId) {
-                    return cancelOrderItem
+                if(order.orderId === cancelledOrderItem.order.orderId) {
+                    const modifiedOrder = {...order}
+                    modifiedOrder.orderItems.map(orderItem => {
+                        if(orderItem.orderItemId === cancelledOrderItem.orderItemId) {
+                            return cancelledOrderItem
+                        }
+                        return orderItem
+                    })
+                    return modifiedOrder
                 }
+                return order
             }))
         }
     }
@@ -33,7 +42,7 @@ export default function OrderItemDetailsCard({ orderItemId, product, orderItemSt
                 <img src={product.imageUrls[0]} alt="product image preview" />
                 <span className={styles.productQty}>{product.quantity}</span>
                 <div className={styles.productInfo}>
-                    <div><span className={styles.productTitle}>{product.productName}</span></div>
+                    <div className={styles.productTitle}>{product.productName}</div>
                     <p className={styles.itemTotal}>₹{(product.price * quantity).toLocaleString('en-IN')}</p>
                     <p className={styles.status}></p>
                 </div>

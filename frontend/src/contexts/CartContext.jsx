@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import UserContext from "./UserContext";
 import { useAuthFetch } from "../hooks/useAuthFetch";
+import { apiBaseUrl } from "../config";
 
 const CartContext = createContext()
 export default CartContext
@@ -12,7 +13,7 @@ export function CartProvider({ children }) {
     const { authFetch } = useAuthFetch()
 
     async function updateCart() {
-        const res = await authFetch("http://localhost:8080/api/cart", {
+        const res = await authFetch(`${apiBaseUrl}/api/cart`, {
             method: "GET"
         })
         const cartResponse = await res.json()
@@ -23,7 +24,7 @@ export function CartProvider({ children }) {
     }
 
     async function addToCart(productId, showToast) {
-        const res = await authFetch("http://localhost:8080/api/cart/items", {
+        const res = await authFetch(`${apiBaseUrl}/api/cart/items`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

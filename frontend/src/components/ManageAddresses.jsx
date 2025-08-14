@@ -5,6 +5,7 @@ import AddressCard from './AddressCard'
 import { useNavigate } from 'react-router'
 import AddressesContext from '../contexts/AddressesContext'
 import { useAuthFetch } from '../hooks/useAuthFetch'
+import { apiBaseUrl } from '../config'
 
 export default function ManageAddresses({ isSelectMode, setShowAddressSelector }) {
 
@@ -25,7 +26,7 @@ export default function ManageAddresses({ isSelectMode, setShowAddressSelector }
 
     async function getAddresses() {
 
-        const res = await authFetch("http://localhost:8080/api/addresses", {
+        const res = await authFetch(`${apiBaseUrl}/api/addresses`, {
             method: "GET"
         })
         const addressList = await res.json()

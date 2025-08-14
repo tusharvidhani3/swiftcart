@@ -1,5 +1,6 @@
 import { createContext, useEffect, useState } from "react"
 import { useNavigate } from "react-router"
+import { apiBaseUrl } from "../config"
 
 const UserContext = createContext()
 export default UserContext
@@ -10,7 +11,7 @@ export function UserProvider({ children }) {
     const navigate = useNavigate()
 
     async function refreshAccessToken() {
-        const res = await fetch('http://localhost:8080/api/auth/refresh-token', {
+        const res = await fetch(`${apiBaseUrl}/api/auth/refresh-token`, {
             method: "POST",
             credentials: 'include',
             headers: {
@@ -24,7 +25,7 @@ export function UserProvider({ children }) {
     }
 
     async function updateUserInfo() {
-        const res = await fetch("http://localhost:8080/api/users/me", {
+        const res = await fetch(`${apiBaseUrl}/api/users/me`, {
             method: "GET",
             credentials: "include",
             headers: {
@@ -41,7 +42,7 @@ export function UserProvider({ children }) {
     }
 
     async function handleLogin(userCredentials) {
-        const res = await fetch("http://localhost:8080/api/auth/login", {
+        const res = await fetch(`${apiBaseUrl}/api/auth/login`, {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json'
@@ -59,7 +60,7 @@ export function UserProvider({ children }) {
     }
 
     async function handleLogout() {
-        const res = await fetch("http://localhost:8080/api/auth/logout", {
+        const res = await fetch(`${apiBaseUrl}/api/auth/logout`, {
             method: "POST",
             credentials: "include"
         })

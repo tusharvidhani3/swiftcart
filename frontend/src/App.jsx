@@ -9,7 +9,6 @@ import { UIProvider } from './contexts/UIContext';
 function App() {
 
   const { userInfo } = useContext(UserContext)
-  console.log(userInfo)
   const matches = useMatches();
   const mainClassKey = matches.find(m => m.handle?.mainClass)?.handle.mainClass || '';
   const mainClass = `${mainClassKey && mainClassKey}`;
