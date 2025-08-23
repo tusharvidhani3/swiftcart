@@ -23,12 +23,15 @@
 .productInfo {
     display: flex;
     gap: 12px;
+    max-height: 120px;
 }
 
 .productTitle {
     font-size: 16px;
     margin: 8px;
     font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .productTitle + div {

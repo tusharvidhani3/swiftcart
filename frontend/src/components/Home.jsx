@@ -7,7 +7,7 @@ import { apiBaseUrl } from "../config";
 
 export default function Home() {
 
-    const [products, setProducts] = useState([])
+    const [products, setProducts] = useState(null)
     const [searchSummary, setSearchSummary] = useState({})
     const { keyword } = useOutletContext()
     const [searchFilters, setSearchFilters] = useState({

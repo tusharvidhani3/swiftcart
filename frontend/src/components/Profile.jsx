@@ -3,6 +3,7 @@ import styles from "../styles/Profile.module.css";
 import UserContext from "../contexts/UserContext";
 import { useAuthFetch } from "../hooks/useAuthFetch";
 import { apiBaseUrl } from "../config";
+import loadingGif from '../assets/images/loading.gif'
 
 export default function Profile() {
 
@@ -31,7 +32,7 @@ export default function Profile() {
         setUserInfo(updatedUserInfo)
     }
 
-    return (
+    return modifiedUserInfo ? (
         <form className={isFormModified ? styles.changed : ""} id={styles.profileForm} onSubmit={e => {
             e.preventDefault()
             updateProfile(e.currentTarget)
@@ -82,5 +83,5 @@ export default function Profile() {
             </div>
             <button className={styles.btnSaveChanges}>Save changes</button>
         </form>
-    )
+    ) : <img className='loadingGif' src={loadingGif} alt="Loading..." />
 }

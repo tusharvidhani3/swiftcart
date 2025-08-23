@@ -22,7 +22,7 @@ export default function Orders() {
         loadOrders()
     }, [])
 
-    return orders.length ? (
+    return orders?.length ? (
         <>
             <h2 className={styles.yourOrders}>Your Orders</h2>
             <div className={styles.ordersContainer}>
