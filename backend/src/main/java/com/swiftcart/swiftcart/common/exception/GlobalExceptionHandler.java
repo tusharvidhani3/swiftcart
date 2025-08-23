@@ -7,6 +7,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.razorpay.RazorpayException;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -38,6 +40,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<String> handelIllegalState(IllegalStateException ex) {
         return new ResponseEntity<String>(ex.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(RazorpayException.class)
+    public ResponseEntity<String> handleRazorpayException(RazorpayException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(ex.getMessage());
     }
 
 }

@@ -3,10 +3,7 @@ package com.swiftcart.swiftcart.features.payment;
 import com.swiftcart.swiftcart.features.order.Order;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
@@ -15,18 +12,20 @@ import lombok.Setter;
 
 @Entity
 @Getter
+@Setter
 public class Payment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long paymentId;
+    @GeneratedValue
+    private Long id;
+
+    private String paymentOrderId;
+
+    private String paymentId;
 
     @OneToOne
     @JoinColumn(name = "order_id")
-    @Setter
     private Order order;
 
-	@Setter
-    @Enumerated(EnumType.STRING)
-	private PaymentMethod paymentMethod;
+    private PaymentStatus paymentStatus;
 }

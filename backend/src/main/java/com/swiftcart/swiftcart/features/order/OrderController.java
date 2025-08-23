@@ -2,6 +2,7 @@ package com.swiftcart.swiftcart.features.order;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import com.razorpay.RazorpayException;
 import com.swiftcart.swiftcart.common.security.UserDetailsImpl;
 
 import jakarta.validation.Valid;
@@ -34,8 +35,8 @@ public class OrderController {
 
     @PostMapping("/checkout")
     @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<OrderResponse> placeOrder(@RequestBody @Valid PlaceOrderRequest placeOrderRequest, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        OrderResponse orderResponse=orderService.placeOrder(placeOrderRequest, userDetailsImpl.getUser().getUserId());
+    public ResponseEntity<OrderResponse> createOrder(@RequestBody @Valid PlaceOrderRequest placeOrderRequest, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) throws RazorpayException {
+        OrderResponse orderResponse=orderService.createOrder(placeOrderRequest, userDetailsImpl.getUser().getUserId());
         return ResponseEntity.created(URI.create("/orders/"+orderResponse.getOrderId())).body(orderResponse);
     }
 
@@ -70,7 +71,7 @@ public class OrderController {
 
     @PostMapping("/checkout/buy-now")
     @PreAuthorize("hasRole('CUSTOMER')") // Can allow Admin also to place order on user's behalf
-    public ResponseEntity<OrderResponse> placeBuyNowOrder(@RequestBody PlaceBuyNowOrderRequest placeBuyNowOrderRequest, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
+    public ResponseEntity<OrderResponse> placeBuyNowOrder(@RequestBody PlaceBuyNowOrderRequest placeBuyNowOrderRequest, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) throws RazorpayException {
         OrderResponse orderResponse = orderService.placeBuyNowOrder(placeBuyNowOrderRequest, userDetailsImpl.getUser());
         return ResponseEntity.created(URI.create("/orders/"+orderResponse.getOrderId())).body(orderResponse);
     }

@@ -19,6 +19,10 @@ import com.swiftcart.swiftcart.features.address.AddressSnapshot;
 import com.swiftcart.swiftcart.features.cart.CartItem;
 import com.swiftcart.swiftcart.features.cart.CartService;
 import com.swiftcart.swiftcart.features.payment.Payment;
+import com.swiftcart.swiftcart.features.payment.PaymentDTO;
+import com.swiftcart.swiftcart.features.payment.PaymentService;
+import com.swiftcart.swiftcart.features.payment.PaymentStatus;
+import com.razorpay.RazorpayException;
 import com.swiftcart.swiftcart.common.exception.BadRequestException;
 import com.swiftcart.swiftcart.common.exception.ResourceNotFoundException;
 import com.swiftcart.swiftcart.features.product.ProductResponse;
@@ -46,22 +50,22 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private AddressService addressService;
 
+    @Autowired
+    private PaymentService paymentService;
+
     @Override
     @Transactional
-    public OrderResponse placeOrder(PlaceOrderRequest placeOrderRequest, Long userId) {
+    public OrderResponse createOrder(PlaceOrderRequest placeOrderRequest, Long userId) throws RazorpayException {
         List<CartItem> cartItems = cartService.getCartItemsByUserId(userId);
-        if(cartItems.isEmpty())
-        throw new ResourceNotFoundException("Order cannot be placed on empty cart");
+        if (cartItems.isEmpty())
+            throw new ResourceNotFoundException("Order cannot be placed on empty cart");
         Address shippingAddress = addressService.getAddressById(placeOrderRequest.getShippingAddressId());
-        if(!shippingAddress.getUser().getUserId().equals(userId))
-        throw new AccessDeniedException("Unauthorized access to the address");
+        if (!shippingAddress.getUser().getUserId().equals(userId))
+            throw new AccessDeniedException("Unauthorized access to the address");
         Order order = new Order();
         order.setPlacedAt(LocalDateTime.now());
         order.setShippingAddress(modelMapper.map(shippingAddress, AddressSnapshot.class));
         order.setUser(shippingAddress.getUser());
-        Payment payment = new Payment();
-        payment.setPaymentMethod(placeOrderRequest.getPaymentMethod());
-        order.setPayment(payment);
         List<OrderItem> orderItems = new ArrayList<>();
         double totalAmount = 0;
         for (CartItem ci : cartItems) {
@@ -69,17 +73,20 @@ public class OrderServiceImpl implements OrderService {
             orderItem.setOrder(order);
             orderItem.setProduct(ci.getProduct());
             orderItem.setQuantity(ci.getQuantity());
-            orderItem.setOrderItemStatus(OrderStatus.PROCESSING);
+            orderItem.setOrderItemStatus(placeOrderRequest.getPrepaid() ? OrderStatus.CREATED : OrderStatus.CONFIRMED);
             orderItem.setDeliveryAt(LocalDateTime.now().plusWeeks(1).withHour(20).withMinute(0).withSecond(0).withNano(0));
             orderItems.add(orderItem);
             productService.updateStock(ci.getProduct().getProductId(), -orderItem.getQuantity());
-            totalAmount += ci.getProduct().getPrice()*ci.getQuantity();
+            totalAmount += ci.getProduct().getPrice() * ci.getQuantity();
         }
         order.setTotalAmount(totalAmount);
         orderItemRepo.saveAll(orderItems);
         order = orderRepo.save(order);
         cartService.deleteCartItemsByUserId(userId);
-        return modelMapper.map(order, OrderResponse.class);
+        OrderResponse orderResponse = modelMapper.map(order, OrderResponse.class);
+        if (placeOrderRequest.getPrepaid())
+            orderResponse.setPayment(paymentService.createOrder(order));
+        return orderResponse;
     }
 
     @Override
@@ -101,9 +108,12 @@ public class OrderServiceImpl implements OrderService {
             orderItemResponse.setDeliveryAt(orderItem.getDeliveryAt());
             return orderItemResponse;
         })
-        .collect(Collectors.toList());
+                .collect(Collectors.toList());
         OrderResponse orderResponse = modelMapper.map(order, OrderResponse.class);
         orderResponse.setOrderItems(orderItems);
+        PaymentDTO paymentDTO = paymentService.getPayment(order.getOrderId());
+        if(paymentDTO != null)
+            orderResponse.setPayment(paymentDTO);
         return orderResponse;
     }
 
@@ -121,6 +131,9 @@ public class OrderServiceImpl implements OrderService {
                         return orderItemResponse;
                     }).collect(Collectors.toList());
                     orderResponse.setOrderItems(orderItemResponseList);
+                    PaymentDTO paymentDTO = paymentService.getPayment(order.getOrderId());
+                    if(paymentDTO != null)
+                        orderResponse.setPayment(paymentDTO);
                     return orderResponse;
                 });
     }
@@ -129,16 +142,21 @@ public class OrderServiceImpl implements OrderService {
     public Page<OrderResponseForSeller> getAllOrders(Pageable pageable) {
         return orderRepo.findAll(pageable)
                 .map(order -> {
-                    OrderResponseForSeller orderResponseForSeller = modelMapper.map(order, OrderResponseForSeller.class);
+                    OrderResponseForSeller orderResponseForSeller = modelMapper.map(order,
+                            OrderResponseForSeller.class);
                     List<OrderItem> orderItems = orderItemRepo.findAllByOrder_OrderId(order.getOrderId());
                     List<OrderItemResponse> orderItemResponseList = orderItems.stream().map(orderItem -> {
-                        ProductResponse productResponse = modelMapper.map(orderItem.getProduct(), ProductResponse.class);
+                        ProductResponse productResponse = modelMapper.map(orderItem.getProduct(),
+                                ProductResponse.class);
                         productResponse.setImageUrls(productService.getProductImages(orderItem.getProduct().getProductId()));
                         OrderItemResponse orderItemResponse = modelMapper.map(orderItem, OrderItemResponse.class);
                         orderItemResponse.setProduct(productResponse);
                         return orderItemResponse;
                     }).collect(Collectors.toList());
                     orderResponseForSeller.setOrderItems(orderItemResponseList);
+                    PaymentDTO paymentDTO = paymentService.getPayment(order.getOrderId());
+                    if(paymentDTO != null)
+                        orderResponseForSeller.setPayment(paymentDTO);
                     return orderResponseForSeller;
                 });
     }
@@ -163,7 +181,7 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new ResourceNotFoundException("Order Item not found"));
         if (!orderItem.getOrder().getUser().getUserId().equals(userId))
             throw new AccessDeniedException("You are not allowed to perform this action");
-        if(orderItem.getOrderItemStatus() == OrderStatus.PENDING || orderItem.getOrderItemStatus() == OrderStatus.PROCESSING || orderItem.getOrderItemStatus() == OrderStatus.SHIPPED) {
+        if (orderItem.getOrderItemStatus() == OrderStatus.CONFIRMED || orderItem.getOrderItemStatus() == OrderStatus.OUT_FOR_DELIVERY || orderItem.getOrderItemStatus() == OrderStatus.SHIPPED) {
             orderItem.setOrderItemStatus(OrderStatus.CANCELLED);
             productService.updateStock(orderItem.getProduct().getProductId(), orderItem.getQuantity());
             orderItem = orderItemRepo.save(orderItem);
@@ -176,7 +194,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderResponse placeBuyNowOrder(PlaceBuyNowOrderRequest placeBuyNowOrderRequest, User user) {
+    public OrderResponse placeBuyNowOrder(PlaceBuyNowOrderRequest placeBuyNowOrderRequest, User user) throws RazorpayException {
         CartItem cartItem = cartService.getCartItemByCartItemId(placeBuyNowOrderRequest.getCartItemId());
         Address shippingAddress = addressService.getAddressById(placeBuyNowOrderRequest.getShippingAddressId());
         if (cartItem.getCart().getUser().getUserId() != user.getUserId() || shippingAddress.getUser().getUserId() != user.getUserId())
@@ -188,17 +206,18 @@ public class OrderServiceImpl implements OrderService {
         order.setUser(user);
         order = orderRepo.save(order);
         Payment payment = new Payment();
-        payment.setPaymentMethod(placeBuyNowOrderRequest.getPaymentMethod());
-        order.setPayment(payment);
+        payment.setPaymentStatus(placeBuyNowOrderRequest.getPrepaid() ? PaymentStatus.PENDING : PaymentStatus.COD);
         OrderItem orderItem = new OrderItem();
         orderItem.setProduct(cartItem.getProduct());
         orderItem.setOrder(order);
         orderItem.setQuantity(cartItem.getQuantity());
-        orderItem.setOrderItemStatus(OrderStatus.PROCESSING);
+        orderItem.setOrderItemStatus(OrderStatus.CREATED);
         orderItem.setDeliveryAt(LocalDateTime.now().plusWeeks(1).withHour(20).withMinute(0).withSecond(0).withNano(0));
         orderItemRepo.save(orderItem);
         productService.updateStock(cartItem.getProduct().getProductId(), -orderItem.getQuantity());
         OrderResponse orderResponse = modelMapper.map(order, OrderResponse.class);
+        if (placeBuyNowOrderRequest.getPrepaid())
+            orderResponse.setPayment(paymentService.createOrder(order));
         return orderResponse;
     }
 
@@ -210,14 +229,14 @@ public class OrderServiceImpl implements OrderService {
 
         List<OrderItem> orderItems = orderItemRepo.findAllByOrder_OrderId(orderId);
         orderItems.stream().forEach(orderItem -> {
-                if(orderItem.getOrderItemStatus() == OrderStatus.PENDING || orderItem.getOrderItemStatus() == OrderStatus.PROCESSING || orderItem.getOrderItemStatus() == OrderStatus.SHIPPED) {
-                    orderItem.setOrderItemStatus(OrderStatus.CANCELLED);
-                    productService.updateStock(orderItem.getProduct().getProductId(), orderItem.getQuantity());
-                    orderItem = orderItemRepo.save(orderItem);
-                }
-                else {
-                    throw new BadRequestException("Cannot cancel order, one or more item(s) delivered");
-                }
+            if (orderItem.getOrderItemStatus() == OrderStatus.CONFIRMED || orderItem.getOrderItemStatus() == OrderStatus.OUT_FOR_DELIVERY || orderItem.getOrderItemStatus() == OrderStatus.SHIPPED) {
+                orderItem.setOrderItemStatus(OrderStatus.CANCELLED);
+                productService.updateStock(orderItem.getProduct().getProductId(), orderItem.getQuantity());
+                orderItem = orderItemRepo.save(orderItem);
+            }
+            else {
+                throw new BadRequestException("Cannot cancel order, one or more item(s) delivered");
+            }
         });
         return modelMapper.map(order, OrderResponse.class);
     }

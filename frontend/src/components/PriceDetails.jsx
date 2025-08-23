@@ -1,7 +1,10 @@
+import { useNavigate } from 'react-router'
 import styles from '../styles/PriceDetails.module.css'
+import PaymentButton from './PaymentButton'
 
-export default function PriceDetails({ proceedToBtnTxt, proceedToBtnClick, cart, isCheckoutMode }) {
+export default function PriceDetails({ nextBtnClick, cart, isCheckoutMode, isCod }) {
 
+    const navigate = useNavigate()
     const totalAmount=cart?.totalPrice, cartItemsCount=cart?.cartItems.length
 
     return (
@@ -19,7 +22,10 @@ export default function PriceDetails({ proceedToBtnTxt, proceedToBtnClick, cart,
 
             <div className={styles.checkout}>
                 <h2 className={styles.priceToPay}>₹{totalAmount.toLocaleString('en-IN')}</h2>
-                <button className={styles.btnCheckout} onClick={proceedToBtnClick}>Proceed to {proceedToBtnTxt}</button>
+                {isCheckoutMode ? (isCod ? <button className={styles.btnCheckout} onClick={async () => {
+                    const orderResponse = await nextBtnClick()
+                    navigate(`/orders/${orderResponse.orderId}`)
+                    }}>Place Order</button> : <PaymentButton createOrder={nextBtnClick} amount={totalAmount*100} />) : <button className={styles.btnCheckout} onClick={nextBtnClick}>Proceed to Checkout</button>}
             </div>
         </section>
     )

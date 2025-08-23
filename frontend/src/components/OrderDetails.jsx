@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import OrderItemDetailsCard from './OrderItemDetailsCard'
 import useMediaQuery from '../hooks/useMediaQuery'
 import { apiBaseUrl } from '../config'
+import razorpayLogo from '../assets/icons/razorpay-logo.svg'
 
 export default function OrderDetails() {
 
@@ -51,7 +52,7 @@ export default function OrderDetails() {
                     <section className={styles.section}>
                         <h2>Payment Method</h2>
                         <div className={styles.paymentMethod}>
-                            {order.payment.paymentMethod.replaceAll('_', ' ')}
+                            {order.payment ? <img className={styles.razorpayLogo} src={razorpayLogo} /> : 'Cash On Delivery'}
                         </div>
                     </section>
 
@@ -92,7 +93,7 @@ export default function OrderDetails() {
                 <section className={styles.section}>
                     <h2>Payment Method</h2>
                     <div className={styles.paymentMethod}>
-                        {order.payment.paymentMethod.replaceAll('_', ' ')}
+                        {order.payment ? <img className={styles.razorpayLogo} src={razorpayLogo} /> : 'Cash On Delivery'}
                     </div>
                 </section>
 

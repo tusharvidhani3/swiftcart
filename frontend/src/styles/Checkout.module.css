@@ -116,6 +116,10 @@
     box-sizing: border-box;
 }
 
+.paymentOption img {
+    width: 120px;
+}
+
 @media screen and (min-width: 768px) {
 
     .addressPreview {

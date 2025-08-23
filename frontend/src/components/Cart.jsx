@@ -23,6 +23,6 @@ export default function Cart() {
     return cart?.cartItems.length ? (
         <>
             <CartItemsContainer />
-            <PriceDetails cart={cart} proceedToBtnTxt={"Checkout"} proceedToBtnClick={() => {navigate('/checkout')}} />
+            <PriceDetails cart={cart} nextBtnTxt={"Proceed to Checkout"} nextBtnClick={() => {navigate('/checkout')}} />
         </>) : <EmptyCart />
 }

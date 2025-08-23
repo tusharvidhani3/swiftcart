@@ -48,7 +48,7 @@ export default function OrderItemDetailsCard({ orderItemId, product, orderItemSt
                 </div>
             </div>
             <div className={styles.itemActions}>
-                {['PENDING', 'PROCESSING', 'SHIPPED'].includes(orderItemStatus) && <button className={styles.btnCancel} onClick={cancelOrderItem}>Cancel</button>}
+                {['CONFIRMED', 'SHIPPED'].includes(orderItemStatus) && <button className={styles.btnCancel} onClick={cancelOrderItem}>Cancel</button>}
                 {orderItemStatus==='DELIVERED' ? <button className={styles.btnReturn}>Return / Replace</button> : <button className={styles.btnTrack}>Track package</button>}
                 {['DELIVERED', 'RETURNED', 'REFUNDED'].includes(orderItemStatus) && <button className={styles.btnReview}>Review</button>}
             </div>

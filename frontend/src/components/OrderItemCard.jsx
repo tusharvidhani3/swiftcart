@@ -23,12 +23,14 @@ export default function OrderItemCard({ product, deliveryAt, orderItemStatus }) 
 export function generateStatus(orderItemStatus, deliveryAt) {
     const deliveryDate = new Date(deliveryAt)
     let showDate = false
-    if (orderItemStatus === 'PROCESSING' || orderItemStatus === 'SHIPPED' || orderItemStatus === 'DELIVERED')
+    if (orderItemStatus === 'CONFIRMED' || orderItemStatus === 'SHIPPED' || orderItemStatus === 'DELIVERED')
         showDate = true
 
     let statusText
-    if (orderItemStatus === 'PROCESSING' || orderItemStatus === 'SHIPPED')
+    if (orderItemStatus === 'CONFIRMED' || orderItemStatus === 'SHIPPED')
         statusText = 'Arriving'
+    else if(orderItemStatus === 'OUT_FOR_DELIVERY')
+        statusText = 'Arriving today'
     else if (orderItemStatus === 'DELIVERED')
         statusText = 'Delivered'
     else
