@@ -1,18 +1,20 @@
 import App from './App.jsx'
 import Home from './components/Home.jsx'
-import Cart from './components/Cart.jsx'
 import { createBrowserRouter, Outlet } from 'react-router'
-import ProductDetails from './components/ProductDetails.jsx'
-import Orders from './components/Orders.jsx'
-import Checkout from './components/Checkout.jsx'
-import ManageAddresses from './components/ManageAddresses.jsx'
-import Profile from './components/Profile.jsx'
-import AuthForm from './components/AuthForm.jsx'
-import CreateProductListing from './components/CreateProductListing.jsx'
-import AddressForm from './components/AddressForm.jsx'
-import { AddressesProvider } from './contexts/AddressesContext.jsx'
-import OrderDetails from './components/OrderDetails.jsx'
 import { UserProvider } from './contexts/UserContext.jsx'
+import { lazy } from 'react'
+
+const Cart = lazy(() => import('./components/Cart.jsx'))
+const ProductDetails = lazy(() => import('./components/ProductDetails.jsx'))
+const Orders = lazy(() => import('./components/Orders.jsx'))
+const Checkout = lazy(() => import('./components/Checkout.jsx'))
+const ManageAddresses = lazy(() => import('./components/ManageAddresses.jsx'))
+const Profile = lazy(() => import('./components/Profile.jsx'))
+const AuthForm = lazy(() => import('./components/AuthForm.jsx'))
+const AddressForm = lazy(() => import('./components/AddressForm.jsx'))
+const OrderDetails = lazy(() => import('./components/OrderDetails.jsx'))
+const CreateProductListing = lazy(() => import('./components/CreateProductListing.jsx'))
+const AddressesProvider = lazy(() => import('./contexts/AddressesContext.jsx').then(module => ({default: module.AddressesProvider})))
 
 const router = createBrowserRouter([
     {

@@ -2,9 +2,10 @@ import './App.css'
 import { useMatches } from 'react-router'
 import CustomerApp from './components/CustomerApp'
 import SellerApp from './components/SellerApp';
-import { useContext } from 'react';
+import { Suspense, useContext } from 'react';
 import UserContext from './contexts/UserContext';
 import { UIProvider } from './contexts/UIContext';
+import loadingGif from './assets/images/loading.gif'
 
 function App() {
 
@@ -14,11 +15,13 @@ function App() {
   const mainClass = `${mainClassKey && mainClassKey}`;
 
   return (
-    <UIProvider>
-      {
-        userInfo?.role === 'ROLE_SELLER' ? <SellerApp mainClass={mainClass} /> : <CustomerApp mainClass={mainClass} />
-      }
-    </UIProvider>
+    <Suspense fallback={<img src={loadingGif} alt='Loading...' />}>
+      <UIProvider>
+        {
+          userInfo?.role === 'ROLE_SELLER' ? <SellerApp mainClass={mainClass} /> : <CustomerApp mainClass={mainClass} />
+        }
+      </UIProvider>
+    </Suspense>
   )
 }
 
