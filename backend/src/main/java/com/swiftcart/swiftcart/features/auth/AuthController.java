@@ -52,7 +52,7 @@ public class AuthController {
             .secure(true)
             .path("/")
             .maxAge(Duration.ofMinutes(60))
-            .sameSite("Strict")
+            .sameSite("None")
             .build();
 
         ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken)
@@ -60,7 +60,7 @@ public class AuthController {
             .secure(true)
             .path("/api/auth")
             .maxAge(Duration.ofDays(30))
-            .sameSite("Strict")
+            .sameSite("None")
             .build();
 
         return ResponseEntity.ok()
@@ -84,7 +84,7 @@ public class AuthController {
             .secure(true)
             .path("/")
             .maxAge(Duration.ofMinutes(60))
-            .sameSite("Strict")
+            .sameSite("None")
             .build();
 
         ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken)
@@ -92,7 +92,7 @@ public class AuthController {
             .secure(true)
             .path("/api/auth")
             .maxAge(Duration.ofDays(30))
-            .sameSite("Strict")
+            .sameSite("None")
             .build();
 
         return ResponseEntity.ok()
@@ -113,7 +113,7 @@ public class AuthController {
             .secure(true)
             .path("/")
             .maxAge(0)
-            .sameSite("Strict")
+            .sameSite("None")
             .build();
 
         ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", null)
@@ -121,7 +121,7 @@ public class AuthController {
             .secure(true)
             .path("/api/auth")
             .maxAge(0)
-            .sameSite("Strict")
+            .sameSite("None")
             .build();
         
         return ResponseEntity
@@ -145,7 +145,7 @@ public class AuthController {
             .secure(true)
             .path("/")
             .maxAge(Duration.ofMinutes(60))
-            .sameSite("Strict")
+            .sameSite("None")
             .build();
         
         ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", newRefreshToken)
@@ -153,7 +153,7 @@ public class AuthController {
             .secure(true)
             .path("/api/auth")
             .maxAge(Duration.ofDays(30))
-            .sameSite("Strict")
+            .sameSite("None")
             .build();
         return ResponseEntity.ok()
             .headers(headers -> {

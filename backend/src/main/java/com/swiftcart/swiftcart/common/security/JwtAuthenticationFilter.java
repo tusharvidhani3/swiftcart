@@ -46,7 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     .secure(true)
                     .path("/")
                     .maxAge(0)
-                    .sameSite("Strict")
+                    .sameSite("None")
                     .build();
             response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
             filterChain.doFilter(request, response);
