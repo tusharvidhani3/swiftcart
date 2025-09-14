@@ -27,8 +27,6 @@ public class Address {
 
 	private String addressLine2;
 
-	private String area;
-
 	private String pincode;
 
 	private String city;
