@@ -7,6 +7,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UpdateProductStockRequest {
 
-    private Long productId;
-    private int changeInQty;
+    private Integer stock;
 }

@@ -68,8 +68,8 @@ public class ProductController {
 
     @PatchMapping("/{productId}")
     @PreAuthorize("hasRole('SELLER')")
-    public ResponseEntity<ProductResponse> updateProductStock(@RequestBody @Valid UpdateProductStockRequest req) {
-        ProductResponse productResponse = productService.updateStock(req.getProductId(), req.getChangeInQty());
+    public ResponseEntity<ProductResponse> updateProductStock(@PathVariable Long productId, @RequestBody @Valid UpdateProductStockRequest req) {
+        ProductResponse productResponse = productService.updateStock(productId, req.getStock());
         return ResponseEntity.ok(productResponse);
     }
 }

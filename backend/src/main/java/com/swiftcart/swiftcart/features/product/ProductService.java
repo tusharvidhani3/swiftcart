@@ -13,7 +13,7 @@ public interface ProductService {
     public ProductResponse getProduct(Long productId);
     public ProductResponse updateProduct(Long productId, CreateProductRequest productRequest, List<MultipartFile> productImages);
     public Page<ProductResponse> searchProducts(String keyword, Pageable pageable, String category, long minPrice, long maxPrice, boolean inStock);
-    public ProductResponse updateStock(Long productId, int change);
+    public ProductResponse updateStock(Long productId, int stock);
     public Product getProductById(Long productId);
     public List<String> getProductImages(Long productId);
 }

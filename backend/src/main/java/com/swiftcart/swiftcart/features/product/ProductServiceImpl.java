@@ -72,7 +72,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponse getProduct(Long productId) {
         Product product=productRepo.findByProductId(productId)
-        .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         ProductResponse productResponse = modelMapper.map(product, ProductResponse.class);
         productResponse.setImageUrls(productImageRepo.findAllByProduct_ProductId(productId).stream().map(productImage -> productImage.getImageUrl()).collect(Collectors.toList()));
         return productResponse;
@@ -82,46 +82,52 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public ProductResponse updateProduct(Long productId, CreateProductRequest productRequest, List<MultipartFile> productImages) {
         Product existingProduct = productRepo.findByProductId(productId)
-        .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         modelMapper.map(productRequest, existingProduct);
         Product updatedProduct = productRepo.save(existingProduct);
-        productImageRepo.deleteAllByProduct_ProductId(productId);
-        List<ProductImage> images = new ArrayList<>();
-        List<String> relativePaths = productImages.stream().map(productImage -> {
-            String fullPath = storageService.store(productImage, uploadDir);
-            int relativeStartIndex = fullPath.indexOf("uploads/");
-            String relativePath = fullPath.substring(relativeStartIndex);
-            ProductImage image = new ProductImage();
-            image.setImageUrl(relativePath);
-            images.add(image);
-            return relativePath;
-        }).collect(Collectors.toList());
-        productImageRepo.saveAllAndFlush(images);
         ProductResponse productResponse = modelMapper.map(updatedProduct, ProductResponse.class);
-        productResponse.setImageUrls(relativePaths);
+        if (productImages != null) {
+            productImageRepo.deleteAllByProduct_ProductId(productId);
+            List<ProductImage> images = new ArrayList<>();
+            List<String> relativePaths = productImages.stream().map(productImage -> {
+                String fullPath = storageService.store(productImage, uploadDir);
+                int relativeStartIndex = fullPath.indexOf("uploads/");
+                String relativePath = fullPath.substring(relativeStartIndex);
+                ProductImage image = new ProductImage();
+                image.setImageUrl(relativePath);
+                images.add(image);
+                return relativePath;
+            }).collect(Collectors.toList());
+            productImageRepo.saveAllAndFlush(images);
+        ProductResponse productResponse = modelMapper.map(updatedProduct, ProductResponse.class);
+            productResponse.setImageUrls(relativePaths);
+        }
         return productResponse;
     }
 
     @Override
     public Page<ProductResponse> searchProducts(String keyword, Pageable pageable, String category, long minPrice, long maxPrice, boolean inStock) {
         Page<ProductResponse> productPage = productRepo.searchProducts(keyword, pageable, minPrice, maxPrice, category, inStock).map(product -> {
-            ProductResponse productResponse = modelMapper.map(product, ProductResponse.class);
+                    ProductResponse productResponse = modelMapper.map(product, ProductResponse.class);
             productResponse.setImageUrls(productImageRepo.findAllByProduct_ProductId(product.getProductId()).stream().map(productImage -> productImage.getImageUrl()).collect(Collectors.toList()));
-            return productResponse;
-        });
+                    return productResponse;
+                });
         return productPage;
     }
 
     @Override
     @Transactional
-    public ProductResponse updateStock(Long productId, int change) {
+    public ProductResponse updateStock(Long productId, int stock) {
         Product product = productRepo.findByProductId(productId)
-        .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
-        if(product.getStock() + change < 0)
-        throw new InsufficientStockException("Stock cannot be negative");
-        product.setStock(product.getStock() + change);
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+        if (product.getStock() < 0)
+            throw new InsufficientStockException("Stock cannot be negative");
+        product.setStock(stock);
         product = productRepo.save(product);
-        return modelMapper.map(product, ProductResponse.class);
+        ProductResponse productResponse = modelMapper.map(product, ProductResponse.class);
+        productResponse.setImageUrls(productImageRepo.findAllByProduct_ProductId(productId).stream()
+                .map(productImage -> productImage.getImageUrl()).collect(Collectors.toList()));
+        return productResponse;
     }
 
     @Override
@@ -132,7 +138,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<String> getProductImages(Long productId) {
-        return productImageRepo.findAllByProduct_ProductId(productId).stream().map(productImage -> productImage.getImageUrl()).collect(Collectors.toList());
+        return productImageRepo.findAllByProduct_ProductId(productId).stream()
+                .map(productImage -> productImage.getImageUrl()).collect(Collectors.toList());
     }
 
 }
