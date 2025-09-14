@@ -53,9 +53,14 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDTO updateUser(UserDTO userDTO) {
         User user = userRepo.findByUserId(userDTO.getUserId()).get();
-        modelMapper.map(userDTO, user);
-        userRepo.save(user);
-        return modelMapper.map(user, UserDTO.class);
+        user.setFirstName(userDTO.getFirstName());
+        user.setLastName(userDTO.getLastName());
+        user.setMobileNumber(userDTO.getMobileNumber());
+        user.setEmail(userDTO.getEmail());
+        user = userRepo.save(user);
+        modelMapper.map(user, userDTO);
+        userDTO.setRole(user.getRole().getName());
+        return userDTO;
     }
 
     @Override
