@@ -6,6 +6,7 @@ import OrderItemDetailsCard from './OrderItemDetailsCard'
 import useMediaQuery from '../hooks/useMediaQuery'
 import { apiBaseUrl } from '../config'
 import razorpayLogo from '../assets/icons/razorpay-logo.svg'
+import loadingGif from '../assets/images/loading.gif'
 
 export default function OrderDetails() {
 
@@ -113,5 +114,5 @@ export default function OrderDetails() {
                     </div>
                 </section>
             </>
-    ) : 'loading...'
+    ) : <img className='loadingGif' src={loadingGif} alt="Loading..." />
 }

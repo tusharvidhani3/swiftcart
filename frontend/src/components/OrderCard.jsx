@@ -1,11 +1,12 @@
 import OrderItemCard from "./OrderItemCard"
 import styles from '../styles/Orders.module.css'
 import { useNavigate } from "react-router"
+import loadingGif from '../assets/images/loading.gif'
 
 export default function OrderCard({ order }) {
 
     const navigate = useNavigate()
-    const { orderId, shippingAddress, totalAmount, placedAt, orderItems, payment } = order
+    const { orderId, totalAmount, placedAt, orderItems } = order
     const orderDate = new Date(placedAt)
 
     return orderItems ? (
@@ -19,5 +20,5 @@ export default function OrderCard({ order }) {
                 {orderItems.map(orderItem => <OrderItemCard {...orderItem} key={orderItem.orderItemId} />)}
             </div>
         </div>
-    ):"loading"
+    ):<img className='loadingGif' src={loadingGif} alt="Loading..." />
 }

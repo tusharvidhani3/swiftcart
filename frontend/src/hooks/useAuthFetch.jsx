@@ -7,8 +7,6 @@ export function useAuthFetch() {
     const navigate = useNavigate()
 
     async function authFetch(url, options = {}) {
-        if(!userInfo)
-            navigate(`/auth/login`)
         const res = await fetch(url, {
             ...options,
             credentials: 'include'

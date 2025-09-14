@@ -3,10 +3,9 @@
     display: flex;
     flex-direction: column;
     left: 0;
-    height: 100vh;
+    height: 100dvh;
     transform: translateX(-100%);
     background-color: white;
-    pointer-events: none;
     z-index: 3;
     align-items: center;
     justify-content: center;
@@ -16,12 +15,13 @@
 
 .sideMenu.open {
     transform: translateX(0);
-    pointer-events: all;
 }
 
 .navLinks {
     display: flex;
     flex-direction: column;
+    width: 100%;
+    gap: 12px;
 }
 
 .navLinks > a {
@@ -29,6 +29,11 @@
     display: flex;
     align-items: center;
     gap: 12px;
+    padding-inline-start: 20px;
+}
+
+.navLinks > a:hover {
+    background-color: aliceblue;
 }
 
 .navLinks > a > img {
@@ -48,4 +53,27 @@
 
 .btnClose img {
     width: 32px;
+}
+
+@media screen and (min-width: 768px) {
+    
+    .sideMenu {
+        position: sticky;
+        transform: none;
+        top: 0;
+        flex-basis: 20%;
+        box-shadow: 2px 0 4px rgba(0, 0, 0, .2);
+    }
+
+    .activeLink {
+        background-color: lightblue;
+    }
+
+}
+
+@media screen and (min-width: 1080px) {
+    
+    .sideMenu {
+        flex-basis: 20%;
+    }
 }

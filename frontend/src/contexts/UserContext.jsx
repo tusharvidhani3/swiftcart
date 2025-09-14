@@ -21,7 +21,7 @@ export function UserProvider({ children }) {
         if (res.ok)
             setTokenExpired(false)
         else
-            setUserInfo(null) //tokenexpired will be leaved true
+            setUserInfo(null) //tokenexpired will be left true
     }
 
     async function updateUserInfo() {

@@ -3,6 +3,12 @@ import Home from './components/Home.jsx'
 import { createBrowserRouter, Outlet } from 'react-router'
 import { UserProvider } from './contexts/UserContext.jsx'
 import { lazy } from 'react'
+import SellerDashboard from './components/SellerDashboard.jsx'
+import SellerOrders from './components/SellerOrders.jsx'
+import ProtectedRoute from './components/ProtectedRoute.jsx'
+import SellerProducts from './components/SellerProducts.jsx'
+import { ProductsProvider } from './contexts/ProductsContext.jsx'
+import Error from './components/Error.jsx'
 
 const Cart = lazy(() => import('./components/Cart.jsx'))
 const ProductDetails = lazy(() => import('./components/ProductDetails.jsx'))
@@ -14,40 +20,37 @@ const AuthForm = lazy(() => import('./components/AuthForm.jsx'))
 const AddressForm = lazy(() => import('./components/AddressForm.jsx'))
 const OrderDetails = lazy(() => import('./components/OrderDetails.jsx'))
 const CreateProductListing = lazy(() => import('./components/CreateProductListing.jsx'))
-const AddressesProvider = lazy(() => import('./contexts/AddressesContext.jsx').then(module => ({default: module.AddressesProvider})))
+const AddressesProvider = lazy(() => import('./contexts/AddressesContext.jsx').then(module => ({ default: module.AddressesProvider })))
 
 const router = createBrowserRouter([
     {
         path: '/',
-        element: (<UserProvider>
-            <App />
-        </UserProvider>),
+        element: (
+            <UserProvider>
+                <App />
+            </UserProvider>
+        ),
         children: [
             {
                 index: true,
-                element: <Home />
+                element: <Home />,
+                handle: { mainClass: 'home' }
             },
 
             {
                 path: 'products',
-                children:[
+                children: [
                     {
                         path: ':productId',
                         element: <ProductDetails />,
                         handle: { mainClass: 'productDetails' }
-                    },
-
-                    {
-                        path: 'add',
-                        element: <CreateProductListing />,
-                        handle: { mainClass: 'createProductListing' }
                     }
                 ]
             },
 
             {
                 path: 'profile',
-                element: <Profile />,
+                element: <ProtectedRoute allowedRoles={['ROLE_CUSTOMER', 'ROLE_SELLER']} element={<Profile />} />,
                 handle: { mainClass: 'profile' }
             },
 
@@ -76,21 +79,25 @@ const router = createBrowserRouter([
 
             {
                 path: 'checkout',
-                element: (<AddressesProvider>
-                    <Checkout />
-                </AddressesProvider>),
+                element: (
+                    <AddressesProvider>
+                        <Checkout />
+                    </AddressesProvider>
+                ),
                 handle: { mainClass: 'checkout' }
             },
 
             {
                 path: 'addresses',
-                element: (<AddressesProvider>
-                    <Outlet />
-                </AddressesProvider>),
+                element: (
+                    <AddressesProvider>
+                        <Outlet />
+                    </AddressesProvider>
+                ),
                 children: [
                     {
-                        path: '',
-                        element: <ManageAddresses />,
+                        index: true,
+                        element: <ProtectedRoute allowedRoles={['ROLE_CUSTOMER']} element={<ManageAddresses />} />,
                         handle: { mainClass: 'manageAddresses' }
                     },
 
@@ -131,10 +138,57 @@ const router = createBrowserRouter([
                 ]
             },
 
-            // {
-            //     path: 'seller',
-            //     element:
-            // }
+            {
+                path: 'unauthorized',
+                element: <Error type='unauthorized' />
+
+            },
+
+            {
+                path: 'seller',
+                element: <ProtectedRoute allowedRoles={['ROLE_SELLER']} />,
+                children: [
+                    {
+                        index: true,
+                        element: <SellerDashboard />,
+                        handle: { mainClass: 'sellerDashboard' }
+                    },
+                    {
+                        path: 'orders',
+                        element: <SellerOrders />,
+                        handle: { mainClass: 'sellerOrders' }
+                    },
+                    {
+                        path: 'products',
+                        children: [
+                            {
+                                index: true,
+                                element:
+                                    <ProductsProvider>
+                                        <SellerProducts />
+                                    </ProductsProvider>,
+                                handle: { mainClass: 'sellerProducts' }
+                            },
+                            {
+                                path: 'add',
+                                element:
+                                    <ProductsProvider>
+                                        <CreateProductListing />
+                                    </ProductsProvider>,
+                                handle: { mainClass: 'createProductListing' }
+                            },
+                            {
+                                path: 'edit',
+                                element:
+                                    <ProductsProvider>
+                                        <CreateProductListing isEditMode={true} />
+                                    </ProductsProvider>,
+                                handle: { mainClass: 'createProductListing' }
+                            }
+                        ]
+                    }
+                ]
+            }
         ]
     }
 ])

@@ -64,6 +64,9 @@
 .productTitle {
     font-size: 16px;
     font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 108px;
 }
 
 .itemTotal {
@@ -160,6 +163,15 @@
 .orderStatus {
     font-weight: 700;
     margin-left: 20px;
+}
+
+.productDetails {
+    max-height: 140px;
+    overflow: hidden;
+}
+
+.razorpayLogo {
+    width: 120px;
 }
 
 @media screen and (min-width: 768px) {

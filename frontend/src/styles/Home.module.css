@@ -29,6 +29,7 @@
     width: 100%;
     gap: 12px;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 .productTitle {
@@ -48,6 +49,13 @@
     font-weight: 600;
 }
 
+.discount {
+    font-size: 14px;
+    color: green;
+    width: 100%;
+    text-align: center;
+}
+
 .productMrp {
     text-decoration-line: line-through;
     color: rgb(139, 139, 163);
@@ -62,8 +70,10 @@
 .searchSummary {
     background-color: white;
     font-weight: 600;
-    width: 90%;
-    padding-inline: 16px;
+    width: 100%;
+    padding: 4px 16px;
+    margin-block: 16px;
+    box-sizing: border-box;
 }
 
 .btnAddToCart {
@@ -84,26 +94,186 @@
 
 .searchFilters {
     display: flex;
-    position: fixed;
     width: 100%;
     box-sizing: border-box;
     height: 48px;
-    top: 108px;
-}
-
-.sortBy, .filter {
-    flex-basis: 50%;
-}
-
-.dropDownArrow {
-
 }
 
 .btnSort, .btnFilter {
-    width: 100%;
-    /* height: 100%; */
+    height: 100%;
     background-color: white;
     border: 1px solid gray;
+    border-radius: 0;
+    gap: 12px;
+    flex-basis: 50%;
+}
+
+.btnSort img, .btnFilter img {
+    width: 20px;
+    height: 18px;
+}
+
+.sortByDropDown {
+    background-color: white;
+    bottom: 0;
+    width: 100%;
+    position: fixed;
+    z-index: 2;
+    transform: translateY(100%);
+    transition: transform 0.3s ease-in-out;
+}
+
+.sortByDropDown.open {
+    transform: translateY(0);
+}
+
+.sortByDropDownList {
+    list-style-type: none;
+    padding-inline: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    height: 180px;
+}
+
+.sortByDropDownList li {
+    display: flex;
+    justify-content: space-between;
+}
+
+.sortByTitle {
+    color: #878787;
+    border-bottom: 1px solid #eaeaea;
+    padding: 8px 12px;
+    font-size: 14px;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.customRadio {
+    width: 20px;
+    height: 20px;
+}
+
+.mainWindow {
+    box-sizing: border-box;
+    align-items: center;
+    width: 100%;
+}
+
+.filterMenu {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    width: 100%;
+    height: 100vh;
+    box-sizing: border-box;
+    background-color: white;
+    top: 0;
+    z-index: 3;
+}
+
+.btnBack {
+    background-color: inherit;
+    width: 48px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.filterMenuHeader {
+    display: flex;
+    height: 48px;
+    align-items: center;
+    gap: 16px;
+    z-index: 1;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.06);
+}
+
+.filterMenuHeader h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.filtersList {
+    display: flex;
+    min-height: calc(100vh - 90px);
+    box-sizing: border-box;
+}
+
+.filterAttributes {
+    background-color: rgb(241, 243, 246);
+    flex-basis: min-content;
+}
+
+.filterAttribute {
+    padding-block: 12px;
+    padding-inline: 16px 8px;
+}
+
+.filterAttribute.selected {
+    background-color: white;
+    color: blue;
+}
+
+.actionFilters {
+    display: flex;
+    width: 100%;
+    height: 42px;
+    padding: 4px;
+    box-sizing: border-box;
+    box-shadow: 0 2px 2px 2px #c2c2c2;
+}
+
+.btnApplyFilters {
+    margin-right: 16px;
+    margin-left: auto;
+    width: 120px;
+    height: 34px;
+    background-color: var(--accent-color);
+    border-radius: 0;
+}
+
+.priceFilters {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 2px;
+}
+
+.priceFilters div {
+    display: flex;
+    justify-content: space-between;
+}
+
+.priceFilters input {
+    height: 28px;
+    width: 64px;
+}
+
+.filters {
+    flex-basis: 65%;
+    padding: 16px;
+}
+
+.filterOption {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.filterOption input {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.filterOption label {
+    cursor: pointer;
 }
 
 @media screen and (min-width: 768px) {
@@ -112,6 +282,7 @@
         grid-template-columns: repeat(auto-fit, minmax(clamp(240px, 25vw, 220px), 1fr));
         gap: 24px;
         padding-inline: 48px;
+        margin-top: 16px;
     }
 
     .productTitle {
@@ -120,5 +291,78 @@
 
     .productPrice {
         font-size: 20px;
+    }
+
+    .searchSummary {
+        margin: 0;
+    }
+
+    .filterMenu {
+        position: static;
+        flex-basis: 35%;
+        height: auto;
+        z-index: unset;
+        box-shadow: rgba(0, 0, 0, 0.06) 0px 1px 8px 0px;
+    }
+
+    .filters {
+        flex-basis: 100%;
+    }
+
+    .filters h3 {
+        font-size: 16px;
+    }
+
+    .mainWindow {
+        width: 100%;
+        gap: 20px;
+    }
+
+    .sortByDropDown {
+        position: static;
+        flex-direction: row;
+        display: flex;
+        align-items: center;
+        transform: none;
+    }
+
+    .sortByDropDownList {
+        flex-direction: row;
+        height: unset;
+        gap: 24px;
+        margin: 0;
+        height: 100%;
+    }
+
+    .sortByTitle {
+        border-bottom: none;
+        text-transform: unset;
+    }
+
+    .customRadio {
+        display: none;
+    }
+
+    .sortByDropDownList li {
+        height: 100%;
+        cursor: pointer;
+        padding: 8px;
+    }
+
+    .sortByDropDownList li.selected {
+        border-bottom: 2px solid blue;
+        color: blue;
+    }
+
+    .filterMenuHeader {
+        padding-inline: 16px;
+    }
+
+}
+
+@media screen and (min-width: 1080px) {
+    
+    .filterMenu {
+        flex-basis: 30%;
     }
 }

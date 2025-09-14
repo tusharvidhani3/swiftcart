@@ -4,7 +4,7 @@ import styles from '../styles/OrderDetails.module.css'
 import { generateStatus } from './OrderItemCard'
 import { apiBaseUrl } from '../config'
 
-export default function OrderItemDetailsCard({ orderItemId, product, orderItemStatus, deliveryAt, quantity, orders, setOrders }) {
+export default function OrderItemDetailsCard({ orderItemId, product, orderItemStatus, deliveryAt, quantity, setOrders }) {
 
     const { authFetch } = useAuthFetch()
     const navigate = useNavigate()

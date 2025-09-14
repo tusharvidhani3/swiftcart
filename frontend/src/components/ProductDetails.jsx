@@ -7,6 +7,7 @@ import { useAuthFetch } from '../hooks/useAuthFetch'
 import CheckoutContext from '../contexts/CheckoutContext'
 import ProductImageGallery from './ProductImageGallery'
 import { apiBaseUrl } from '../config'
+import loadingGif from '../assets/images/loading.gif'
 
 export default function ProductDetails() {
 
@@ -63,5 +64,5 @@ export default function ProductDetails() {
                 </div>}
             </div>
         </div>
-    ):"loading"
+    ):<img className='loadingGif' src={loadingGif} alt="Loading..." />
 }

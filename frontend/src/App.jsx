@@ -15,7 +15,7 @@ function App() {
   const mainClass = `${mainClassKey && mainClassKey}`;
 
   return (
-    <Suspense fallback={<img src={loadingGif} alt='Loading...' />}>
+    <Suspense fallback={<img className='loadingGif' src={loadingGif} alt='Loading...' />}>
       <UIProvider>
         {
           userInfo?.role === 'ROLE_SELLER' ? <SellerApp mainClass={mainClass} /> : <CustomerApp mainClass={mainClass} />

@@ -8,38 +8,25 @@ import locationIcon from '../assets/icons/location.svg'
 import logout from "../assets/icons/logout.svg";
 import cartIcon from "../assets/icons/cart.svg";
 import styles from "../styles/Header.module.css";
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useSearchParams } from "react-router";
 import { useNavigate } from "react-router";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useContext, useState } from "react";
 import UserContext from "../contexts/UserContext";
 import CartContext from "../contexts/CartContext";
 
-function Header({ keyword, setKeyword, setSideMenuOpen }) {
+function Header({ setSideMenuOpen }) {
 
+    const [searchParams, setSearchParams] = useSearchParams()
+    const keyword = searchParams.get('k') || ""
     const {userInfo, handleLogout} = useContext(UserContext)
     const [currKeyword, setCurrKeyword] = useState(keyword)
     const navigate = useNavigate()
     const location = useLocation()
     const [showProfileDropDown, setShowProfileDropDown] = useState(false)
-    const loginBtnRef = useRef(null)
     const {cart} = useContext(CartContext)
-    const clickListener = useCallback(() => {
-        navigate('/auth/login')
-    }, [])
-    useEffect(() => {
-        if(!loginBtnRef.current)
-            return;
-        if(!userInfo) {
-            loginBtnRef.current.addEventListener("click", clickListener)
-        }
-        else
-            loginBtnRef.current.removeEventListener("click", clickListener)
-
-        return () => loginBtnRef.current?.removeEventListener("click", clickListener)
-    }, [loginBtnRef.current, userInfo])
 
     function handleSearch() {
-        setKeyword(currKeyword)
+        setSearchParams({ k: currKeyword})
         if(location.pathname !== '/')
             navigate('/')
     }
@@ -51,7 +38,7 @@ function Header({ keyword, setKeyword, setSideMenuOpen }) {
                     e.stopPropagation()
                     setSideMenuOpen(true)
                 }}><img src={hamburgerIcon} alt="hamburger" /></button>
-                <Link to="/" onClick={() => setKeyword("")} className={`${styles.swiftcart} ${styles.link}`}>
+                <Link to="/" onClick={() => setSearchParams({})} className={`${styles.swiftcart} ${styles.link}`}>
                     <span>SwiftCart</span>
                 </Link>
             </div>
@@ -64,9 +51,9 @@ function Header({ keyword, setKeyword, setSideMenuOpen }) {
             </form>
             <div className={`${styles.headerRight} ${userInfo?styles.loggedIn:''}`}>
                 {!location.pathname.startsWith('/auth') && <div className={`${styles.profile} ${userInfo && showProfileDropDown?styles.show:''}`} onMouseEnter={userInfo ? () => setShowProfileDropDown(true) : undefined} onMouseLeave={userInfo ? () => setShowProfileDropDown(false) : undefined}>
-                    <button className={styles.btnProfile} ref={loginBtnRef}>
+                    <button className={styles.btnProfile} onClick={userInfo ? undefined : () => navigate('/auth/login')}>
                         <img src={profile} alt="profile icon" />
-                        <span>{userInfo?userInfo.firstName:"Login"}</span><img src={dropDownArrow} alt="drop down" className={styles.dropDownArrow} />
+                        <span>{userInfo?userInfo.firstName || 'User' : "Login"}</span><img src={dropDownArrow} alt="drop down" className={styles.dropDownArrow} />
                     </button>
                     <ul className={styles.dropDownMenu} onClick={e => setShowProfileDropDown(false)}>
                         <li className={styles.myProfile}><Link to="/profile"><img src={myProfile} />My Profile</Link></li>

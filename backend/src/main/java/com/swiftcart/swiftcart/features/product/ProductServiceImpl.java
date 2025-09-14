@@ -38,7 +38,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public ProductResponse createProduct(CreateProductRequest createProductRequest, List<MultipartFile> productImages) {
-        Product product=new Product();
+        Product product = new Product();
         product.setProductName(createProductRequest.getProductName());
         product.setPrice(createProductRequest.getPrice());
         product.setMrp(createProductRequest.getMrp());
@@ -71,19 +71,33 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponse getProduct(Long productId) {
-        Product product=productRepo.findByProductId(productId)
+        Product product = productRepo.findByProductId(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         ProductResponse productResponse = modelMapper.map(product, ProductResponse.class);
-        productResponse.setImageUrls(productImageRepo.findAllByProduct_ProductId(productId).stream().map(productImage -> productImage.getImageUrl()).collect(Collectors.toList()));
+        productResponse.setImageUrls(productImageRepo.findAllByProduct_ProductId(productId).stream()
+                .map(productImage -> productImage.getImageUrl()).collect(Collectors.toList()));
         return productResponse;
     }
 
     @Override
     @Transactional
-    public ProductResponse updateProduct(Long productId, CreateProductRequest productRequest, List<MultipartFile> productImages) {
+    public ProductResponse updateProduct(Long productId, UpdateProductRequest productRequest,
+            List<MultipartFile> productImages) {
         Product existingProduct = productRepo.findByProductId(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
-        modelMapper.map(productRequest, existingProduct);
+        if(productRequest.getProductName() != null)
+        existingProduct.setProductName(productRequest.getProductName());
+        if(productRequest.getPrice() != null)
+        existingProduct.setPrice(productRequest.getPrice());
+        if(productRequest.getMrp() != null)
+        existingProduct.setPrice(productRequest.getPrice());
+        if(productRequest.getCategory() != null)
+        existingProduct.setCategory(productRequest.getCategory());
+        if(productRequest.getDescription() != null)
+        existingProduct.setDescription(productRequest.getDescription());
+        if(productRequest.getStock() != null)
+        existingProduct.setStock(productRequest.getStock());
+
         Product updatedProduct = productRepo.save(existingProduct);
         ProductResponse productResponse = modelMapper.map(updatedProduct, ProductResponse.class);
         if (productImages != null) {
@@ -99,17 +113,19 @@ public class ProductServiceImpl implements ProductService {
                 return relativePath;
             }).collect(Collectors.toList());
             productImageRepo.saveAllAndFlush(images);
-        ProductResponse productResponse = modelMapper.map(updatedProduct, ProductResponse.class);
             productResponse.setImageUrls(relativePaths);
         }
         return productResponse;
     }
 
     @Override
-    public Page<ProductResponse> searchProducts(String keyword, Pageable pageable, String category, long minPrice, long maxPrice, boolean inStock) {
-        Page<ProductResponse> productPage = productRepo.searchProducts(keyword, pageable, minPrice, maxPrice, category, inStock).map(product -> {
+    public Page<ProductResponse> searchProducts(String keyword, Pageable pageable, List<String> categories,
+            long minPrice, long maxPrice, boolean includeOutOfStock) {
+        Page<ProductResponse> productPage = productRepo
+                .searchProducts(keyword, pageable, minPrice, maxPrice, categories, includeOutOfStock).map(product -> {
                     ProductResponse productResponse = modelMapper.map(product, ProductResponse.class);
-            productResponse.setImageUrls(productImageRepo.findAllByProduct_ProductId(product.getProductId()).stream().map(productImage -> productImage.getImageUrl()).collect(Collectors.toList()));
+                    productResponse.setImageUrls(productImageRepo.findAllByProduct_ProductId(product.getProductId())
+                            .stream().map(productImage -> productImage.getImageUrl()).collect(Collectors.toList()));
                     return productResponse;
                 });
         return productPage;
@@ -132,7 +148,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Product getProductById(Long productId) {
-        Product product = productRepo.findByProductId(productId).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+        Product product = productRepo.findByProductId(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         return product;
     }
 
