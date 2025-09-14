@@ -34,7 +34,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Override
     public String generateAccessToken(String token) {
-        RefreshToken refreshToken = refreshTokenRepo.findByToken(token);
+        RefreshToken refreshToken = refreshTokenRepo.findByTokenWithUserAndRole(token);
         User user = refreshToken.getUser();
         return jwtService.generateToken(user.getUserId(), user.getRole().getName());
     }
