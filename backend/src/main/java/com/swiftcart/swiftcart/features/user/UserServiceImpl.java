@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void register(LoginRequest registerRequest) {
         User user = modelMapper.map(registerRequest, User.class);
-        Role role=roleRepo.getRoleByName("ROLE_CUSTOMER");
+        Role role=roleRepo.findByName("ROLE_CUSTOMER");
         user.setRole(role);
         user.setPassword(encoder.encode(registerRequest.getPassword()));
         userRepo.save(user);
