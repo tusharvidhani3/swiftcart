@@ -57,8 +57,8 @@ public class OrderController {
 
     @PatchMapping("/items/{orderItemId}")
     @PreAuthorize("hasRole('SELLER')")
-    public ResponseEntity<OrderItemResponse> updateOrderItemStatus(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @RequestBody UpdateOrderStatusRequest req) {
-        OrderItemResponse orderItemResponse = orderService.updateOrderItemStatus(userDetailsImpl.getUser(), req.getOrderId(), req.getOrderStatus());
+    public ResponseEntity<OrderItemResponse> updateOrderItemStatus(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @PathVariable Long orderItemId, @RequestBody UpdateOrderStatusRequest req) {
+        OrderItemResponse orderItemResponse = orderService.updateOrderItemStatus(userDetailsImpl.getUser(), orderItemId, req.getOrderStatus());
         return ResponseEntity.ok(orderItemResponse);
     }
     
