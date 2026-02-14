@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface AddressRepo extends JpaRepository<Address,Long> {
+public interface AddressRepository extends JpaRepository<Address,Long> {
 
     public List<Address> findAllByUser_UserId(Long userId);
     public Optional<Address> findByAddressId(Long shippingAddressId);

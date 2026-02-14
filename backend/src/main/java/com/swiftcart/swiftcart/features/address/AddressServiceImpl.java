@@ -15,7 +15,7 @@ import com.swiftcart.swiftcart.features.appuser.AppUser;
 public class AddressServiceImpl implements AddressService {
 
     @Autowired
-    private AddressRepo addressRepo;
+    private AddressRepository addressRepo;
 
     @Autowired
     private AddressMapper addressMapper;

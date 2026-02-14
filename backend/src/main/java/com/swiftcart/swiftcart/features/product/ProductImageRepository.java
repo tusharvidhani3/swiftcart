@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ProductImageRepo extends JpaRepository<ProductImage, Long> {
+public interface ProductImageRepository extends JpaRepository<ProductImage, Long> {
 
     @Query("SELECT pi FROM ProductImage pi WHERE pi.product.productId = :productId ORDER BY pi.sortOrder")
     public List<ProductImage> findAllByProduct_ProductId(@Param("productId") Long productId);

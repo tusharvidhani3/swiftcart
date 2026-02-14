@@ -22,10 +22,10 @@ import com.swiftcart.swiftcart.features.product.ProductService;
 public class CartServiceImpl implements CartService {
 
     @Autowired
-    private CartItemRepo cartItemRepo;
+    private CartItemRepository cartItemRepo;
 
     @Autowired
-    private CartRepo cartRepo;
+    private CartRepository cartRepo;
 
     @Autowired
     private ProductService productService;

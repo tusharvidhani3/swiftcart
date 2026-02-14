@@ -26,10 +26,10 @@ public class ProductServiceImpl implements ProductService {
     private String uploadDir;
 
     @Autowired
-    private ProductRepo productRepo;
+    private ProductRepository productRepo;
 
     @Autowired
-    private ProductImageRepo productImageRepo;
+    private ProductImageRepository productImageRepo;
 
     @Autowired
     private ProductMapper productMapper;

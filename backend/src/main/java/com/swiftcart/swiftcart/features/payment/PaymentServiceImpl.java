@@ -13,7 +13,7 @@ import com.razorpay.RazorpayException;
 import com.razorpay.Utils;
 import com.swiftcart.swiftcart.features.order.Order;
 import com.swiftcart.swiftcart.features.order.OrderItem;
-import com.swiftcart.swiftcart.features.order.OrderItemRepo;
+import com.swiftcart.swiftcart.features.order.OrderItemRepository;
 import com.swiftcart.swiftcart.features.order.OrderStatus;
 
 @Service
@@ -29,10 +29,10 @@ public class PaymentServiceImpl implements PaymentService {
     private PaymentMapper paymentMapper;
 
     @Autowired
-    private PaymentRepo paymentRepo;
+    private PaymentRepository paymentRepo;
 
     @Autowired
-    private OrderItemRepo orderItemRepo;
+    private OrderItemRepository orderItemRepo;
 
     @Override
     public PaymentDto createOrder(Order order) throws RazorpayException {
