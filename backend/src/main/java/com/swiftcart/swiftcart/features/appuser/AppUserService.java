@@ -1,4 +1,4 @@
-package com.swiftcart.swiftcart.features.user;
+package com.swiftcart.swiftcart.features.appuser;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -6,10 +6,10 @@ import org.springframework.data.domain.Pageable;
 import com.swiftcart.swiftcart.common.security.UserDetailsImpl;
 import com.swiftcart.swiftcart.features.auth.LoginRequest;
 
-public interface UserService {
+public interface AppUserService {
 
     public void register(LoginRequest registerRequest);
     public UserDetailsImpl authenticate(LoginRequest loginRequest);
-    public UserDto updateUser(UserDto userDto);
-    public Page<UserDto> getAllUsers(Pageable pageable);
+    public AppUserDto updateUser(AppUserDto userDto);
+    public Page<AppUserDto> getAllUsers(Pageable pageable);
 }

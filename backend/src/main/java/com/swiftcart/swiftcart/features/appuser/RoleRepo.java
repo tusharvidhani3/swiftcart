@@ -1,4 +1,4 @@
-package com.swiftcart.swiftcart.features.user;
+package com.swiftcart.swiftcart.features.appuser;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

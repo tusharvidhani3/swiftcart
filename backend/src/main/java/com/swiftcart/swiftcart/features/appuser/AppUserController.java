@@ -1,4 +1,4 @@
-package com.swiftcart.swiftcart.features.user;
+package com.swiftcart.swiftcart.features.appuser;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,34 +18,34 @@ import com.swiftcart.swiftcart.common.security.UserDetailsImpl;
 
 @RestController
 @RequestMapping("/api/users")
-public class UserController {
+public class AppUserController {
 
     @Autowired
-    private UserService userService;
+    private AppUserService userService;
 
     @Autowired
-    private UserMapper userMapper;
+    private AppUserMapper userMapper;
 
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<UserDto> getLoggedInUser(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        User user = userDetailsImpl.getUser();
-        UserDto userDto = userMapper.toDto(user);
+    public ResponseEntity<AppUserDto> getLoggedInUser(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
+        AppUser user = userDetailsImpl.getUser();
+        AppUserDto userDto = userMapper.toDto(user);
         userDto.setRole(user.getRole().getName());
         return ResponseEntity.ok(userDto);
     }
 
     @PutMapping
-    public ResponseEntity<UserDto> updateUserInfo(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @RequestBody UserDto userDto) {
+    public ResponseEntity<AppUserDto> updateUserInfo(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @RequestBody AppUserDto userDto) {
         userDto.setUserId(userDetailsImpl.getUser().getUserId());
-        UserDto updatedUserDto = userService.updateUser(userDto);
+        AppUserDto updatedUserDto = userService.updateUser(userDto);
         return ResponseEntity.ok(updatedUserDto);
     }
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Page<UserDto>> getAllUsers(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "userId") String sortBy) {
-        Page<UserDto> users = userService.getAllUsers(PageRequest.of(page, size, Sort.by(sortBy).ascending()));
+    public ResponseEntity<Page<AppUserDto>> getAllUsers(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "userId") String sortBy) {
+        Page<AppUserDto> users = userService.getAllUsers(PageRequest.of(page, size, Sort.by(sortBy).ascending()));
         return ResponseEntity.ok(users);
     }
 }

@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.swiftcart.swiftcart.common.security.UserDetailsImpl;
-import com.swiftcart.swiftcart.features.user.User;
-import com.swiftcart.swiftcart.features.user.UserDto;
-import com.swiftcart.swiftcart.features.user.UserMapper;
-import com.swiftcart.swiftcart.features.user.UserService;
+import com.swiftcart.swiftcart.features.appuser.AppUser;
+import com.swiftcart.swiftcart.features.appuser.AppUserDto;
+import com.swiftcart.swiftcart.features.appuser.AppUserMapper;
+import com.swiftcart.swiftcart.features.appuser.AppUserService;
 
 import jakarta.validation.Valid;
 
@@ -27,7 +27,7 @@ import jakarta.validation.Valid;
 public class AuthController {
 
     @Autowired
-    private UserService userService;
+    private AppUserService userService;
 
     @Autowired
     private JwtService jwtService;
@@ -36,14 +36,14 @@ public class AuthController {
     private RefreshTokenService tokenService;
 
     @Autowired
-    private UserMapper userMapper;
+    private AppUserMapper userMapper;
 
     @PostMapping(value = {"/register", "/signup"})
-    public ResponseEntity<UserDto> register(@RequestBody @Valid LoginRequest registerReq) {
+    public ResponseEntity<AppUserDto> register(@RequestBody @Valid LoginRequest registerReq) {
         userService.register(registerReq);
         UserDetailsImpl userDetailsImpl = userService.authenticate(registerReq);
-        User user = userDetailsImpl.getUser();
-        UserDto userDto = userMapper.toDto(user);
+        AppUser user = userDetailsImpl.getUser();
+        AppUserDto userDto = userMapper.toDto(user);
         userDto.setRole(user.getRole().getName());
         String jwt = jwtService.generateToken(user.getUserId(), user.getRole().getName());
         String refreshToken = tokenService.generateRefreshToken(userDetailsImpl.getUser());
@@ -72,10 +72,10 @@ public class AuthController {
     }
 
     @PostMapping(value = {"/login", "/signin"})
-    public ResponseEntity<UserDto> login(@RequestBody @Valid LoginRequest loginReq) {
+    public ResponseEntity<AppUserDto> login(@RequestBody @Valid LoginRequest loginReq) {
         UserDetailsImpl userDetailsImpl = userService.authenticate(loginReq);
-        User user = userDetailsImpl.getUser();
-        UserDto userDto = userMapper.toDto(user);
+        AppUser user = userDetailsImpl.getUser();
+        AppUserDto userDto = userMapper.toDto(user);
         userDto.setRole(user.getRole().getName());
         String jwt = jwtService.generateToken(user.getUserId(), user.getRole().getName());
         String refreshToken = tokenService.generateRefreshToken(userDetailsImpl.getUser());

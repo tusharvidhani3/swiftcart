@@ -1,4 +1,4 @@
-package com.swiftcart.swiftcart.features.user;
+package com.swiftcart.swiftcart.features.appuser;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,13 +14,13 @@ import com.swiftcart.swiftcart.common.security.UserDetailsImpl;
 import com.swiftcart.swiftcart.features.auth.LoginRequest;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class AppUserServiceImpl implements AppUserService {
 
     @Autowired
-    private UserMapper userMapper;
+    private AppUserMapper userMapper;
 
     @Autowired
-    private UserRepo userRepo;
+    private AppUserRepo userRepo;
 
     @Autowired
     private RoleRepo roleRepo;
@@ -34,7 +34,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void register(LoginRequest registerRequest) {
-        User user = userMapper.toEntity(registerRequest);
+        AppUser user = userMapper.toEntity(registerRequest);
         Role role=roleRepo.findByName("ROLE_CUSTOMER");
         user.setRole(role);
         user.setPassword(encoder.encode(registerRequest.getPassword()));
@@ -50,8 +50,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserDto updateUser(UserDto userDto) {
-        User user = userRepo.findByUserId(userDto.getUserId()).get();
+    public AppUserDto updateUser(AppUserDto userDto) {
+        AppUser user = userRepo.findByUserId(userDto.getUserId()).get();
         user.setFirstName(userDto.getFirstName());
         user.setLastName(userDto.getLastName());
         user.setMobileNumber(userDto.getMobileNumber());
@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<UserDto> getAllUsers(Pageable pageable) {
+    public Page<AppUserDto> getAllUsers(Pageable pageable) {
         return userRepo.findAll(pageable).map(user -> userMapper.toDto(user));
     }
 

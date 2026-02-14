@@ -1,10 +1,10 @@
 package com.swiftcart.swiftcart.features.auth;
 
-import com.swiftcart.swiftcart.features.user.User;
+import com.swiftcart.swiftcart.features.appuser.AppUser;
 
 public interface RefreshTokenService {
 
-    public String generateRefreshToken(User user);
+    public String generateRefreshToken(AppUser user);
     public String generateAccessToken(String refreshToken);
     public void invalidateRefreshToken(String refreshToken);
     public boolean isValid(String refreshToken);

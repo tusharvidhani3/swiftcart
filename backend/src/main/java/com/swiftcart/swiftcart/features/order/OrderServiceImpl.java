@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.swiftcart.swiftcart.features.address.Address;
 import com.swiftcart.swiftcart.features.address.AddressMapper;
 import com.swiftcart.swiftcart.features.address.AddressService;
+import com.swiftcart.swiftcart.features.appuser.AppUser;
 import com.swiftcart.swiftcart.features.cart.CartItem;
 import com.swiftcart.swiftcart.features.cart.CartService;
 import com.swiftcart.swiftcart.features.payment.Payment;
@@ -27,7 +28,6 @@ import com.swiftcart.swiftcart.common.exception.ResourceNotFoundException;
 import com.swiftcart.swiftcart.features.product.ProductMapper;
 import com.swiftcart.swiftcart.features.product.ProductResponse;
 import com.swiftcart.swiftcart.features.product.ProductService;
-import com.swiftcart.swiftcart.features.user.User;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -99,7 +99,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderResponse getOrder(Long orderId, User user) {
+    public OrderResponse getOrder(Long orderId, AppUser user) {
         Order order = orderRepo.findByOrderId(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
         String role = user.getRole().getName();
@@ -170,7 +170,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderItemResponse updateOrderItemStatus(User user, Long orderItemId, OrderStatus orderStatus) {
+    public OrderItemResponse updateOrderItemStatus(AppUser user, Long orderItemId, OrderStatus orderStatus) {
         OrderItem orderItem = orderItemRepo.findByOrderItemId(orderItemId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order Item not found"));
         if (orderStatus == OrderStatus.CANCELLED) {
@@ -201,7 +201,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderResponse placeBuyNowOrder(PlaceBuyNowOrderRequest placeBuyNowOrderRequest, User user) throws RazorpayException {
+    public OrderResponse placeBuyNowOrder(PlaceBuyNowOrderRequest placeBuyNowOrderRequest, AppUser user) throws RazorpayException {
         CartItem cartItem = cartService.getCartItemByCartItemId(placeBuyNowOrderRequest.getCartItemId());
         Address shippingAddress = addressService.getAddressById(placeBuyNowOrderRequest.getShippingAddressId());
         if (cartItem.getCart().getUser().getUserId() != user.getUserId() || shippingAddress.getUser().getUserId() != user.getUserId())

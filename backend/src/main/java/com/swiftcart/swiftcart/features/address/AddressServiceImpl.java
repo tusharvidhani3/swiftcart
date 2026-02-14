@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.swiftcart.swiftcart.common.exception.ResourceNotFoundException;
-import com.swiftcart.swiftcart.features.user.User;
+import com.swiftcart.swiftcart.features.appuser.AppUser;
 
 @Service
 public class AddressServiceImpl implements AddressService {
@@ -22,7 +22,7 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     @Transactional
-    public AddressDto addAddress(AddressDto addressDto, User user) {
+    public AddressDto addAddress(AddressDto addressDto, AppUser user) {
         Address address=addressMapper.toEntity(addressDto);
         address.setUser(user);
         if(addressRepo.countByUser_UserId(user.getUserId()) == 0)
@@ -60,7 +60,7 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     @Transactional
-    public AddressDto updateAddress(AddressDto addressDto, User user) {
+    public AddressDto updateAddress(AddressDto addressDto, AppUser user) {
         Address address = addressMapper.toEntity(addressDto);
         Address oldAddress = addressRepo.findByAddressId(addressDto.getAddressId()).get();
         if (!oldAddress.getUser().getUserId().equals(user.getUserId()))

@@ -3,7 +3,7 @@ package com.swiftcart.swiftcart.features.order;
 import java.time.LocalDateTime;
 
 import com.swiftcart.swiftcart.features.address.AddressSnapshot;
-import com.swiftcart.swiftcart.features.user.User;
+import com.swiftcart.swiftcart.features.appuser.AppUser;
 
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -28,7 +28,7 @@ public class Order {
     @ManyToOne
     @JoinColumn(name = "user_id")
     @Setter
-    private User user;
+    private AppUser user;
 
     @Setter
     @Embedded

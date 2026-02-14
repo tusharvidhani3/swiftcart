@@ -12,11 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.swiftcart.swiftcart.common.exception.InsufficientStockException;
 import com.swiftcart.swiftcart.common.exception.ResourceNotFoundException;
+import com.swiftcart.swiftcart.features.appuser.AppUser;
 import com.swiftcart.swiftcart.features.product.Product;
 import com.swiftcart.swiftcart.features.product.ProductMapper;
 import com.swiftcart.swiftcart.features.product.ProductResponse;
 import com.swiftcart.swiftcart.features.product.ProductService;
-import com.swiftcart.swiftcart.features.user.User;
 
 @Service
 public class CartServiceImpl implements CartService {
@@ -38,7 +38,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     @Transactional
-    public CartResponse addProductToCart(User user, Long productId, int quantity) {
+    public CartResponse addProductToCart(AppUser user, Long productId, int quantity) {
         Optional<Cart> cartOptional = cartRepo.findByUser_UserId(user.getUserId());
         Cart cart = null;
         CartItem cartItem = null;
@@ -112,7 +112,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Transactional
-    private Cart createNewCartForUser(User user) {
+    private Cart createNewCartForUser(AppUser user) {
         Cart cart = new Cart();
         cart.setUser(user);
         cart = cartRepo.save(cart);
@@ -120,7 +120,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public CartResponse initiateBuyNow(Long productId, User user) {
+    public CartResponse initiateBuyNow(Long productId, AppUser user) {
         CartItem cartItem = cartItemRepo.findByCart_User_UserIdAndProduct_ProductId(user.getUserId(),
                 productId)
                 .orElseGet(() -> {
