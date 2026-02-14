@@ -1,4 +1,4 @@
-package com.swiftcart.swiftcart.features.user;
+package com.swiftcart.swiftcart.features.appuser;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

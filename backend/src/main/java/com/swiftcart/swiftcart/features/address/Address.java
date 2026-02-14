@@ -1,6 +1,6 @@
 package com.swiftcart.swiftcart.features.address;
 
-import com.swiftcart.swiftcart.features.user.User;
+import com.swiftcart.swiftcart.features.appuser.AppUser;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -41,5 +41,5 @@ public class Address {
     private Boolean defaultShipping = false;
 
 	@ManyToOne
-	private User user;
+	private AppUser user;
 }

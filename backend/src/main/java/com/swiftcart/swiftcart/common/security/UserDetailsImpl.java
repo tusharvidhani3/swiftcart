@@ -7,13 +7,13 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.swiftcart.swiftcart.features.user.User;
+import com.swiftcart.swiftcart.features.appuser.AppUser;
 
 public class UserDetailsImpl implements UserDetails {
 
-    private User user;
+    private AppUser user;
 
-    public UserDetailsImpl(User user) {
+    public UserDetailsImpl(AppUser user) {
         this.user=user;
     }
 
@@ -32,7 +32,7 @@ public class UserDetailsImpl implements UserDetails {
         return user.getUserId().toString();
     }
 
-    public User getUser() {
+    public AppUser getUser() {
         return this.user;
     }
 }

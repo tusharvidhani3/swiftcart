@@ -1,6 +1,6 @@
 package com.swiftcart.swiftcart.features.cart;
 
-import com.swiftcart.swiftcart.features.user.User;
+import com.swiftcart.swiftcart.features.appuser.AppUser;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,5 +22,5 @@ public class Cart {
     @OneToOne
     @JoinColumn(name = "user_id", nullable=false)
     @Setter
-    private User user;
+    private AppUser user;
 }

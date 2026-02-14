@@ -2,7 +2,7 @@ package com.swiftcart.swiftcart.features.auth;
 
 import java.time.Instant;
 
-import com.swiftcart.swiftcart.features.user.User;
+import com.swiftcart.swiftcart.features.appuser.AppUser;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,7 +29,7 @@ public class RefreshToken {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private AppUser user;
 
     private Instant createdAt;
     private Instant expiresAt;

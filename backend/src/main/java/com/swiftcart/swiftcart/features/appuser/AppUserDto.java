@@ -1,4 +1,4 @@
-package com.swiftcart.swiftcart.features.user;
+package com.swiftcart.swiftcart.features.appuser;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class UserDto {
+public class AppUserDto {
 
     private Long userId;
 

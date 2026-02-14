@@ -10,7 +10,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.swiftcart.swiftcart.features.user.User;
+import com.swiftcart.swiftcart.features.appuser.AppUser;
 
 @Service
 public class RefreshTokenServiceImpl implements RefreshTokenService {
@@ -22,7 +22,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     JwtService jwtService;
 
     @Override
-    public String generateRefreshToken(User user) {
+    public String generateRefreshToken(AppUser user) {
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.setUser(user);
         refreshToken.setCreatedAt(Instant.now());
@@ -35,7 +35,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Override
     public String generateAccessToken(String token) {
         RefreshToken refreshToken = refreshTokenRepo.findByTokenWithUserAndRole(token);
-        User user = refreshToken.getUser();
+        AppUser user = refreshToken.getUser();
         return jwtService.generateToken(user.getUserId(), user.getRole().getName());
     }
 
