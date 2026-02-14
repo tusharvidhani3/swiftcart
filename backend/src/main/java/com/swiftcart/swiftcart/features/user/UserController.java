@@ -1,6 +1,5 @@
 package com.swiftcart.swiftcart.features.user;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,13 +24,13 @@ public class UserController {
     private UserService userService;
 
     @Autowired
-    private ModelMapper modelMapper;
+    private UserMapper userMapper;
 
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserDTO> getLoggedInUser(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
         User user = userDetailsImpl.getUser();
-        UserDTO userDTO = modelMapper.map(user, UserDTO.class);
+        UserDTO userDTO = userMapper.toDto(user);
         userDTO.setRole(user.getRole().getName());
         return ResponseEntity.ok(userDTO);
     }

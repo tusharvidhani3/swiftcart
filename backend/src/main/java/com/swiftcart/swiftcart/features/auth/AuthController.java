@@ -2,7 +2,6 @@ package com.swiftcart.swiftcart.features.auth;
 
 import java.time.Duration;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.swiftcart.swiftcart.common.security.UserDetailsImpl;
 import com.swiftcart.swiftcart.features.user.User;
 import com.swiftcart.swiftcart.features.user.UserDTO;
+import com.swiftcart.swiftcart.features.user.UserMapper;
 import com.swiftcart.swiftcart.features.user.UserService;
 
 import jakarta.validation.Valid;
@@ -36,14 +36,14 @@ public class AuthController {
     private RefreshTokenService tokenService;
 
     @Autowired
-    private ModelMapper modelMapper;
+    private UserMapper userMapper;
 
     @PostMapping(value = {"/register", "/signup"})
     public ResponseEntity<UserDTO> register(@RequestBody @Valid LoginRequest registerReq) {
         userService.register(registerReq);
         UserDetailsImpl userDetailsImpl = userService.authenticate(registerReq);
         User user = userDetailsImpl.getUser();
-        UserDTO userDTO = modelMapper.map(user, UserDTO.class);
+        UserDTO userDTO = userMapper.toDto(user);
         userDTO.setRole(user.getRole().getName());
         String jwt = jwtService.generateToken(user.getUserId(), user.getRole().getName());
         String refreshToken = tokenService.generateRefreshToken(userDetailsImpl.getUser());
@@ -75,7 +75,7 @@ public class AuthController {
     public ResponseEntity<UserDTO> login(@RequestBody @Valid LoginRequest loginReq) {
         UserDetailsImpl userDetailsImpl = userService.authenticate(loginReq);
         User user = userDetailsImpl.getUser();
-        UserDTO userDTO = modelMapper.map(user, UserDTO.class);
+        UserDTO userDTO = userMapper.toDto(user);
         userDTO.setRole(user.getRole().getName());
         String jwt = jwtService.generateToken(user.getUserId(), user.getRole().getName());
         String refreshToken = tokenService.generateRefreshToken(userDetailsImpl.getUser());

@@ -1,6 +1,5 @@
 package com.swiftcart.swiftcart.features.user;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +17,7 @@ import com.swiftcart.swiftcart.features.auth.LoginRequest;
 public class UserServiceImpl implements UserService {
 
     @Autowired
-    private ModelMapper modelMapper;
+    private UserMapper userMapper;
 
     @Autowired
     private UserRepo userRepo;
@@ -35,7 +34,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void register(LoginRequest registerRequest) {
-        User user = modelMapper.map(registerRequest, User.class);
+        User user = userMapper.toEntity(registerRequest);
         Role role=roleRepo.findByName("ROLE_CUSTOMER");
         user.setRole(role);
         user.setPassword(encoder.encode(registerRequest.getPassword()));
@@ -58,14 +57,14 @@ public class UserServiceImpl implements UserService {
         user.setMobileNumber(userDTO.getMobileNumber());
         user.setEmail(userDTO.getEmail());
         user = userRepo.save(user);
-        modelMapper.map(user, userDTO);
+        userMapper.update(user, userDTO);
         userDTO.setRole(user.getRole().getName());
         return userDTO;
     }
 
     @Override
     public Page<UserDTO> getAllUsers(Pageable pageable) {
-        return userRepo.findAll(pageable).map(user -> modelMapper.map(user, UserDTO.class));
+        return userRepo.findAll(pageable).map(user -> userMapper.toDto(user));
     }
 
 }

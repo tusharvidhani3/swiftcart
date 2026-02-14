@@ -3,7 +3,6 @@ package com.swiftcart.swiftcart.features.address;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -19,23 +18,23 @@ public class AddressServiceImpl implements AddressService {
     private AddressRepo addressRepo;
 
     @Autowired
-    private ModelMapper modelMapper;
+    private AddressMapper addressMapper;
 
     @Override
     @Transactional
     public AddressDTO addAddress(AddressDTO addressDTO, User user) {
-        Address address=modelMapper.map(addressDTO, Address.class);
+        Address address=addressMapper.toEntity(addressDTO);
         address.setUser(user);
         if(addressRepo.countByUser_UserId(user.getUserId()) == 0)
         address.setIsDefaultShipping(true);
         address=addressRepo.save(address);
-        return modelMapper.map(address, AddressDTO.class);
+        return addressMapper.toDto(address);
     }
 
     @Override
     public List<AddressDTO> getAddressesForLoggedInUser(Long userId) {
         List<Address> userAddresses = addressRepo.findAllByUser_UserId(userId);
-        return userAddresses.stream().map(address -> modelMapper.map(address, AddressDTO.class)).collect(Collectors.toList());
+        return userAddresses.stream().map(address -> addressMapper.toDto(address)).collect(Collectors.toList());
     }
 
     @Override
@@ -44,7 +43,7 @@ public class AddressServiceImpl implements AddressService {
         .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
         if (!address.getUser().getUserId().equals(userId))
             throw new AccessDeniedException("Unauthorized access to this address");
-        return modelMapper.map(address, AddressDTO.class);
+        return addressMapper.toDto(address);
     }
 
     @Override
@@ -62,13 +61,14 @@ public class AddressServiceImpl implements AddressService {
     @Override
     @Transactional
     public AddressDTO updateAddress(AddressDTO addressDTO, User user) {
-        Address address = modelMapper.map(addressDTO, Address.class);
-        Address beforeAddress = addressRepo.findByAddressId(addressDTO.getAddressId()).get();
-        if (!beforeAddress.getUser().getUserId().equals(user.getUserId()))
+        Address address = addressMapper.toEntity(addressDTO);
+        Address oldAddress = addressRepo.findByAddressId(addressDTO.getAddressId()).get();
+        if (!oldAddress.getUser().getUserId().equals(user.getUserId()))
             throw new AccessDeniedException("Unauthorized access to this address");
         address.setUser(user);
-        address.setIsDefaultShipping(beforeAddress.getIsDefaultShipping());
-        return modelMapper.map(addressRepo.save(address), AddressDTO.class);
+        address.setIsDefaultShipping(oldAddress.getIsDefaultShipping());
+        address = addressRepo.save(address);
+        return addressMapper.toDto(address);
     }
 
     @Override
@@ -80,14 +80,14 @@ public class AddressServiceImpl implements AddressService {
         throw new AccessDeniedException("Access denied: This address does not belong to you");
         addressRepo.unsetDefaultShipping(userId);
         addressRepo.setDefaultShipping(addressId);
-        return modelMapper.map(address, AddressDTO.class);
+        return addressMapper.toDto(address);
     }
 
     @Override
     public AddressDTO getDefaultAddressForUser(Long userId) {
         Address address = addressRepo.findDefaultShippingAddress(userId)
         .orElseThrow(() -> new ResourceNotFoundException("No address added"));
-        return modelMapper.map(address, AddressDTO.class);
+        return addressMapper.toDto(address);
     }
 
     @Override

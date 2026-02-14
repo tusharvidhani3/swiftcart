@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -14,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.swiftcart.swiftcart.common.exception.InsufficientStockException;
 import com.swiftcart.swiftcart.common.exception.ResourceNotFoundException;
 import com.swiftcart.swiftcart.features.product.Product;
+import com.swiftcart.swiftcart.features.product.ProductMapper;
 import com.swiftcart.swiftcart.features.product.ProductResponse;
 import com.swiftcart.swiftcart.features.product.ProductService;
 import com.swiftcart.swiftcart.features.user.User;
@@ -28,10 +28,13 @@ public class CartServiceImpl implements CartService {
     private CartRepo cartRepo;
 
     @Autowired
-    ProductService productService;
+    private ProductService productService;
 
     @Autowired
-    private ModelMapper modelMapper;
+    private ProductMapper productMapper;
+
+    @Autowired
+    private CartItemMapper cartItemMapper;
 
     @Override
     @Transactional
@@ -93,9 +96,9 @@ public class CartServiceImpl implements CartService {
         for (CartItem ci : cartItems) {
             totalPrice += ci.getProduct().getPrice() * ci.getQuantity();
             List<String> productImages = productService.getProductImages(ci.getProduct().getProductId());
-            ProductResponse productResponse = modelMapper.map(ci.getProduct(), ProductResponse.class);
+            ProductResponse productResponse = productMapper.toResponse(ci.getProduct());
             productResponse.setImageUrls(productImages);
-            CartItemResponse cartItemResponse = modelMapper.map(ci, CartItemResponse.class);
+            CartItemResponse cartItemResponse = cartItemMapper.toResponse(ci);
             cartItemResponse.setProduct(productResponse);
             cartItemResponses.add(cartItemResponse);
         }
@@ -132,7 +135,7 @@ public class CartServiceImpl implements CartService {
                     return ci;
                 });
 
-        CartItemResponse cartItemResponse = modelMapper.map(cartItem, CartItemResponse.class);
+        CartItemResponse cartItemResponse = cartItemMapper.toResponse(cartItem);
         CartResponse cartResponse = new CartResponse();
         cartResponse.setCartItems(List.of(cartItemResponse));
         cartResponse.setTotalPrice(cartItemResponse.getProduct().getPrice());

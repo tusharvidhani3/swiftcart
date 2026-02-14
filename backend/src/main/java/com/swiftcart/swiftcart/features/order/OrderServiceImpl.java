@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,8 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.swiftcart.swiftcart.features.address.Address;
+import com.swiftcart.swiftcart.features.address.AddressMapper;
 import com.swiftcart.swiftcart.features.address.AddressService;
-import com.swiftcart.swiftcart.features.address.AddressSnapshot;
 import com.swiftcart.swiftcart.features.cart.CartItem;
 import com.swiftcart.swiftcart.features.cart.CartService;
 import com.swiftcart.swiftcart.features.payment.Payment;
@@ -25,6 +24,7 @@ import com.swiftcart.swiftcart.features.payment.PaymentStatus;
 import com.razorpay.RazorpayException;
 import com.swiftcart.swiftcart.common.exception.BadRequestException;
 import com.swiftcart.swiftcart.common.exception.ResourceNotFoundException;
+import com.swiftcart.swiftcart.features.product.ProductMapper;
 import com.swiftcart.swiftcart.features.product.ProductResponse;
 import com.swiftcart.swiftcart.features.product.ProductService;
 import com.swiftcart.swiftcart.features.user.User;
@@ -39,9 +39,6 @@ public class OrderServiceImpl implements OrderService {
     private OrderRepo orderRepo;
 
     @Autowired
-    private ModelMapper modelMapper;
-
-    @Autowired
     private ProductService productService;
 
     @Autowired
@@ -52,6 +49,18 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private PaymentService paymentService;
+
+    @Autowired
+    private AddressMapper addressMapper;
+
+    @Autowired
+    private ProductMapper productMapper;
+
+    @Autowired
+    private OrderMapper orderMapper;
+
+    @Autowired
+    private OrderItemMapper orderItemMapper;
 
     @Override
     @Transactional
@@ -64,7 +73,7 @@ public class OrderServiceImpl implements OrderService {
             throw new AccessDeniedException("Unauthorized access to the address");
         Order order = new Order();
         order.setPlacedAt(LocalDateTime.now());
-        order.setShippingAddress(modelMapper.map(shippingAddress, AddressSnapshot.class));
+        order.setShippingAddress(addressMapper.toSnapshot(shippingAddress));
         order.setUser(shippingAddress.getUser());
         List<OrderItem> orderItems = new ArrayList<>();
         double totalAmount = 0;
@@ -83,7 +92,7 @@ public class OrderServiceImpl implements OrderService {
         orderItemRepo.saveAll(orderItems);
         order = orderRepo.save(order);
         cartService.deleteCartItemsByUserId(userId);
-        OrderResponse orderResponse = modelMapper.map(order, OrderResponse.class);
+        OrderResponse orderResponse = orderMapper.toResponse(order);
         if (placeOrderRequest.getPrepaid())
             orderResponse.setPayment(paymentService.createOrder(order));
         return orderResponse;
@@ -100,7 +109,7 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItemResponse> orderItems = orderItemRepo.findAllByOrder_OrderId(orderId).stream().map(orderItem -> {
             OrderItemResponse orderItemResponse = new OrderItemResponse();
             orderItemResponse.setOrderItemId(orderItem.getOrderItemId());
-            ProductResponse productResponse = modelMapper.map(orderItem.getProduct(), ProductResponse.class);
+            ProductResponse productResponse = productMapper.toResponse(orderItem.getProduct());
             productResponse.setImageUrls(productService.getProductImages(orderItem.getProduct().getProductId()));
             orderItemResponse.setProduct(productResponse);
             orderItemResponse.setQuantity(orderItem.getQuantity());
@@ -109,7 +118,7 @@ public class OrderServiceImpl implements OrderService {
             return orderItemResponse;
         })
                 .collect(Collectors.toList());
-        OrderResponse orderResponse = modelMapper.map(order, OrderResponse.class);
+        OrderResponse orderResponse = orderMapper.toResponse(order);
         orderResponse.setOrderItems(orderItems);
         PaymentDTO paymentDTO = paymentService.getPayment(order.getOrderId());
         if(paymentDTO != null)
@@ -121,12 +130,12 @@ public class OrderServiceImpl implements OrderService {
     public Page<OrderResponse> getOrdersForAuthenticatedUser(Long userId, Pageable pageable) {
         return orderRepo.findAllByUser_UserId(userId, pageable)
                 .map(order -> {
-                    OrderResponse orderResponse = modelMapper.map(order, OrderResponse.class);
+                    OrderResponse orderResponse = orderMapper.toResponse(order);
                     List<OrderItem> orderItems = orderItemRepo.findAllByOrder_OrderId(order.getOrderId());
                     List<OrderItemResponse> orderItemResponseList = orderItems.stream().map(orderItem -> {
-                        ProductResponse productResponse = modelMapper.map(orderItem.getProduct(), ProductResponse.class);
+                        ProductResponse productResponse = productMapper.toResponse(orderItem.getProduct());
                         productResponse.setImageUrls(productService.getProductImages(orderItem.getProduct().getProductId()));
-                        OrderItemResponse orderItemResponse = modelMapper.map(orderItem, OrderItemResponse.class);
+                        OrderItemResponse orderItemResponse = orderItemMapper.toResponse(orderItem);
                         orderItemResponse.setProduct(productResponse);
                         return orderItemResponse;
                     }).collect(Collectors.toList());
@@ -142,14 +151,12 @@ public class OrderServiceImpl implements OrderService {
     public Page<OrderResponseForSeller> getAllOrders(Pageable pageable) {
         return orderRepo.findAll(pageable)
                 .map(order -> {
-                    OrderResponseForSeller orderResponseForSeller = modelMapper.map(order,
-                            OrderResponseForSeller.class);
+                    OrderResponseForSeller orderResponseForSeller = orderMapper.toResponseForSeller(order);
                     List<OrderItem> orderItems = orderItemRepo.findAllByOrder_OrderId(order.getOrderId());
                     List<OrderItemResponse> orderItemResponseList = orderItems.stream().map(orderItem -> {
-                        ProductResponse productResponse = modelMapper.map(orderItem.getProduct(),
-                                ProductResponse.class);
+                        ProductResponse productResponse = productMapper.toResponse(orderItem.getProduct());
                         productResponse.setImageUrls(productService.getProductImages(orderItem.getProduct().getProductId()));
-                        OrderItemResponse orderItemResponse = modelMapper.map(orderItem, OrderItemResponse.class);
+                        OrderItemResponse orderItemResponse = orderItemMapper.toResponse(orderItem);
                         orderItemResponse.setProduct(productResponse);
                         return orderItemResponse;
                     }).collect(Collectors.toList());
@@ -171,7 +178,7 @@ public class OrderServiceImpl implements OrderService {
         }
         orderItem.setOrderItemStatus(orderStatus);
         orderItem = orderItemRepo.save(orderItem);
-        return modelMapper.map(orderItem, OrderItemResponse.class);
+        return orderItemMapper.toResponse(orderItem);
     }
 
     @Override
@@ -189,7 +196,7 @@ public class OrderServiceImpl implements OrderService {
         else {
             throw new BadRequestException("Cannot cancel an order item that is already delivered");
         }
-        return modelMapper.map(orderItem, OrderItemResponse.class);
+        return orderItemMapper.toResponse(orderItem);
     }
 
     @Override
@@ -201,7 +208,7 @@ public class OrderServiceImpl implements OrderService {
             throw new AccessDeniedException("Access Denied: Something went wrong");
         Order order = new Order();
         order.setPlacedAt(LocalDateTime.now());
-        order.setShippingAddress(modelMapper.map(shippingAddress, AddressSnapshot.class));
+        order.setShippingAddress(addressMapper.toSnapshot(shippingAddress));
         order.setTotalAmount(cartItem.getProduct().getPrice());
         order.setUser(user);
         order = orderRepo.save(order);
@@ -215,7 +222,7 @@ public class OrderServiceImpl implements OrderService {
         orderItem.setDeliveryAt(LocalDateTime.now().plusWeeks(1).withHour(20).withMinute(0).withSecond(0).withNano(0));
         orderItemRepo.save(orderItem);
         productService.updateStock(cartItem.getProduct().getProductId(), -orderItem.getQuantity());
-        OrderResponse orderResponse = modelMapper.map(order, OrderResponse.class);
+        OrderResponse orderResponse = orderMapper.toResponse(order);
         if (placeBuyNowOrderRequest.getPrepaid())
             orderResponse.setPayment(paymentService.createOrder(order));
         return orderResponse;
@@ -238,7 +245,7 @@ public class OrderServiceImpl implements OrderService {
                 throw new BadRequestException("Cannot cancel order, one or more item(s) delivered");
             }
         });
-        return modelMapper.map(order, OrderResponse.class);
+        return orderMapper.toResponse(order);
     }
 
 }

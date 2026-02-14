@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -21,9 +20,6 @@ import com.swiftcart.swiftcart.common.storage.StorageService;
 public class ProductServiceImpl implements ProductService {
 
     @Autowired
-    private ModelMapper modelMapper;
-
-    @Autowired
     private StorageService storageService;
 
     @Value("${product.images.directory}")
@@ -34,6 +30,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private ProductImageRepo productImageRepo;
+
+    @Autowired
+    private ProductMapper productMapper;
 
     @Override
     @Transactional
@@ -56,8 +55,8 @@ public class ProductServiceImpl implements ProductService {
             return relativePath;
         }).collect(Collectors.toList());
         productImageRepo.saveAllAndFlush(images);
-        productRepo.save(product);
-        ProductResponse productResponse = modelMapper.map(product, ProductResponse.class);
+        product = productRepo.save(product);
+        ProductResponse productResponse = productMapper.toResponse(product);
         productResponse.setImageUrls(relativePaths);
         return productResponse;
     }
@@ -73,7 +72,7 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponse getProduct(Long productId) {
         Product product=productRepo.findByProductId(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
-        ProductResponse productResponse = modelMapper.map(product, ProductResponse.class);
+        ProductResponse productResponse = productMapper.toResponse(product);
         productResponse.setImageUrls(productImageRepo.findAllByProduct_ProductId(productId).stream().map(productImage -> productImage.getImageUrl()).collect(Collectors.toList()));
         return productResponse;
     }
@@ -83,9 +82,9 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponse updateProduct(Long productId, CreateProductRequest productRequest, List<MultipartFile> productImages) {
         Product existingProduct = productRepo.findByProductId(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
-        modelMapper.map(productRequest, existingProduct);
+        productMapper.update(productRequest, existingProduct);
         Product updatedProduct = productRepo.save(existingProduct);
-        ProductResponse productResponse = modelMapper.map(updatedProduct, ProductResponse.class);
+        ProductResponse productResponse = productMapper.toResponse(updatedProduct);
         if (productImages != null) {
             productImageRepo.deleteAllByProduct_ProductId(productId);
             List<ProductImage> images = new ArrayList<>();
@@ -99,7 +98,7 @@ public class ProductServiceImpl implements ProductService {
                 return relativePath;
             }).collect(Collectors.toList());
             productImageRepo.saveAllAndFlush(images);
-        ProductResponse productResponse = modelMapper.map(updatedProduct, ProductResponse.class);
+            productResponse = productMapper.toResponse(updatedProduct);
             productResponse.setImageUrls(relativePaths);
         }
         return productResponse;
@@ -108,7 +107,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Page<ProductResponse> searchProducts(String keyword, Pageable pageable, String category, long minPrice, long maxPrice, boolean inStock) {
         Page<ProductResponse> productPage = productRepo.searchProducts(keyword, pageable, minPrice, maxPrice, category, inStock).map(product -> {
-                    ProductResponse productResponse = modelMapper.map(product, ProductResponse.class);
+                    ProductResponse productResponse = productMapper.toResponse(product);
             productResponse.setImageUrls(productImageRepo.findAllByProduct_ProductId(product.getProductId()).stream().map(productImage -> productImage.getImageUrl()).collect(Collectors.toList()));
                     return productResponse;
                 });
@@ -124,7 +123,7 @@ public class ProductServiceImpl implements ProductService {
             throw new InsufficientStockException("Stock cannot be negative");
         product.setStock(stock);
         product = productRepo.save(product);
-        ProductResponse productResponse = modelMapper.map(product, ProductResponse.class);
+        ProductResponse productResponse = productMapper.toResponse(product);
         productResponse.setImageUrls(productImageRepo.findAllByProduct_ProductId(productId).stream()
                 .map(productImage -> productImage.getImageUrl()).collect(Collectors.toList()));
         return productResponse;

@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.json.JSONObject;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -27,7 +26,7 @@ public class PaymentServiceImpl implements PaymentService {
     private String keySecret;
 
     @Autowired
-    private ModelMapper modelMapper;
+    private PaymentMapper paymentMapper;
 
     @Autowired
     private PaymentRepo paymentRepo;
@@ -47,7 +46,7 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setOrder(order);
         payment.setPaymentOrderId(paymentOrder.get("id").toString());
         payment = paymentRepo.save(payment);
-        return modelMapper.map(payment, PaymentDTO.class);
+        return paymentMapper.toDto(payment);
     }
 
     @Override
@@ -89,7 +88,7 @@ public class PaymentServiceImpl implements PaymentService {
         Payment payment = paymentRepo.findByOrder_OrderId(orderId);
         if(payment == null)
         return null;
-        return modelMapper.map(payment, PaymentDTO.class);
+        return paymentMapper.toDto(payment);
     }
 
 }
