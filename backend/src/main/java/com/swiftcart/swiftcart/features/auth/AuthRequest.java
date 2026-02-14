@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class LoginRequest {
+public class AuthRequest {
 
     @NotBlank(message = "Mobile number cannot be blank")
     @Pattern(regexp = "^[6789]{1}[0-9]{9}$", message = "Enter valid 10 digit mobile number")

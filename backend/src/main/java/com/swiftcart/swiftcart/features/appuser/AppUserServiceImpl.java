@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.swiftcart.swiftcart.common.security.UserDetailsImpl;
-import com.swiftcart.swiftcart.features.auth.LoginRequest;
+import com.swiftcart.swiftcart.features.auth.AuthRequest;
 
 @Service
 public class AppUserServiceImpl implements AppUserService {
@@ -33,7 +33,7 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Override
     @Transactional
-    public void register(LoginRequest registerRequest) {
+    public void register(AuthRequest registerRequest) {
         AppUser user = userMapper.toEntity(registerRequest);
         Role role=roleRepo.findByName("ROLE_CUSTOMER");
         user.setRole(role);
@@ -42,7 +42,7 @@ public class AppUserServiceImpl implements AppUserService {
     }
 
     @Override
-    public UserDetailsImpl authenticate(LoginRequest loginRequest) {
+    public UserDetailsImpl authenticate(AuthRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getMobileNumber(), loginRequest.getPassword()));
         UserDetailsImpl userDetailsImpl = (UserDetailsImpl)authentication.getPrincipal();
         return userDetailsImpl;

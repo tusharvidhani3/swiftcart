@@ -39,9 +39,9 @@ public class AuthController {
     private AppUserMapper userMapper;
 
     @PostMapping(value = {"/register", "/signup"})
-    public ResponseEntity<AppUserDto> register(@RequestBody @Valid LoginRequest registerReq) {
-        userService.register(registerReq);
-        UserDetailsImpl userDetailsImpl = userService.authenticate(registerReq);
+    public ResponseEntity<AppUserDto> register(@RequestBody @Valid AuthRequest registerRequest) {
+        userService.register(registerRequest);
+        UserDetailsImpl userDetailsImpl = userService.authenticate(registerRequest);
         AppUser user = userDetailsImpl.getUser();
         AppUserDto userDto = userMapper.toDto(user);
         userDto.setRole(user.getRole().getName());
@@ -72,8 +72,8 @@ public class AuthController {
     }
 
     @PostMapping(value = {"/login", "/signin"})
-    public ResponseEntity<AppUserDto> login(@RequestBody @Valid LoginRequest loginReq) {
-        UserDetailsImpl userDetailsImpl = userService.authenticate(loginReq);
+    public ResponseEntity<AppUserDto> login(@RequestBody @Valid AuthRequest loginRequest) {
+        UserDetailsImpl userDetailsImpl = userService.authenticate(loginRequest);
         AppUser user = userDetailsImpl.getUser();
         AppUserDto userDto = userMapper.toDto(user);
         userDto.setRole(user.getRole().getName());
