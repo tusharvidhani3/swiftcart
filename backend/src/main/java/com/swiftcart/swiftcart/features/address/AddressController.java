@@ -31,19 +31,19 @@ public class AddressController {
     private AddressService addressService;
 
     @GetMapping
-    public ResponseEntity<List<AddressDTO>> getLoggedInUserAddresses(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
+    public ResponseEntity<List<AddressDto>> getLoggedInUserAddresses(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
         return ResponseEntity.ok(addressService.getAddressesForLoggedInUser(userDetailsImpl.getUser().getUserId()));
     }
     
     @PostMapping
-    public ResponseEntity<AddressDTO> addAddress(@Valid @RequestBody AddressDTO addressDTO, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        return new ResponseEntity<>(addressService.addAddress(addressDTO, userDetailsImpl.getUser()), HttpStatus.CREATED);
+    public ResponseEntity<AddressDto> addAddress(@Valid @RequestBody AddressDto addressDto, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
+        return new ResponseEntity<>(addressService.addAddress(addressDto, userDetailsImpl.getUser()), HttpStatus.CREATED);
     }
 
     @GetMapping("/{addressId}")
-    public ResponseEntity<AddressDTO> getAddress(@PathVariable Long addressId, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        AddressDTO addressDTO = addressService.getAddress(addressId, userDetailsImpl.getUser().getUserId());
-        return new ResponseEntity<>(addressDTO, HttpStatus.OK);
+    public ResponseEntity<AddressDto> getAddress(@PathVariable Long addressId, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
+        AddressDto addressDto = addressService.getAddress(addressId, userDetailsImpl.getUser().getUserId());
+        return new ResponseEntity<>(addressDto, HttpStatus.OK);
     }
 
     @DeleteMapping("/{addressId}")
@@ -53,19 +53,19 @@ public class AddressController {
     }
 
     @PutMapping("/{addressId}")
-    public ResponseEntity<AddressDTO> updateAddress(@PathVariable Long addressId, @RequestBody @Valid AddressDTO addressDTO, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        return new ResponseEntity<>(addressService.updateAddress(addressDTO, userDetailsImpl.getUser()), HttpStatus.OK);
+    public ResponseEntity<AddressDto> updateAddress(@PathVariable Long addressId, @RequestBody @Valid AddressDto addressDto, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
+        return new ResponseEntity<>(addressService.updateAddress(addressDto, userDetailsImpl.getUser()), HttpStatus.OK);
     }
 
     @PutMapping("/{addressId}/default")
     @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<AddressDTO> changeDefaultAddress(@PathVariable Long addressId, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
+    public ResponseEntity<AddressDto> changeDefaultAddress(@PathVariable Long addressId, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
         return ResponseEntity.ok(addressService.changeDefaultAddress(addressId, userDetailsImpl.getUser().getUserId()));
     }
 
     @GetMapping("/default")
     @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<AddressDTO> getDefaultAddress(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
+    public ResponseEntity<AddressDto> getDefaultAddress(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
         return ResponseEntity.ok(addressService.getDefaultAddressForUser(userDetailsImpl.getUser().getUserId()));
     }
 }

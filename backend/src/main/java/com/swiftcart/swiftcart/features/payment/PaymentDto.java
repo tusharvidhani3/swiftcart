@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class PaymentDTO {
+public class PaymentDto {
 
     private String paymentOrderId;
     private String paymentId;

@@ -5,7 +5,7 @@ import com.swiftcart.swiftcart.features.order.Order;
 
 public interface PaymentService {
 
-    public PaymentDTO createOrder(Order order) throws RazorpayException;
+    public PaymentDto createOrder(Order order) throws RazorpayException;
     public void verifyPaymentAndConfirmOrder(String payload, String signature) throws RazorpayException;
-    public PaymentDTO getPayment(Long orderId);
+    public PaymentDto getPayment(Long orderId);
 }

@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.swiftcart.swiftcart.features.address.AddressSnapshot;
-import com.swiftcart.swiftcart.features.payment.PaymentDTO;
+import com.swiftcart.swiftcart.features.payment.PaymentDto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,5 +18,5 @@ public class OrderResponse {
     private double totalAmount;
     private LocalDateTime placedAt;
     private List<OrderItemResponse> orderItems;
-    private PaymentDTO payment;
+    private PaymentDto payment;
 }

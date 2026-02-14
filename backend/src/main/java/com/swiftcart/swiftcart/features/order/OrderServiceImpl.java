@@ -18,7 +18,7 @@ import com.swiftcart.swiftcart.features.address.AddressService;
 import com.swiftcart.swiftcart.features.cart.CartItem;
 import com.swiftcart.swiftcart.features.cart.CartService;
 import com.swiftcart.swiftcart.features.payment.Payment;
-import com.swiftcart.swiftcart.features.payment.PaymentDTO;
+import com.swiftcart.swiftcart.features.payment.PaymentDto;
 import com.swiftcart.swiftcart.features.payment.PaymentService;
 import com.swiftcart.swiftcart.features.payment.PaymentStatus;
 import com.razorpay.RazorpayException;
@@ -120,9 +120,9 @@ public class OrderServiceImpl implements OrderService {
                 .collect(Collectors.toList());
         OrderResponse orderResponse = orderMapper.toResponse(order);
         orderResponse.setOrderItems(orderItems);
-        PaymentDTO paymentDTO = paymentService.getPayment(order.getOrderId());
-        if(paymentDTO != null)
-            orderResponse.setPayment(paymentDTO);
+        PaymentDto paymentDto = paymentService.getPayment(order.getOrderId());
+        if(paymentDto != null)
+            orderResponse.setPayment(paymentDto);
         return orderResponse;
     }
 
@@ -140,9 +140,9 @@ public class OrderServiceImpl implements OrderService {
                         return orderItemResponse;
                     }).collect(Collectors.toList());
                     orderResponse.setOrderItems(orderItemResponseList);
-                    PaymentDTO paymentDTO = paymentService.getPayment(order.getOrderId());
-                    if(paymentDTO != null)
-                        orderResponse.setPayment(paymentDTO);
+                    PaymentDto paymentDto = paymentService.getPayment(order.getOrderId());
+                    if(paymentDto != null)
+                        orderResponse.setPayment(paymentDto);
                     return orderResponse;
                 });
     }
@@ -161,9 +161,9 @@ public class OrderServiceImpl implements OrderService {
                         return orderItemResponse;
                     }).collect(Collectors.toList());
                     orderResponseForSeller.setOrderItems(orderItemResponseList);
-                    PaymentDTO paymentDTO = paymentService.getPayment(order.getOrderId());
-                    if(paymentDTO != null)
-                        orderResponseForSeller.setPayment(paymentDTO);
+                    PaymentDto paymentDto = paymentService.getPayment(order.getOrderId());
+                    if(paymentDto != null)
+                        orderResponseForSeller.setPayment(paymentDto);
                     return orderResponseForSeller;
                 });
     }

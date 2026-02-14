@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.swiftcart.swiftcart.common.security.UserDetailsImpl;
 import com.swiftcart.swiftcart.features.user.User;
-import com.swiftcart.swiftcart.features.user.UserDTO;
+import com.swiftcart.swiftcart.features.user.UserDto;
 import com.swiftcart.swiftcart.features.user.UserMapper;
 import com.swiftcart.swiftcart.features.user.UserService;
 
@@ -39,12 +39,12 @@ public class AuthController {
     private UserMapper userMapper;
 
     @PostMapping(value = {"/register", "/signup"})
-    public ResponseEntity<UserDTO> register(@RequestBody @Valid LoginRequest registerReq) {
+    public ResponseEntity<UserDto> register(@RequestBody @Valid LoginRequest registerReq) {
         userService.register(registerReq);
         UserDetailsImpl userDetailsImpl = userService.authenticate(registerReq);
         User user = userDetailsImpl.getUser();
-        UserDTO userDTO = userMapper.toDto(user);
-        userDTO.setRole(user.getRole().getName());
+        UserDto userDto = userMapper.toDto(user);
+        userDto.setRole(user.getRole().getName());
         String jwt = jwtService.generateToken(user.getUserId(), user.getRole().getName());
         String refreshToken = tokenService.generateRefreshToken(userDetailsImpl.getUser());
         ResponseCookie accessCookie = ResponseCookie.from("access_token", jwt)
@@ -68,15 +68,15 @@ public class AuthController {
                 headers.add(HttpHeaders.SET_COOKIE, accessCookie.toString());
                 headers.add(HttpHeaders.SET_COOKIE, refreshCookie.toString());
             })
-            .body(userDTO);
+            .body(userDto);
     }
 
     @PostMapping(value = {"/login", "/signin"})
-    public ResponseEntity<UserDTO> login(@RequestBody @Valid LoginRequest loginReq) {
+    public ResponseEntity<UserDto> login(@RequestBody @Valid LoginRequest loginReq) {
         UserDetailsImpl userDetailsImpl = userService.authenticate(loginReq);
         User user = userDetailsImpl.getUser();
-        UserDTO userDTO = userMapper.toDto(user);
-        userDTO.setRole(user.getRole().getName());
+        UserDto userDto = userMapper.toDto(user);
+        userDto.setRole(user.getRole().getName());
         String jwt = jwtService.generateToken(user.getUserId(), user.getRole().getName());
         String refreshToken = tokenService.generateRefreshToken(userDetailsImpl.getUser());
         ResponseCookie accessCookie = ResponseCookie.from("access_token", jwt)
@@ -100,7 +100,7 @@ public class AuthController {
                 headers.add(HttpHeaders.SET_COOKIE, accessCookie.toString());
                 headers.add(HttpHeaders.SET_COOKIE, refreshCookie.toString());
             })
-            .body(userDTO);
+            .body(userDto);
     }
 
     @PostMapping(value = {"/logout", "/signout"})

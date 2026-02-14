@@ -38,7 +38,7 @@ public class Address {
     @Enumerated(EnumType.STRING)
     private AddressType addressType;
 
-    private Boolean isDefaultShipping = false;
+    private Boolean defaultShipping = false;
 
 	@ManyToOne
 	private User user;

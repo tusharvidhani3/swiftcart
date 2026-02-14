@@ -18,7 +18,7 @@ export default function ManageAddresses({ isSelectMode, setShowAddressSelector }
 
     useEffect(() => {
         setAddressCards(addresses.map(address => {
-            if (isSelectMode && address.isDefaultShipping)
+            if (isSelectMode && address.defaultShipping)
                 setSelectedAddress(address)
             return <AddressCard key={address.addressId} address={address} threeDotsMenuOpenId={threeDotsMenuOpenId} setThreeDotsMenuOpenId={setThreeDotsMenuOpenId} setShowAddressSelector={setShowAddressSelector} />
         }))

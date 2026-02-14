@@ -6,12 +6,12 @@ import com.swiftcart.swiftcart.features.user.User;
 
 public interface AddressService {
 
-    public AddressDTO addAddress(AddressDTO addressDTO, User user);
-    public List<AddressDTO> getAddressesForLoggedInUser(Long userId);
-    public AddressDTO getAddress(Long addressId, Long userId);
+    public AddressDto addAddress(AddressDto addressDto, User user);
+    public List<AddressDto> getAddressesForLoggedInUser(Long userId);
+    public AddressDto getAddress(Long addressId, Long userId);
     public void deleteAddress(Long addressId, Long userId);
-    public AddressDTO updateAddress(AddressDTO addressDTO, User user);
-    public AddressDTO changeDefaultAddress(Long addressId, Long userId);
-    public AddressDTO getDefaultAddressForUser(Long userId);
+    public AddressDto updateAddress(AddressDto addressDto, User user);
+    public AddressDto changeDefaultAddress(Long addressId, Long userId);
+    public AddressDto getDefaultAddressForUser(Long userId);
     Address getAddressById(Long addressId);
 }

@@ -50,20 +50,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserDTO updateUser(UserDTO userDTO) {
-        User user = userRepo.findByUserId(userDTO.getUserId()).get();
-        user.setFirstName(userDTO.getFirstName());
-        user.setLastName(userDTO.getLastName());
-        user.setMobileNumber(userDTO.getMobileNumber());
-        user.setEmail(userDTO.getEmail());
+    public UserDto updateUser(UserDto userDto) {
+        User user = userRepo.findByUserId(userDto.getUserId()).get();
+        user.setFirstName(userDto.getFirstName());
+        user.setLastName(userDto.getLastName());
+        user.setMobileNumber(userDto.getMobileNumber());
+        user.setEmail(userDto.getEmail());
         user = userRepo.save(user);
-        userMapper.update(user, userDTO);
-        userDTO.setRole(user.getRole().getName());
-        return userDTO;
+        userMapper.update(user, userDto);
+        userDto.setRole(user.getRole().getName());
+        return userDto;
     }
 
     @Override
-    public Page<UserDTO> getAllUsers(Pageable pageable) {
+    public Page<UserDto> getAllUsers(Pageable pageable) {
         return userRepo.findAll(pageable).map(user -> userMapper.toDto(user));
     }
 

@@ -28,24 +28,24 @@ public class UserController {
 
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<UserDTO> getLoggedInUser(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
+    public ResponseEntity<UserDto> getLoggedInUser(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
         User user = userDetailsImpl.getUser();
-        UserDTO userDTO = userMapper.toDto(user);
-        userDTO.setRole(user.getRole().getName());
-        return ResponseEntity.ok(userDTO);
+        UserDto userDto = userMapper.toDto(user);
+        userDto.setRole(user.getRole().getName());
+        return ResponseEntity.ok(userDto);
     }
 
     @PutMapping
-    public ResponseEntity<UserDTO> updateUserInfo(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @RequestBody UserDTO userDTO) {
-        userDTO.setUserId(userDetailsImpl.getUser().getUserId());
-        UserDTO updatedUserDTO = userService.updateUser(userDTO);
-        return ResponseEntity.ok(updatedUserDTO);
+    public ResponseEntity<UserDto> updateUserInfo(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @RequestBody UserDto userDto) {
+        userDto.setUserId(userDetailsImpl.getUser().getUserId());
+        UserDto updatedUserDto = userService.updateUser(userDto);
+        return ResponseEntity.ok(updatedUserDto);
     }
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Page<UserDTO>> getAllUsers(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "userId") String sortBy) {
-        Page<UserDTO> users = userService.getAllUsers(PageRequest.of(page, size, Sort.by(sortBy).ascending()));
+    public ResponseEntity<Page<UserDto>> getAllUsers(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "userId") String sortBy) {
+        Page<UserDto> users = userService.getAllUsers(PageRequest.of(page, size, Sort.by(sortBy).ascending()));
         return ResponseEntity.ok(users);
     }
 }

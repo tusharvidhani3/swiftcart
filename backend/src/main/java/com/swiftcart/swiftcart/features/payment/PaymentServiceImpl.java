@@ -35,7 +35,7 @@ public class PaymentServiceImpl implements PaymentService {
     private OrderItemRepo orderItemRepo;
 
     @Override
-    public PaymentDTO createOrder(Order order) throws RazorpayException {
+    public PaymentDto createOrder(Order order) throws RazorpayException {
         RazorpayClient razorpay = new RazorpayClient(keyId, keySecret);
         JSONObject orderRequest = new JSONObject();
         orderRequest.put("amount", order.getTotalAmount()*100);
@@ -84,7 +84,7 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
 
-    public PaymentDTO getPayment(Long orderId) {
+    public PaymentDto getPayment(Long orderId) {
         Payment payment = paymentRepo.findByOrder_OrderId(orderId);
         if(payment == null)
         return null;

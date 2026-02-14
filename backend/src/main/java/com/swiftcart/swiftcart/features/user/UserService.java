@@ -10,6 +10,6 @@ public interface UserService {
 
     public void register(LoginRequest registerRequest);
     public UserDetailsImpl authenticate(LoginRequest loginRequest);
-    public UserDTO updateUser(UserDTO userDTO);
-    public Page<UserDTO> getAllUsers(Pageable pageable);
+    public UserDto updateUser(UserDto userDto);
+    public Page<UserDto> getAllUsers(Pageable pageable);
 }

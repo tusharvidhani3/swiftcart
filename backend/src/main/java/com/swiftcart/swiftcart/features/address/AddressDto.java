@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class AddressDTO {
+public class AddressDto {
 
     private Long addressId;
 
@@ -41,5 +41,5 @@ public class AddressDTO {
 
     private AddressType addressType;
 
-    private Boolean isDefaultShipping;
+    private Boolean defaultShipping;
 }
