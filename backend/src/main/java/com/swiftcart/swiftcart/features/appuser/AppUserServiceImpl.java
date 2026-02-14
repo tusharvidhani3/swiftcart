@@ -20,10 +20,10 @@ public class AppUserServiceImpl implements AppUserService {
     private AppUserMapper userMapper;
 
     @Autowired
-    private AppUserRepo userRepo;
+    private AppUserRepository userRepo;
 
     @Autowired
-    private RoleRepo roleRepo;
+    private RoleRepository roleRepo;
 
     @Autowired
     private PasswordEncoder encoder;

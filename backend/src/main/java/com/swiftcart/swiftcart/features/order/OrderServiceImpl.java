@@ -33,10 +33,10 @@ import com.swiftcart.swiftcart.features.product.ProductService;
 public class OrderServiceImpl implements OrderService {
 
     @Autowired
-    private OrderItemRepo orderItemRepo;
+    private OrderItemRepository orderItemRepo;
 
     @Autowired
-    private OrderRepo orderRepo;
+    private OrderRepository orderRepo;
 
     @Autowired
     private ProductService productService;

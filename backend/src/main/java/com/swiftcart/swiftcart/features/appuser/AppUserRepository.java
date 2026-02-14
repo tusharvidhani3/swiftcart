@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface AppUserRepo extends JpaRepository<AppUser,Integer> {
+public interface AppUserRepository extends JpaRepository<AppUser,Integer> {
 
     @Query("SELECT u FROM AppUser u JOIN FETCH u.role WHERE u.email = :email")
     public Optional<AppUser> findByEmailWithRole(@Param("email") String email);

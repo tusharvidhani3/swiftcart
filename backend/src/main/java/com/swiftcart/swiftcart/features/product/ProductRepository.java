@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ProductRepo extends JpaRepository<Product,Integer> {
+public interface ProductRepository extends JpaRepository<Product,Integer> {
 
     public Optional<Product> findByProductId(Long productId);
 

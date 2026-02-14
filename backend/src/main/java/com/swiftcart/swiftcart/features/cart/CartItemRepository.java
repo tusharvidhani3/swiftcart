@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CartItemRepo extends JpaRepository<CartItem,Integer> {
+public interface CartItemRepository extends JpaRepository<CartItem,Integer> {
 
     public List<CartItem> findAllByCart_User_UserId(Long userId);
 

@@ -7,12 +7,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import com.swiftcart.swiftcart.common.exception.ResourceNotFoundException;
 import com.swiftcart.swiftcart.features.appuser.AppUser;
-import com.swiftcart.swiftcart.features.appuser.AppUserRepo;
+import com.swiftcart.swiftcart.features.appuser.AppUserRepository;
 
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
-    private AppUserRepo userRepo;
+    private AppUserRepository userRepo;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

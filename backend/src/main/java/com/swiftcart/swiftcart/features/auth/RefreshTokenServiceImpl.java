@@ -16,7 +16,7 @@ import com.swiftcart.swiftcart.features.appuser.AppUser;
 public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Autowired
-    RefreshTokenRepo refreshTokenRepo;
+    RefreshTokenRepository refreshTokenRepo;
 
     @Autowired
     JwtService jwtService;
