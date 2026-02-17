@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AppUserDto {
 
-    private Long userId;
+    private Long id;
 
     @Size(min = 2, max = 50, message = "First name must be 2 - 50 characters long")
     @Pattern(regexp = "^[A-Za-z]*$", message = "Enter valid characters in first name")

@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class OrderResponse {
 
-    private Long orderId;
+    private Long id;
     private AddressSnapshot shippingAddress;
     private double totalAmount;
     private LocalDateTime placedAt;

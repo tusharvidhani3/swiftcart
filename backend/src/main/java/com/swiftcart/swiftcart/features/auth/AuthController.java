@@ -45,7 +45,7 @@ public class AuthController {
         AppUser user = userDetailsImpl.getUser();
         AppUserDto userDto = userMapper.toDto(user);
         userDto.setRole(user.getRole().getName());
-        String jwt = jwtService.generateToken(user.getUserId(), user.getRole().getName());
+        String jwt = jwtService.generateToken(user.getId(), user.getRole().getName());
         String refreshToken = tokenService.generateRefreshToken(userDetailsImpl.getUser());
         ResponseCookie accessCookie = ResponseCookie.from("access_token", jwt)
             .httpOnly(true)
@@ -77,7 +77,7 @@ public class AuthController {
         AppUser user = userDetailsImpl.getUser();
         AppUserDto userDto = userMapper.toDto(user);
         userDto.setRole(user.getRole().getName());
-        String jwt = jwtService.generateToken(user.getUserId(), user.getRole().getName());
+        String jwt = jwtService.generateToken(user.getId(), user.getRole().getName());
         String refreshToken = tokenService.generateRefreshToken(userDetailsImpl.getUser());
         ResponseCookie accessCookie = ResponseCookie.from("access_token", jwt)
             .httpOnly(true)

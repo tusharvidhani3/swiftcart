@@ -68,7 +68,7 @@ export default function OrderDetails() {
 
                 <section className={styles.section}>
                     <div className={styles.productsOrdered}>
-                        {order.orderItems.map(orderItem => <OrderItemDetailsCard {...orderItem} key={orderItem.orderItemId} />)}
+                        {order.orderItems.map(orderItem => <OrderItemDetailsCard {...orderItem} key={orderItem.id} />)}
                     </div>
                 </section>
             </>
@@ -77,7 +77,7 @@ export default function OrderDetails() {
                 <section className={styles.section}>
                     <h2>Order Details</h2>
                     <div className={styles.orderData}>
-                        <div><span>Order Id</span> <span className={styles.orderId}>{order.orderId}</span></div>
+                        <div><span>Order Id</span> <span className={styles.orderId}>{order.id}</span></div>
                         <div><span>Order placed</span> <span className={styles.orderDate}>{orderDate.getDate()} {orderDate.toLocaleString('default', { month: 'long' })} {orderDate.getFullYear()}</span></div>
                         <div><span>Order total</span> <span className={styles.orderTotal}>₹{order.totalAmount.toLocaleString('en-IN')}</span></div>
                     </div>
@@ -86,7 +86,7 @@ export default function OrderDetails() {
                 <section className={styles.section}>
                     <h2>Products in Order</h2>
                     <div className={styles.productsOrdered}>
-                        {order.orderItems.map(orderItem => <OrderItemDetailsCard {...orderItem} key={orderItem.orderItemId} />)}
+                        {order.orderItems.map(orderItem => <OrderItemDetailsCard {...orderItem} key={orderItem.id} />)}
                     </div>
                 </section>
 

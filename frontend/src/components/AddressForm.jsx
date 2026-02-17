@@ -37,7 +37,7 @@ export default function AddAddress({ isEditMode }) {
     }
 
     async function handleEditAddress() {
-        const res = await authFetch(`${apiBaseUrl}/api/addresses/${editingAddress.addressId}`, {
+        const res = await authFetch(`${apiBaseUrl}/api/addresses/${editingAddress.id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -46,7 +46,7 @@ export default function AddAddress({ isEditMode }) {
         })
         const addressData = await res.json()
         setAddresses(addresses => addresses.map(address => {
-            if (address.addressId === addressData.addressId)
+            if (address.id === addressData.id)
                 return addressData
             return address
         }))

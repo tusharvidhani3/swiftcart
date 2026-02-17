@@ -8,7 +8,7 @@ import CartContext from '../contexts/CartContext'
 import { useAuthFetch } from '../hooks/useAuthFetch'
 import { apiBaseUrl } from '../config'
 
-export default function CartItem({ cartItemId, product, quantity }) {
+export default function CartItem({ id, product, quantity }) {
 
     const { showToast } = useContext(ToastContext)
     const { setCart } = useContext(CartContext)
@@ -16,7 +16,7 @@ export default function CartItem({ cartItemId, product, quantity }) {
     const {authFetch} = useAuthFetch()
 
     async function changeQty(changeInQty) {
-        const res = await authFetch(`${apiBaseUrl}/api/cart/items/${cartItemId}`, {
+        const res = await authFetch(`${apiBaseUrl}/api/cart/items/${id}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
@@ -33,7 +33,7 @@ export default function CartItem({ cartItemId, product, quantity }) {
     }
 
     async function removeCartItem() {
-        const res = await authFetch(`${apiBaseUrl}/api/cart/items/${cartItemId}`, {
+        const res = await authFetch(`${apiBaseUrl}/api/cart/items/${id}`, {
             method: "DELETE",
         })
         const cartResponse = await res.json()
@@ -42,7 +42,7 @@ export default function CartItem({ cartItemId, product, quantity }) {
 
     return (
         <div className={styles.cartItem}>
-            <div className={styles.productPreview} onClick={() => navigate(`/products/${product.productId}`)}>
+            <div className={styles.productPreview} onClick={() => navigate(`/products/${product.id}`)}>
                 <img alt="product image preview" className={styles.productImage} src={product.imageUrls[0]} />
                 <div>
                     <h2 className={styles.productTitle}>{product.productName}</h2>

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CartResponse {
 
-    private Long cartId;
+    private Long id;
     private double totalPrice;
     private List<CartItemResponse> cartItems;
 }

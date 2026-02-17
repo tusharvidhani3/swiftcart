@@ -31,7 +31,7 @@ public class CartController {
 
     @GetMapping
     public ResponseEntity<CartResponse> getCart(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        return ResponseEntity.ok(cartService.getCartResponse(userDetailsImpl.getUser().getUserId()));
+        return ResponseEntity.ok(cartService.getCartResponse(userDetailsImpl.getUser().getId()));
     }
     
     @PostMapping("/items")
@@ -42,13 +42,13 @@ public class CartController {
 
     @PutMapping("/items/{cartItemId}")
     public ResponseEntity<CartResponse> updateQty(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @PathVariable Long cartItemId, @RequestBody @Valid UpdateCartItemQtyRequest req){
-        CartResponse cartResponse = cartService.updateQuantity(userDetailsImpl.getUser().getUserId(), cartItemId, req.getQuantity());
+        CartResponse cartResponse = cartService.updateQuantity(userDetailsImpl.getUser().getId(), cartItemId, req.getQuantity());
         return ResponseEntity.ok(cartResponse);
     }
 
     @DeleteMapping("/items/{cartItemId}")
     public ResponseEntity<CartResponse> removeProductFromCart(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @PathVariable Long cartItemId) {
-        CartResponse cartResponse = cartService.removeProductFromCart(userDetailsImpl.getUser().getUserId(), cartItemId);
+        CartResponse cartResponse = cartService.removeProductFromCart(userDetailsImpl.getUser().getId(), cartItemId);
         return ResponseEntity.ok(cartResponse);
     }
 
@@ -60,12 +60,12 @@ public class CartController {
 
     @GetMapping("/count")
     public ResponseEntity<Integer> getCartQtyCount(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        return ResponseEntity.ok(cartService.getCartQuantityCount(userDetailsImpl.getUser().getUserId()));
+        return ResponseEntity.ok(cartService.getCartQuantityCount(userDetailsImpl.getUser().getId()));
     }
 
     @GetMapping("/summary")
     public ResponseEntity<Map<String, Object>> getCartSummary(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        CartResponse cartResponse =  cartService.getCartResponse(userDetailsImpl.getUser().getUserId());
+        CartResponse cartResponse =  cartService.getCartResponse(userDetailsImpl.getUser().getId());
         Map<String, Object> summary = new HashMap<>();
         summary.put("totalPrice", cartResponse.getTotalPrice());
         summary.put("cartItemsCount", cartResponse.getCartItems().size());

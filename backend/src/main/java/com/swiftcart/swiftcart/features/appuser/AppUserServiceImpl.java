@@ -51,7 +51,7 @@ public class AppUserServiceImpl implements AppUserService {
     @Override
     @Transactional
     public AppUserDto updateUser(AppUserDto userDto) {
-        AppUser user = userRepo.findByUserId(userDto.getUserId()).get();
+        AppUser user = userRepo.findById(userDto.getId()).get();
         user.setFirstName(userDto.getFirstName());
         user.setLastName(userDto.getLastName());
         user.setMobileNumber(userDto.getMobileNumber());

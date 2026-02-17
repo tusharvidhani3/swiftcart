@@ -26,7 +26,7 @@ export default function Orders() {
         <>
             <h2 className={styles.yourOrders}>Your Orders</h2>
             <div className={styles.ordersContainer}>
-                {orders.map(order => <OrderCard order={order} key={order.orderId} orders={orders} />)}
+                {orders.map(order => <OrderCard order={order} key={order.id} orders={orders} />)}
             </div>
         </>
     ):"Empty Orders"

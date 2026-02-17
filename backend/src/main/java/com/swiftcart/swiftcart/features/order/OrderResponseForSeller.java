@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class OrderResponseForSeller {
 
-    private Long orderId;
+    private Long id;
     private LocalDateTime placedAt;
     private double totalAmount;
     private PaymentDto payment;

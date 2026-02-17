@@ -25,7 +25,7 @@ public class AddressServiceImpl implements AddressService {
     public AddressDto addAddress(AddressDto addressDto, AppUser user) {
         Address address=addressMapper.toEntity(addressDto);
         address.setUser(user);
-        if(addressRepo.countByUser_UserId(user.getUserId()) == 0)
+        if(addressRepo.countByUser_Id(user.getId()) == 0)
         address.setDefaultShipping(true);
         address=addressRepo.save(address);
         return addressMapper.toDto(address);
@@ -33,15 +33,15 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public List<AddressDto> getAddressesForLoggedInUser(Long userId) {
-        List<Address> userAddresses = addressRepo.findAllByUser_UserId(userId);
+        List<Address> userAddresses = addressRepo.findByUser_Id(userId);
         return userAddresses.stream().map(address -> addressMapper.toDto(address)).collect(Collectors.toList());
     }
 
     @Override
     public AddressDto getAddress(Long addressId, Long userId) {
-        Address address = addressRepo.findByAddressId(addressId)
+        Address address = addressRepo.findById(addressId)
         .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
-        if (!address.getUser().getUserId().equals(userId))
+        if (!address.getUser().getId().equals(userId))
             throw new AccessDeniedException("Unauthorized access to this address");
         return addressMapper.toDto(address);
     }
@@ -49,9 +49,9 @@ public class AddressServiceImpl implements AddressService {
     @Override
     @Transactional
     public void deleteAddress(Long addressId, Long userId) {
-        Address address = addressRepo.findByAddressId(addressId)
+        Address address = addressRepo.findById(addressId)
         .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
-        if (!address.getUser().getUserId().equals(userId))
+        if (!address.getUser().getId().equals(userId))
             throw new AccessDeniedException("Unauthorized access to this address");
         if(address.getDefaultShipping() != null && address.getDefaultShipping())
         throw new IllegalStateException("Cannot delete the default shipping address");
@@ -62,8 +62,8 @@ public class AddressServiceImpl implements AddressService {
     @Transactional
     public AddressDto updateAddress(AddressDto addressDto, AppUser user) {
         Address address = addressMapper.toEntity(addressDto);
-        Address oldAddress = addressRepo.findByAddressId(addressDto.getAddressId()).get();
-        if (!oldAddress.getUser().getUserId().equals(user.getUserId()))
+        Address oldAddress = addressRepo.findById(addressDto.getId()).get();
+        if (!oldAddress.getUser().getId().equals(user.getId()))
             throw new AccessDeniedException("Unauthorized access to this address");
         address.setUser(user);
         address.setDefaultShipping(oldAddress.getDefaultShipping());
@@ -74,9 +74,9 @@ public class AddressServiceImpl implements AddressService {
     @Override
     @Transactional
     public AddressDto changeDefaultAddress(Long addressId, Long userId) {
-        Address address = addressRepo.findByAddressId(addressId)
+        Address address = addressRepo.findById(addressId)
         .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
-        if(address.getUser().getUserId() != userId)
+        if(address.getUser().getId() != userId)
         throw new AccessDeniedException("Access denied: This address does not belong to you");
         addressRepo.unsetDefaultShipping(userId);
         addressRepo.setDefaultShipping(addressId);

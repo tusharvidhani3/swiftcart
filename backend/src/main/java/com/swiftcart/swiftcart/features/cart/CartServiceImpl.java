@@ -39,7 +39,7 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional
     public CartResponse addProductToCart(AppUser user, Long productId, int quantity) {
-        Optional<Cart> cartOptional = cartRepo.findByUser_UserId(user.getUserId());
+        Optional<Cart> cartOptional = cartRepo.findByUser_Id(user.getId());
         Cart cart = null;
         CartItem cartItem = null;
         if (cartOptional.isEmpty()) {
@@ -48,7 +48,7 @@ public class CartServiceImpl implements CartService {
         }
         else 
         cart = cartOptional.get();
-        Optional<CartItem> cartItemOptional = cartItemRepo.findByCart_User_UserIdAndProduct_ProductId(user.getUserId(),
+        Optional<CartItem> cartItemOptional = cartItemRepo.findByCart_User_IdAndProduct_Id(user.getId(),
                 productId);
         if (cartItemOptional.isEmpty())
             cartItem = createCartItem(cart, productId, quantity);
@@ -60,15 +60,15 @@ public class CartServiceImpl implements CartService {
             cartItem.setQuantity(updatedQty);
             cartItemRepo.save(cartItem);
         }
-        return getCartResponse(user.getUserId());
+        return getCartResponse(user.getId());
     }
 
     @Override
     @Transactional
     public CartResponse removeProductFromCart(Long userId, Long cartItemId) {
-        CartItem cartItem = cartItemRepo.findByCartItemId(cartItemId)
+        CartItem cartItem = cartItemRepo.findById(cartItemId)
         .orElseThrow(() -> new ResourceNotFoundException("Cart item not found"));
-        if (!cartItem.getCart().getUser().getUserId().equals(userId))
+        if (!cartItem.getCart().getUser().getId().equals(userId))
             throw new AccessDeniedException("Unauthorized access to this cart item");
         cartItemRepo.delete(cartItem);
         return getCartResponse(userId);
@@ -77,9 +77,9 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional
     public CartResponse updateQuantity(Long userId, Long cartItemId, int quantity) {
-        CartItem cartItem = cartItemRepo.findByCartItemId(cartItemId)
+        CartItem cartItem = cartItemRepo.findById(cartItemId)
         .orElseThrow(() -> new ResourceNotFoundException("Cart item not found"));
-        if (!cartItem.getCart().getUser().getUserId().equals(userId))
+        if (!cartItem.getCart().getUser().getId().equals(userId))
             throw new AccessDeniedException("Unauthorized access to this cart item");
         if (cartItem.getProduct().getStock() < quantity)
             throw new InsufficientStockException("Cannot add more items. Stock limit reached");
@@ -91,11 +91,11 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartResponse getCartResponse(Long userId) {
         double totalPrice = 0;
-        List<CartItem> cartItems = cartItemRepo.findAllByCart_User_UserId(userId);
+        List<CartItem> cartItems = cartItemRepo.findByCart_User_Id(userId);
         List<CartItemResponse> cartItemResponses = new ArrayList<>();
         for (CartItem ci : cartItems) {
             totalPrice += ci.getProduct().getPrice() * ci.getQuantity();
-            List<String> productImages = productService.getProductImages(ci.getProduct().getProductId());
+            List<String> productImages = productService.getProductImages(ci.getProduct().getId());
             ProductResponse productResponse = productMapper.toResponse(ci.getProduct());
             productResponse.setImageUrls(productImages);
             CartItemResponse cartItemResponse = cartItemMapper.toResponse(ci);
@@ -103,9 +103,9 @@ public class CartServiceImpl implements CartService {
             cartItemResponses.add(cartItemResponse);
         }
         CartResponse cartResponse = new CartResponse();
-        Cart cart = cartRepo.findByUser_UserId(userId)
+        Cart cart = cartRepo.findByUser_Id(userId)
         .orElseGet(() -> new Cart());
-        cartResponse.setCartId(cart.getCartId());
+        cartResponse.setId(cart.getId());
         cartResponse.setTotalPrice(totalPrice);
         cartResponse.setCartItems(cartItemResponses);
         return cartResponse;
@@ -121,11 +121,11 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public CartResponse initiateBuyNow(Long productId, AppUser user) {
-        CartItem cartItem = cartItemRepo.findByCart_User_UserIdAndProduct_ProductId(user.getUserId(),
+        CartItem cartItem = cartItemRepo.findByCart_User_IdAndProduct_Id(user.getId(),
                 productId)
                 .orElseGet(() -> {
                     CartItem ci = new CartItem();
-                    ci.setCart(cartRepo.findByUser_UserId(user.getUserId()).orElseGet(() -> createNewCartForUser(user)));
+                    ci.setCart(cartRepo.findByUser_Id(user.getId()).orElseGet(() -> createNewCartForUser(user)));
                     Product product = productService.getProductById(productId);
                     if(product.getStock() < 1)
                     throw new InsufficientStockException("Product is out of stock");
@@ -157,8 +157,8 @@ public class CartServiceImpl implements CartService {
         Long cartId;
         Integer cartQuantityCount;
         try {
-        cartId = cartRepo.findByUser_UserId(userId).get().getCartId();
-        cartQuantityCount = cartItemRepo.getTotalQuantityByCartId(cartId);
+        cartId = cartRepo.findByUser_Id(userId).get().getId();
+        cartQuantityCount = cartItemRepo.sumQuantityByCartId(cartId);
         }
         catch(NoSuchElementException ex) {
             cartQuantityCount = 0;
@@ -168,17 +168,17 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public List<CartItem> getCartItemsByUserId(Long userId) {
-        return cartItemRepo.findAllByCart_User_UserId(userId);
+        return cartItemRepo.findByCart_User_Id(userId);
     }
 
     @Override
     public void deleteCartItemsByUserId(Long userId) {
-        cartItemRepo.deleteAllByCart_User_UserId(userId);
+        cartItemRepo.deleteByCart_User_Id(userId);
     }
 
     @Override
     public CartItem getCartItemByCartItemId(Long cartItemId) {
-        return cartItemRepo.findByCartItemId(cartItemId).orElseThrow(() -> new ResourceNotFoundException("No cart item found with this cart item id"));
+        return cartItemRepo.findById(cartItemId).orElseThrow(() -> new ResourceNotFoundException("No cart item found with this cart item id"));
     }
 
 }

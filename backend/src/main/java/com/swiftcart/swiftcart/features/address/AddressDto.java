@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AddressDto {
 
-    private Long addressId;
+    private Long id;
 
     @NotBlank(message = "Name cannot be blank")
     @Pattern(regexp = "^[A-Za-z]{2,50}(?:[ .'-][A-Za-z]{2,50})*$", message = "Please enter a valid name")

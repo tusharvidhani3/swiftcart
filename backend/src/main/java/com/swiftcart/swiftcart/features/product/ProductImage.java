@@ -14,7 +14,7 @@ import lombok.Setter;
 @Entity
 @Getter
 @Table(uniqueConstraints = {
-        @UniqueConstraint(columnNames = { "product_id", "sort_order" })
+        @UniqueConstraint(columnNames = { "id", "sort_order" })
 })
 public class ProductImage {
 

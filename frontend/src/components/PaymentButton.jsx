@@ -28,7 +28,7 @@ export default function PaymentButton({ createOrder, amount }) {
             order_id: orderResponse.payment.paymentOrderId, 
             theme: { color: "#3399cc" },
             handler: () => {
-                navigate(`/orders/${orderResponse.orderId}`)
+                navigate(`/orders/${orderResponse.id}`)
             },
             modal: {
                 ondismiss: () => setToast("Payment failed")

@@ -61,7 +61,7 @@ public class JwtService {
     public boolean isTokenValid(String token, UserDetailsImpl userDetailsImpl) {
         Date expirationDate = extractExpiration(token);
         String userId = extractUserId(token);
-        return userDetailsImpl.getUser().getUserId().toString().equals(userId) && !expirationDate.before(new Date());
+        return userDetailsImpl.getUser().getId().toString().equals(userId) && !expirationDate.before(new Date());
     }
 
     private Date extractExpiration(String token) {

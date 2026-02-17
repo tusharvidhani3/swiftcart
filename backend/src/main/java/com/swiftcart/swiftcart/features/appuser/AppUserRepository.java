@@ -20,6 +20,6 @@ public interface AppUserRepository extends JpaRepository<AppUser,Integer> {
 
     public Page<AppUser> findAll(Pageable pageable);
 
-    public Optional<AppUser> findByUserId(Long userId);
+    public Optional<AppUser> findById(Long id);
 
 }

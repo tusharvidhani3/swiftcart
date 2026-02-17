@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class CreateProductRequest {
 
     @Size(min = 3, max = 200, message = "Product name must be between 3 and 200 characters")
-    private String productName;
+    private String name;
 
     @Min(value = 1, message = "Price of a product cannot be less than 1 rupee")
     private Double price;

@@ -36,7 +36,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     public String generateAccessToken(String token) {
         RefreshToken refreshToken = refreshTokenRepo.findByTokenWithUserAndRole(token);
         AppUser user = refreshToken.getUser();
-        return jwtService.generateToken(user.getUserId(), user.getRole().getName());
+        return jwtService.generateToken(user.getId(), user.getRole().getName());
     }
 
     @Override
@@ -74,7 +74,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Scheduled(cron = "0 0 3 * * ?") // Every day at 3 AM
     public void purgeExpiredTokens() {
-        refreshTokenRepo.deleteAllByExpiresAtBefore(Instant.now());
+        refreshTokenRepo.deleteByExpiresAtBefore(Instant.now());
     }
 
 }

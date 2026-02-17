@@ -46,7 +46,7 @@ export default function Checkout() {
             },
             body: JSON.stringify({
                 prepaid: isPrepaid,
-                shippingAddressId: selectedAddress.addressId
+                shippingAddressId: selectedAddress.id
             })
         })
         if (res.ok) {
@@ -63,8 +63,8 @@ export default function Checkout() {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                cartItemId: checkoutCart.cartItems[0].cartItemId,
-                shippingAddressId: selectedAddress.addressId,
+                cartItemId: checkoutCart.cartItems[0].id,
+                shippingAddressId: selectedAddress.id,
                 prepaid: isPrepaid
             })
         })
