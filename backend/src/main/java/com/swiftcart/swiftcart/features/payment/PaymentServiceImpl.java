@@ -67,7 +67,7 @@ public class PaymentServiceImpl implements PaymentService {
             payment.setPaymentId(paymentId);
             if(json.getString("event").equals("payment.captured")) {
                 payment.setPaymentStatus(PaymentStatus.PAID);
-                List<OrderItem> orderItems = orderItemRepo.findByOrder_Id(payment.getOrder().getId());
+                List<OrderItem> orderItems = orderItemRepo.findByOrderId(payment.getOrder().getId());
                 orderItems = orderItems.stream().map(orderItem -> { 
                     orderItem.setOrderItemStatus(OrderStatus.CONFIRMED);
                     return orderItem;
@@ -85,7 +85,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     public PaymentDto getPayment(Long orderId) {
-        Payment payment = paymentRepo.findByOrder_OrderId(orderId);
+        Payment payment = paymentRepo.findByOrderOrderId(orderId);
         if(payment == null)
         return null;
         return paymentMapper.toDto(payment);

@@ -39,7 +39,7 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional
     public CartResponse addProductToCart(AppUser user, Long productId, int quantity) {
-        Optional<Cart> cartOptional = cartRepo.findByUser_Id(user.getId());
+        Optional<Cart> cartOptional = cartRepo.findByUserId(user.getId());
         Cart cart = null;
         CartItem cartItem = null;
         if (cartOptional.isEmpty()) {
@@ -48,7 +48,7 @@ public class CartServiceImpl implements CartService {
         }
         else 
         cart = cartOptional.get();
-        Optional<CartItem> cartItemOptional = cartItemRepo.findByCart_User_IdAndProduct_Id(user.getId(),
+        Optional<CartItem> cartItemOptional = cartItemRepo.findByCartUserIdAndProductId(user.getId(),
                 productId);
         if (cartItemOptional.isEmpty())
             cartItem = createCartItem(cart, productId, quantity);
@@ -91,7 +91,7 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartResponse getCartResponse(Long userId) {
         double totalPrice = 0;
-        List<CartItem> cartItems = cartItemRepo.findByCart_User_Id(userId);
+        List<CartItem> cartItems = cartItemRepo.findByCartUserId(userId);
         List<CartItemResponse> cartItemResponses = new ArrayList<>();
         for (CartItem ci : cartItems) {
             totalPrice += ci.getProduct().getPrice() * ci.getQuantity();
@@ -103,7 +103,7 @@ public class CartServiceImpl implements CartService {
             cartItemResponses.add(cartItemResponse);
         }
         CartResponse cartResponse = new CartResponse();
-        Cart cart = cartRepo.findByUser_Id(userId)
+        Cart cart = cartRepo.findByUserId(userId)
         .orElseGet(() -> new Cart());
         cartResponse.setId(cart.getId());
         cartResponse.setTotalPrice(totalPrice);
@@ -121,11 +121,11 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public CartResponse initiateBuyNow(Long productId, AppUser user) {
-        CartItem cartItem = cartItemRepo.findByCart_User_IdAndProduct_Id(user.getId(),
+        CartItem cartItem = cartItemRepo.findByCartUserIdAndProductId(user.getId(),
                 productId)
                 .orElseGet(() -> {
                     CartItem ci = new CartItem();
-                    ci.setCart(cartRepo.findByUser_Id(user.getId()).orElseGet(() -> createNewCartForUser(user)));
+                    ci.setCart(cartRepo.findByUserId(user.getId()).orElseGet(() -> createNewCartForUser(user)));
                     Product product = productService.getProductById(productId);
                     if(product.getStock() < 1)
                     throw new InsufficientStockException("Product is out of stock");
@@ -157,7 +157,7 @@ public class CartServiceImpl implements CartService {
         Long cartId;
         Integer cartQuantityCount;
         try {
-        cartId = cartRepo.findByUser_Id(userId).get().getId();
+        cartId = cartRepo.findByUserId(userId).get().getId();
         cartQuantityCount = cartItemRepo.sumQuantityByCartId(cartId);
         }
         catch(NoSuchElementException ex) {
@@ -168,12 +168,12 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public List<CartItem> getCartItemsByUserId(Long userId) {
-        return cartItemRepo.findByCart_User_Id(userId);
+        return cartItemRepo.findByCartUserId(userId);
     }
 
     @Override
     public void deleteCartItemsByUserId(Long userId) {
-        cartItemRepo.deleteByCart_User_Id(userId);
+        cartItemRepo.deleteByCartUserId(userId);
     }
 
     @Override

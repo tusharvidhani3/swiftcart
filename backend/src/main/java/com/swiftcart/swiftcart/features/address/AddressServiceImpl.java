@@ -25,7 +25,7 @@ public class AddressServiceImpl implements AddressService {
     public AddressDto addAddress(AddressDto addressDto, AppUser user) {
         Address address=addressMapper.toEntity(addressDto);
         address.setUser(user);
-        if(addressRepo.countByUser_Id(user.getId()) == 0)
+        if(addressRepo.countByUserId(user.getId()) == 0)
         address.setDefaultShipping(true);
         address=addressRepo.save(address);
         return addressMapper.toDto(address);
@@ -33,7 +33,7 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public List<AddressDto> getAddressesForLoggedInUser(Long userId) {
-        List<Address> userAddresses = addressRepo.findByUser_Id(userId);
+        List<Address> userAddresses = addressRepo.findByUserId(userId);
         return userAddresses.stream().map(address -> addressMapper.toDto(address)).collect(Collectors.toList());
     }
 

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AddressRepository extends JpaRepository<Address,Long> {
 
-    public List<Address> findByUser_Id(Long id);
+    public List<Address> findByUserId(Long id);
     
     @Query("SELECT a FROM Address a WHERE a.user.id = :userId AND a.defaultShipping = true")
     public Optional<Address> findDefaultShippingAddress(@Param("userId") Long userId);
@@ -25,5 +25,5 @@ public interface AddressRepository extends JpaRepository<Address,Long> {
     @Query("UPDATE Address a SET a.defaultShipping = true WHERE a.id = :addressId")
     public void setDefaultShipping(@Param("addressId") Long addressId);
 
-    public long countByUser_Id(Long userId);
+    public long countByUserId(Long userId);
 }

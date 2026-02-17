@@ -106,7 +106,7 @@ public class OrderServiceImpl implements OrderService {
         boolean isAdminOrSeller = role.equals("ROLE_ADMIN") || role.equals("ROLE_SELLER");
         if (!isAdminOrSeller && !order.getUser().getId().equals(user.getId()))
             throw new AccessDeniedException("You are not authorized to access this order");
-        List<OrderItemResponse> orderItems = orderItemRepo.findByOrder_Id(orderId).stream().map(orderItem -> {
+        List<OrderItemResponse> orderItems = orderItemRepo.findByOrderId(orderId).stream().map(orderItem -> {
             OrderItemResponse orderItemResponse = new OrderItemResponse();
             orderItemResponse.setId(orderItem.getId());
             ProductResponse productResponse = productMapper.toResponse(orderItem.getProduct());
@@ -128,10 +128,10 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Page<OrderResponse> getOrdersForAuthenticatedUser(Long userId, Pageable pageable) {
-        return orderRepo.findByUser_Id(userId, pageable)
+        return orderRepo.findByUserId(userId, pageable)
                 .map(order -> {
                     OrderResponse orderResponse = orderMapper.toResponse(order);
-                    List<OrderItem> orderItems = orderItemRepo.findByOrder_Id(order.getId());
+                    List<OrderItem> orderItems = orderItemRepo.findByOrderId(order.getId());
                     List<OrderItemResponse> orderItemResponseList = orderItems.stream().map(orderItem -> {
                         ProductResponse productResponse = productMapper.toResponse(orderItem.getProduct());
                         productResponse.setImageUrls(productService.getProductImages(orderItem.getProduct().getId()));
@@ -152,7 +152,7 @@ public class OrderServiceImpl implements OrderService {
         return orderRepo.findAll(pageable)
                 .map(order -> {
                     OrderResponseForSeller orderResponseForSeller = orderMapper.toResponseForSeller(order);
-                    List<OrderItem> orderItems = orderItemRepo.findByOrder_Id(order.getId());
+                    List<OrderItem> orderItems = orderItemRepo.findByOrderId(order.getId());
                     List<OrderItemResponse> orderItemResponseList = orderItems.stream().map(orderItem -> {
                         ProductResponse productResponse = productMapper.toResponse(orderItem.getProduct());
                         productResponse.setImageUrls(productService.getProductImages(orderItem.getProduct().getId()));
@@ -234,7 +234,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepo.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
-        List<OrderItem> orderItems = orderItemRepo.findByOrder_Id(orderId);
+        List<OrderItem> orderItems = orderItemRepo.findByOrderId(orderId);
         orderItems.stream().forEach(orderItem -> {
             if (orderItem.getOrderItemStatus() == OrderStatus.CONFIRMED || orderItem.getOrderItemStatus() == OrderStatus.OUT_FOR_DELIVERY || orderItem.getOrderItemStatus() == OrderStatus.SHIPPED) {
                 orderItem.setOrderItemStatus(OrderStatus.CANCELLED);
