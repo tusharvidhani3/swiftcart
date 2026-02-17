@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ProductResponse {
 
-    private Long productId;
-    private String productName;
+    private Long id;
+    private String name;
     @DecimalMin("1.0")
     private double price;
     @DecimalMin("1.0")

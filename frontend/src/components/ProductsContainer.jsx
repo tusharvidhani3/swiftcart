@@ -7,7 +7,7 @@ export default function ProductsContainer({ products }) {
     return (
         <div className={styles.productsContainer}>
             {products.length ?
-            products.map(product => <ProductCard {...product} key={product.productId} />)
+            products.map(product => <ProductCard {...product} key={product.id} />)
             :
             new Array(12).fill(0).map((ele, i) => <ProductCardShimmer key={i} />)
             }

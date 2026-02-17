@@ -37,14 +37,14 @@ public class AppUserController {
 
     @PutMapping
     public ResponseEntity<AppUserDto> updateUserInfo(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @RequestBody AppUserDto userDto) {
-        userDto.setUserId(userDetailsImpl.getUser().getUserId());
+        userDto.setId(userDetailsImpl.getUser().getId());
         AppUserDto updatedUserDto = userService.updateUser(userDto);
         return ResponseEntity.ok(updatedUserDto);
     }
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Page<AppUserDto>> getAllUsers(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "userId") String sortBy) {
+    public ResponseEntity<Page<AppUserDto>> getAllUsers(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "id") String sortBy) {
         Page<AppUserDto> users = userService.getAllUsers(PageRequest.of(page, size, Sort.by(sortBy).ascending()));
         return ResponseEntity.ok(users);
     }

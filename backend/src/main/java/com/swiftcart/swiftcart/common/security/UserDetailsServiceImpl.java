@@ -21,7 +21,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     public UserDetailsImpl loadUserByUserId(Long userId) {
-        AppUser user = userRepo.findByUserId(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        AppUser user = userRepo.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         return new UserDetailsImpl(user);
     }
 

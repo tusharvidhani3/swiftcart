@@ -69,7 +69,7 @@ public class OrderServiceImpl implements OrderService {
         if (cartItems.isEmpty())
             throw new ResourceNotFoundException("Order cannot be placed on empty cart");
         Address shippingAddress = addressService.getAddressById(placeOrderRequest.getShippingAddressId());
-        if (!shippingAddress.getUser().getUserId().equals(userId))
+        if (!shippingAddress.getUser().getId().equals(userId))
             throw new AccessDeniedException("Unauthorized access to the address");
         Order order = new Order();
         order.setPlacedAt(LocalDateTime.now());
@@ -85,7 +85,7 @@ public class OrderServiceImpl implements OrderService {
             orderItem.setOrderItemStatus(placeOrderRequest.getPrepaid() ? OrderStatus.CREATED : OrderStatus.CONFIRMED);
             orderItem.setDeliveryAt(LocalDateTime.now().plusWeeks(1).withHour(20).withMinute(0).withSecond(0).withNano(0));
             orderItems.add(orderItem);
-            productService.updateStock(ci.getProduct().getProductId(), -orderItem.getQuantity());
+            productService.updateStock(ci.getProduct().getId(), -orderItem.getQuantity());
             totalAmount += ci.getProduct().getPrice() * ci.getQuantity();
         }
         order.setTotalAmount(totalAmount);
@@ -100,17 +100,17 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderResponse getOrder(Long orderId, AppUser user) {
-        Order order = orderRepo.findByOrderId(orderId)
+        Order order = orderRepo.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
         String role = user.getRole().getName();
         boolean isAdminOrSeller = role.equals("ROLE_ADMIN") || role.equals("ROLE_SELLER");
-        if (!isAdminOrSeller && !order.getUser().getUserId().equals(user.getUserId()))
+        if (!isAdminOrSeller && !order.getUser().getId().equals(user.getId()))
             throw new AccessDeniedException("You are not authorized to access this order");
-        List<OrderItemResponse> orderItems = orderItemRepo.findAllByOrder_OrderId(orderId).stream().map(orderItem -> {
+        List<OrderItemResponse> orderItems = orderItemRepo.findByOrder_Id(orderId).stream().map(orderItem -> {
             OrderItemResponse orderItemResponse = new OrderItemResponse();
-            orderItemResponse.setOrderItemId(orderItem.getOrderItemId());
+            orderItemResponse.setId(orderItem.getId());
             ProductResponse productResponse = productMapper.toResponse(orderItem.getProduct());
-            productResponse.setImageUrls(productService.getProductImages(orderItem.getProduct().getProductId()));
+            productResponse.setImageUrls(productService.getProductImages(orderItem.getProduct().getId()));
             orderItemResponse.setProduct(productResponse);
             orderItemResponse.setQuantity(orderItem.getQuantity());
             orderItemResponse.setOrderItemStatus(orderItem.getOrderItemStatus());
@@ -120,7 +120,7 @@ public class OrderServiceImpl implements OrderService {
                 .collect(Collectors.toList());
         OrderResponse orderResponse = orderMapper.toResponse(order);
         orderResponse.setOrderItems(orderItems);
-        PaymentDto paymentDto = paymentService.getPayment(order.getOrderId());
+        PaymentDto paymentDto = paymentService.getPayment(order.getId());
         if(paymentDto != null)
             orderResponse.setPayment(paymentDto);
         return orderResponse;
@@ -128,19 +128,19 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Page<OrderResponse> getOrdersForAuthenticatedUser(Long userId, Pageable pageable) {
-        return orderRepo.findAllByUser_UserId(userId, pageable)
+        return orderRepo.findByUser_Id(userId, pageable)
                 .map(order -> {
                     OrderResponse orderResponse = orderMapper.toResponse(order);
-                    List<OrderItem> orderItems = orderItemRepo.findAllByOrder_OrderId(order.getOrderId());
+                    List<OrderItem> orderItems = orderItemRepo.findByOrder_Id(order.getId());
                     List<OrderItemResponse> orderItemResponseList = orderItems.stream().map(orderItem -> {
                         ProductResponse productResponse = productMapper.toResponse(orderItem.getProduct());
-                        productResponse.setImageUrls(productService.getProductImages(orderItem.getProduct().getProductId()));
+                        productResponse.setImageUrls(productService.getProductImages(orderItem.getProduct().getId()));
                         OrderItemResponse orderItemResponse = orderItemMapper.toResponse(orderItem);
                         orderItemResponse.setProduct(productResponse);
                         return orderItemResponse;
                     }).collect(Collectors.toList());
                     orderResponse.setOrderItems(orderItemResponseList);
-                    PaymentDto paymentDto = paymentService.getPayment(order.getOrderId());
+                    PaymentDto paymentDto = paymentService.getPayment(order.getId());
                     if(paymentDto != null)
                         orderResponse.setPayment(paymentDto);
                     return orderResponse;
@@ -152,16 +152,16 @@ public class OrderServiceImpl implements OrderService {
         return orderRepo.findAll(pageable)
                 .map(order -> {
                     OrderResponseForSeller orderResponseForSeller = orderMapper.toResponseForSeller(order);
-                    List<OrderItem> orderItems = orderItemRepo.findAllByOrder_OrderId(order.getOrderId());
+                    List<OrderItem> orderItems = orderItemRepo.findByOrder_Id(order.getId());
                     List<OrderItemResponse> orderItemResponseList = orderItems.stream().map(orderItem -> {
                         ProductResponse productResponse = productMapper.toResponse(orderItem.getProduct());
-                        productResponse.setImageUrls(productService.getProductImages(orderItem.getProduct().getProductId()));
+                        productResponse.setImageUrls(productService.getProductImages(orderItem.getProduct().getId()));
                         OrderItemResponse orderItemResponse = orderItemMapper.toResponse(orderItem);
                         orderItemResponse.setProduct(productResponse);
                         return orderItemResponse;
                     }).collect(Collectors.toList());
                     orderResponseForSeller.setOrderItems(orderItemResponseList);
-                    PaymentDto paymentDto = paymentService.getPayment(order.getOrderId());
+                    PaymentDto paymentDto = paymentService.getPayment(order.getId());
                     if(paymentDto != null)
                         orderResponseForSeller.setPayment(paymentDto);
                     return orderResponseForSeller;
@@ -171,10 +171,10 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderItemResponse updateOrderItemStatus(AppUser user, Long orderItemId, OrderStatus orderStatus) {
-        OrderItem orderItem = orderItemRepo.findByOrderItemId(orderItemId)
+        OrderItem orderItem = orderItemRepo.findById(orderItemId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order Item not found"));
         if (orderStatus == OrderStatus.CANCELLED) {
-            productService.updateStock(orderItem.getProduct().getProductId(), orderItem.getQuantity());
+            productService.updateStock(orderItem.getProduct().getId(), orderItem.getQuantity());
         }
         orderItem.setOrderItemStatus(orderStatus);
         orderItem = orderItemRepo.save(orderItem);
@@ -184,13 +184,13 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderItemResponse cancelOrderItem(Long userId, Long orderItemId) {
-        OrderItem orderItem = orderItemRepo.findByOrderItemId(orderItemId)
+        OrderItem orderItem = orderItemRepo.findById(orderItemId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order Item not found"));
-        if (!orderItem.getOrder().getUser().getUserId().equals(userId))
+        if (!orderItem.getOrder().getUser().getId().equals(userId))
             throw new AccessDeniedException("You are not allowed to perform this action");
         if (orderItem.getOrderItemStatus() == OrderStatus.CONFIRMED || orderItem.getOrderItemStatus() == OrderStatus.OUT_FOR_DELIVERY || orderItem.getOrderItemStatus() == OrderStatus.SHIPPED) {
             orderItem.setOrderItemStatus(OrderStatus.CANCELLED);
-            productService.updateStock(orderItem.getProduct().getProductId(), orderItem.getQuantity());
+            productService.updateStock(orderItem.getProduct().getId(), orderItem.getQuantity());
             orderItem = orderItemRepo.save(orderItem);
         }
         else {
@@ -204,7 +204,7 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponse placeBuyNowOrder(PlaceBuyNowOrderRequest placeBuyNowOrderRequest, AppUser user) throws RazorpayException {
         CartItem cartItem = cartService.getCartItemByCartItemId(placeBuyNowOrderRequest.getCartItemId());
         Address shippingAddress = addressService.getAddressById(placeBuyNowOrderRequest.getShippingAddressId());
-        if (cartItem.getCart().getUser().getUserId() != user.getUserId() || shippingAddress.getUser().getUserId() != user.getUserId())
+        if (cartItem.getCart().getUser().getId() != user.getId() || shippingAddress.getUser().getId() != user.getId())
             throw new AccessDeniedException("Access Denied: Something went wrong");
         Order order = new Order();
         order.setPlacedAt(LocalDateTime.now());
@@ -221,7 +221,7 @@ public class OrderServiceImpl implements OrderService {
         orderItem.setOrderItemStatus(OrderStatus.CREATED);
         orderItem.setDeliveryAt(LocalDateTime.now().plusWeeks(1).withHour(20).withMinute(0).withSecond(0).withNano(0));
         orderItemRepo.save(orderItem);
-        productService.updateStock(cartItem.getProduct().getProductId(), -orderItem.getQuantity());
+        productService.updateStock(cartItem.getProduct().getId(), -orderItem.getQuantity());
         OrderResponse orderResponse = orderMapper.toResponse(order);
         if (placeBuyNowOrderRequest.getPrepaid())
             orderResponse.setPayment(paymentService.createOrder(order));
@@ -231,14 +231,14 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderResponse cancelOrder(Long orderId) {
-        Order order = orderRepo.findByOrderId(orderId)
+        Order order = orderRepo.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
 
-        List<OrderItem> orderItems = orderItemRepo.findAllByOrder_OrderId(orderId);
+        List<OrderItem> orderItems = orderItemRepo.findByOrder_Id(orderId);
         orderItems.stream().forEach(orderItem -> {
             if (orderItem.getOrderItemStatus() == OrderStatus.CONFIRMED || orderItem.getOrderItemStatus() == OrderStatus.OUT_FOR_DELIVERY || orderItem.getOrderItemStatus() == OrderStatus.SHIPPED) {
                 orderItem.setOrderItemStatus(OrderStatus.CANCELLED);
-                productService.updateStock(orderItem.getProduct().getProductId(), orderItem.getQuantity());
+                productService.updateStock(orderItem.getProduct().getId(), orderItem.getQuantity());
                 orderItem = orderItemRepo.save(orderItem);
             }
             else {

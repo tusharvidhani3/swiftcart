@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class OrderItemResponse {
 
-    private Long orderItemId;
+    private Long id;
     private LocalDateTime deliveryAt;
     private ProductResponse product;
     private OrderStatus orderItemStatus;

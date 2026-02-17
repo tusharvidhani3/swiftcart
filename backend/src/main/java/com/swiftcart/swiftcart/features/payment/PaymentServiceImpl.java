@@ -67,7 +67,7 @@ public class PaymentServiceImpl implements PaymentService {
             payment.setPaymentId(paymentId);
             if(json.getString("event").equals("payment.captured")) {
                 payment.setPaymentStatus(PaymentStatus.PAID);
-                List<OrderItem> orderItems = orderItemRepo.findAllByOrder_OrderId(payment.getOrder().getOrderId());
+                List<OrderItem> orderItems = orderItemRepo.findByOrder_Id(payment.getOrder().getId());
                 orderItems = orderItems.stream().map(orderItem -> { 
                     orderItem.setOrderItemStatus(OrderStatus.CONFIRMED);
                     return orderItem;

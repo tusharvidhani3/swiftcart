@@ -32,7 +32,7 @@ public class AddressController {
 
     @GetMapping
     public ResponseEntity<List<AddressDto>> getLoggedInUserAddresses(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        return ResponseEntity.ok(addressService.getAddressesForLoggedInUser(userDetailsImpl.getUser().getUserId()));
+        return ResponseEntity.ok(addressService.getAddressesForLoggedInUser(userDetailsImpl.getUser().getId()));
     }
     
     @PostMapping
@@ -42,13 +42,13 @@ public class AddressController {
 
     @GetMapping("/{addressId}")
     public ResponseEntity<AddressDto> getAddress(@PathVariable Long addressId, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        AddressDto addressDto = addressService.getAddress(addressId, userDetailsImpl.getUser().getUserId());
+        AddressDto addressDto = addressService.getAddress(addressId, userDetailsImpl.getUser().getId());
         return new ResponseEntity<>(addressDto, HttpStatus.OK);
     }
 
     @DeleteMapping("/{addressId}")
     public ResponseEntity<Void> deleteAddress(@PathVariable Long addressId, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        addressService.deleteAddress(addressId, userDetailsImpl.getUser().getUserId());
+        addressService.deleteAddress(addressId, userDetailsImpl.getUser().getId());
         return ResponseEntity.noContent().build();
     }
 
@@ -60,12 +60,12 @@ public class AddressController {
     @PutMapping("/{addressId}/default")
     @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<AddressDto> changeDefaultAddress(@PathVariable Long addressId, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        return ResponseEntity.ok(addressService.changeDefaultAddress(addressId, userDetailsImpl.getUser().getUserId()));
+        return ResponseEntity.ok(addressService.changeDefaultAddress(addressId, userDetailsImpl.getUser().getId()));
     }
 
     @GetMapping("/default")
     @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<AddressDto> getDefaultAddress(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        return ResponseEntity.ok(addressService.getDefaultAddressForUser(userDetailsImpl.getUser().getUserId()));
+        return ResponseEntity.ok(addressService.getDefaultAddressForUser(userDetailsImpl.getUser().getId()));
     }
 }

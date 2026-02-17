@@ -36,22 +36,22 @@ public class OrderController {
     @PostMapping("/checkout")
     @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<OrderResponse> createOrder(@RequestBody @Valid PlaceOrderRequest placeOrderRequest, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) throws RazorpayException {
-        OrderResponse orderResponse=orderService.createOrder(placeOrderRequest, userDetailsImpl.getUser().getUserId());
-        return ResponseEntity.created(URI.create("/orders/"+orderResponse.getOrderId())).body(orderResponse);
+        OrderResponse orderResponse=orderService.createOrder(placeOrderRequest, userDetailsImpl.getUser().getId());
+        return ResponseEntity.created(URI.create("/orders/"+orderResponse.getId())).body(orderResponse);
     }
 
     @GetMapping
     @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<Page<OrderResponse>> getLoggedInCustomerOrders(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "placedAt") String sortBy) {
         Pageable pageable=PageRequest.of(page, size, Sort.by(sortBy).descending());
-        Page<OrderResponse> orders=orderService.getOrdersForAuthenticatedUser(userDetailsImpl.getUser().getUserId(), pageable);
+        Page<OrderResponse> orders=orderService.getOrdersForAuthenticatedUser(userDetailsImpl.getUser().getId(), pageable);
         return ResponseEntity.ok(orders);
     }
     
     @PatchMapping("/items/{orderItemId}/cancel")
     @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<OrderItemResponse> cancelOrderItem(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @PathVariable Long orderItemId) {
-        OrderItemResponse orderItemResponse=orderService.cancelOrderItem(userDetailsImpl.getUser().getUserId(), orderItemId);
+        OrderItemResponse orderItemResponse=orderService.cancelOrderItem(userDetailsImpl.getUser().getId(), orderItemId);
         return ResponseEntity.ok(orderItemResponse);
     }
 
@@ -73,7 +73,7 @@ public class OrderController {
     @PreAuthorize("hasRole('CUSTOMER')") // Can allow Admin also to place order on user's behalf
     public ResponseEntity<OrderResponse> placeBuyNowOrder(@RequestBody PlaceBuyNowOrderRequest placeBuyNowOrderRequest, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) throws RazorpayException {
         OrderResponse orderResponse = orderService.placeBuyNowOrder(placeBuyNowOrderRequest, userDetailsImpl.getUser());
-        return ResponseEntity.created(URI.create("/orders/"+orderResponse.getOrderId())).body(orderResponse);
+        return ResponseEntity.created(URI.create("/orders/"+orderResponse.getId())).body(orderResponse);
     }
 
     @GetMapping("/all")

@@ -4,14 +4,14 @@ import styles from '../styles/OrderDetails.module.css'
 import { generateStatus } from './OrderItemCard'
 import { apiBaseUrl } from '../config'
 
-export default function OrderItemDetailsCard({ orderItemId, product, orderItemStatus, deliveryAt, quantity, orders, setOrders }) {
+export default function OrderItemDetailsCard({ id, product, orderItemStatus, deliveryAt, quantity, orders, setOrders }) {
 
     const { authFetch } = useAuthFetch()
     const navigate = useNavigate()
 
     async function cancelOrderItem() {
         
-        const res = await authFetch(`${apiBaseUrl}/api/orders/items/${orderItemId}/cancel`, {
+        const res = await authFetch(`${apiBaseUrl}/api/orders/items/${id}/cancel`, {
             method: 'PATCH',
             credentials: 'include'
         })
@@ -19,10 +19,10 @@ export default function OrderItemDetailsCard({ orderItemId, product, orderItemSt
         if(res.ok) {
             const cancelledOrderItem = await res.json()
             setOrders(orders => orders.map(order => {
-                if(order.orderId === cancelledOrderItem.order.orderId) {
+                if(order.id === cancelledOrderItem.order.id) {
                     const modifiedOrder = {...order}
                     modifiedOrder.orderItems.map(orderItem => {
-                        if(orderItem.orderItemId === cancelledOrderItem.orderItemId) {
+                        if(orderItem.id === cancelledOrderItem.id) {
                             return cancelledOrderItem
                         }
                         return orderItem
@@ -38,7 +38,7 @@ export default function OrderItemDetailsCard({ orderItemId, product, orderItemSt
         <div className={styles.orderItem}>
             <div className={styles.orderStatus}>{generateStatus(orderItemStatus, deliveryAt)}</div>
             <div className={styles.orderItemInfo}>
-            <div className={styles.productDetails} onClick={() => navigate(`/products/${product.productId}`)}>
+            <div className={styles.productDetails} onClick={() => navigate(`/products/${product.id}`)}>
                 <img src={product.imageUrls[0]} alt="product image preview" />
                 <span className={styles.productQty}>{product.quantity}</span>
                 <div className={styles.productInfo}>

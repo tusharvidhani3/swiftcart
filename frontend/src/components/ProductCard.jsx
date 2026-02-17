@@ -4,14 +4,14 @@ import ToastContext from '../contexts/ToastContext'
 import { useNavigate } from 'react-router'
 import CartContext from '../contexts/CartContext'
 
-export default function ProductCard({ productId, productName, price, mrp, imageUrls }) {
+export default function ProductCard({ id, productName, price, mrp, imageUrls }) {
 
     const { showToast } = useContext(ToastContext)
     const navigate = useNavigate()
     const { addToCart } = useContext(CartContext)
 
     return (
-        <div className={styles.productCard} onClick={() => navigate(`/products/${productId}`)}>
+        <div className={styles.productCard} onClick={() => navigate(`/products/${id}`)}>
             <img alt="product image" className={styles.productImage} src={`${imageUrls[0]}`} />
             <h1 className={styles.productTitle}>{productName}</h1>
             <div>
@@ -20,7 +20,7 @@ export default function ProductCard({ productId, productName, price, mrp, imageU
             </div>
             <button className={styles.btnAddToCart} onClick={e => {
                 e.stopPropagation()
-                addToCart(productId, showToast)
+                addToCart(id, showToast)
                 }}>Add to cart</button>
         </div>
     )
