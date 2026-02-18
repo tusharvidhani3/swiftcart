@@ -9,11 +9,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.swiftcart.swiftcart.features.appuser.AppUser;
 
-public class UserDetailsImpl implements UserDetails {
+public class UserPrincipal implements UserDetails {
 
     private AppUser user;
 
-    public UserDetailsImpl(AppUser user) {
+    public UserPrincipal(AppUser user) {
         this.user=user;
     }
 

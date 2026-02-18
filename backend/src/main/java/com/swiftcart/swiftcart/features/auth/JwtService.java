@@ -10,7 +10,7 @@ import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.swiftcart.swiftcart.common.security.UserDetailsImpl;
+import com.swiftcart.swiftcart.common.security.UserPrincipal;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -30,7 +30,6 @@ public class JwtService {
 
     public String generateToken(Long userId, String role) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", userId);
         claims.put("role", role);
         return Jwts.builder()
                 .claims(claims)
@@ -58,10 +57,10 @@ public class JwtService {
                 .getPayload();
     }
 
-    public boolean isTokenValid(String token, UserDetailsImpl userDetailsImpl) {
+    public boolean isTokenValid(String token, UserPrincipal userPrincipal) {
         Date expirationDate = extractExpiration(token);
         String userId = extractUserId(token);
-        return userDetailsImpl.getUser().getId().toString().equals(userId) && !expirationDate.before(new Date());
+        return userPrincipal.getUser().getId().toString().equals(userId) && !expirationDate.before(new Date());
     }
 
     private Date extractExpiration(String token) {

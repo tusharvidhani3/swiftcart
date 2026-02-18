@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.swiftcart.swiftcart.common.security.UserDetailsImpl;
+import com.swiftcart.swiftcart.common.security.UserPrincipal;
 
 @RestController
 @RequestMapping("/api/users")
@@ -28,17 +28,15 @@ public class AppUserController {
 
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<AppUserDto> getLoggedInUser(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        AppUser user = userDetailsImpl.getUser();
+    public ResponseEntity<AppUserDto> getLoggedInUser(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        AppUser user = userPrincipal.getUser();
         AppUserDto userDto = userMapper.toDto(user);
-        userDto.setRole(user.getRole().getName());
         return ResponseEntity.ok(userDto);
     }
 
     @PutMapping
-    public ResponseEntity<AppUserDto> updateUserInfo(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @RequestBody AppUserDto userDto) {
-        userDto.setId(userDetailsImpl.getUser().getId());
-        AppUserDto updatedUserDto = userService.updateUser(userDto);
+    public ResponseEntity<AppUserDto> updateUserInfo(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestBody AppUserDto userDto) {
+        AppUserDto updatedUserDto = userService.updateUser(userPrincipal.getUser().getId(), userDto);
         return ResponseEntity.ok(updatedUserDto);
     }
 

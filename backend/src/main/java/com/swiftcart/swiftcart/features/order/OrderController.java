@@ -3,7 +3,7 @@ package com.swiftcart.swiftcart.features.order;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.razorpay.RazorpayException;
-import com.swiftcart.swiftcart.common.security.UserDetailsImpl;
+import com.swiftcart.swiftcart.common.security.UserPrincipal;
 
 import jakarta.validation.Valid;
 
@@ -35,45 +35,45 @@ public class OrderController {
 
     @PostMapping("/checkout")
     @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<OrderResponse> createOrder(@RequestBody @Valid PlaceOrderRequest placeOrderRequest, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) throws RazorpayException {
-        OrderResponse orderResponse=orderService.createOrder(placeOrderRequest, userDetailsImpl.getUser().getId());
-        return ResponseEntity.created(URI.create("/orders/"+orderResponse.getId())).body(orderResponse);
+    public ResponseEntity<OrderResponse> createOrder(@RequestBody @Valid PlaceOrderRequest placeOrderRequest, @AuthenticationPrincipal UserPrincipal userPrincipal) throws RazorpayException {
+        OrderResponse orderResponse=orderService.createOrder(placeOrderRequest, userPrincipal.getUser().getId());
+        return ResponseEntity.created(URI.create("/orders/"+orderResponse.id())).body(orderResponse);
     }
 
     @GetMapping
     @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<Page<OrderResponse>> getLoggedInCustomerOrders(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "placedAt") String sortBy) {
+    public ResponseEntity<Page<OrderResponse>> getLoggedInCustomerOrders(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "placedAt") String sortBy) {
         Pageable pageable=PageRequest.of(page, size, Sort.by(sortBy).descending());
-        Page<OrderResponse> orders=orderService.getOrdersForAuthenticatedUser(userDetailsImpl.getUser().getId(), pageable);
+        Page<OrderResponse> orders=orderService.getOrdersForAuthenticatedUser(userPrincipal.getUser().getId(), pageable);
         return ResponseEntity.ok(orders);
     }
     
     @PatchMapping("/items/{orderItemId}/cancel")
     @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<OrderItemResponse> cancelOrderItem(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @PathVariable Long orderItemId) {
-        OrderItemResponse orderItemResponse=orderService.cancelOrderItem(userDetailsImpl.getUser().getId(), orderItemId);
+    public ResponseEntity<OrderItemResponse> cancelOrderItem(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long orderItemId) {
+        OrderItemResponse orderItemResponse=orderService.cancelOrderItem(userPrincipal.getUser().getId(), orderItemId);
         return ResponseEntity.ok(orderItemResponse);
     }
 
     @PatchMapping("/items/{orderItemId}")
     @PreAuthorize("hasRole('SELLER')")
-    public ResponseEntity<OrderItemResponse> updateOrderItemStatus(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @PathVariable Long orderItemId, @RequestBody UpdateOrderStatusRequest req) {
-        OrderItemResponse orderItemResponse = orderService.updateOrderItemStatus(userDetailsImpl.getUser(), orderItemId, req.getOrderStatus());
+    public ResponseEntity<OrderItemResponse> updateOrderItemStatus(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long orderItemId, @RequestBody UpdateOrderStatusRequest req) {
+        OrderItemResponse orderItemResponse = orderService.updateOrderItemStatus(userPrincipal.getUser(), orderItemId, req.orderStatus());
         return ResponseEntity.ok(orderItemResponse);
     }
     
     @GetMapping("/{orderId}")
     @PreAuthorize("hasAnyRole('CUSTOMER','SELLER','ADMIN')")
-    public ResponseEntity<OrderResponse> getOrder(@PathVariable Long orderId, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        OrderResponse orderResponse = orderService.getOrder(orderId, userDetailsImpl.getUser());
+    public ResponseEntity<OrderResponse> getOrder(@PathVariable Long orderId, @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        OrderResponse orderResponse = orderService.getOrder(orderId, userPrincipal.getUser());
         return new ResponseEntity<OrderResponse>(orderResponse, HttpStatus.OK);
     }
 
     @PostMapping("/checkout/buy-now")
     @PreAuthorize("hasRole('CUSTOMER')") // Can allow Admin also to place order on user's behalf
-    public ResponseEntity<OrderResponse> placeBuyNowOrder(@RequestBody PlaceBuyNowOrderRequest placeBuyNowOrderRequest, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) throws RazorpayException {
-        OrderResponse orderResponse = orderService.placeBuyNowOrder(placeBuyNowOrderRequest, userDetailsImpl.getUser());
-        return ResponseEntity.created(URI.create("/orders/"+orderResponse.getId())).body(orderResponse);
+    public ResponseEntity<OrderResponse> placeBuyNowOrder(@RequestBody PlaceBuyNowOrderRequest placeBuyNowOrderRequest, @AuthenticationPrincipal UserPrincipal userPrincipal) throws RazorpayException {
+        OrderResponse orderResponse = orderService.placeBuyNowOrder(placeBuyNowOrderRequest, userPrincipal.getUser());
+        return ResponseEntity.created(URI.create("/orders/"+orderResponse.id())).body(orderResponse);
     }
 
     @GetMapping("/all")

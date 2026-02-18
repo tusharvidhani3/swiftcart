@@ -85,7 +85,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     public PaymentDto getPayment(Long orderId) {
-        Payment payment = paymentRepo.findByOrderOrderId(orderId);
+        Payment payment = paymentRepo.findByOrderId(orderId);
         if(payment == null)
         return null;
         return paymentMapper.toDto(payment);

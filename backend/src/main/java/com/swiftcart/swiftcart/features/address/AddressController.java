@@ -3,7 +3,7 @@ package com.swiftcart.swiftcart.features.address;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.swiftcart.swiftcart.common.security.UserDetailsImpl;
+import com.swiftcart.swiftcart.common.security.UserPrincipal;
 
 import jakarta.validation.Valid;
 
@@ -31,41 +31,41 @@ public class AddressController {
     private AddressService addressService;
 
     @GetMapping
-    public ResponseEntity<List<AddressDto>> getLoggedInUserAddresses(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        return ResponseEntity.ok(addressService.getAddressesForLoggedInUser(userDetailsImpl.getUser().getId()));
+    public ResponseEntity<List<AddressDto>> getLoggedInUserAddresses(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return ResponseEntity.ok(addressService.getAddressesForLoggedInUser(userPrincipal.getUser().getId()));
     }
     
     @PostMapping
-    public ResponseEntity<AddressDto> addAddress(@Valid @RequestBody AddressDto addressDto, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        return new ResponseEntity<>(addressService.addAddress(addressDto, userDetailsImpl.getUser()), HttpStatus.CREATED);
+    public ResponseEntity<AddressDto> addAddress(@Valid @RequestBody AddressDto addressDto, @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return new ResponseEntity<>(addressService.addAddress(addressDto, userPrincipal.getUser()), HttpStatus.CREATED);
     }
 
     @GetMapping("/{addressId}")
-    public ResponseEntity<AddressDto> getAddress(@PathVariable Long addressId, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        AddressDto addressDto = addressService.getAddress(addressId, userDetailsImpl.getUser().getId());
+    public ResponseEntity<AddressDto> getAddress(@PathVariable Long addressId, @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        AddressDto addressDto = addressService.getAddress(addressId, userPrincipal.getUser().getId());
         return new ResponseEntity<>(addressDto, HttpStatus.OK);
     }
 
     @DeleteMapping("/{addressId}")
-    public ResponseEntity<Void> deleteAddress(@PathVariable Long addressId, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        addressService.deleteAddress(addressId, userDetailsImpl.getUser().getId());
+    public ResponseEntity<Void> deleteAddress(@PathVariable Long addressId, @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        addressService.deleteAddress(addressId, userPrincipal.getUser().getId());
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{addressId}")
-    public ResponseEntity<AddressDto> updateAddress(@PathVariable Long addressId, @RequestBody @Valid AddressDto addressDto, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        return new ResponseEntity<>(addressService.updateAddress(addressDto, userDetailsImpl.getUser()), HttpStatus.OK);
+    public ResponseEntity<AddressDto> updateAddress(@PathVariable Long addressId, @RequestBody @Valid AddressDto addressDto, @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return new ResponseEntity<>(addressService.updateAddress(addressDto, userPrincipal.getUser()), HttpStatus.OK);
     }
 
     @PutMapping("/{addressId}/default")
     @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<AddressDto> changeDefaultAddress(@PathVariable Long addressId, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        return ResponseEntity.ok(addressService.changeDefaultAddress(addressId, userDetailsImpl.getUser().getId()));
+    public ResponseEntity<AddressDto> changeDefaultAddress(@PathVariable Long addressId, @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return ResponseEntity.ok(addressService.changeDefaultAddress(addressId, userPrincipal.getUser().getId()));
     }
 
     @GetMapping("/default")
     @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<AddressDto> getDefaultAddress(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        return ResponseEntity.ok(addressService.getDefaultAddressForUser(userDetailsImpl.getUser().getId()));
+    public ResponseEntity<AddressDto> getDefaultAddress(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return ResponseEntity.ok(addressService.getDefaultAddressForUser(userPrincipal.getUser().getId()));
     }
 }

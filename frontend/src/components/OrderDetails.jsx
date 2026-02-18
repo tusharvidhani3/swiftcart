@@ -68,7 +68,7 @@ export default function OrderDetails() {
 
                 <section className={styles.section}>
                     <div className={styles.productsOrdered}>
-                        {order.orderItems.map(orderItem => <OrderItemDetailsCard {...orderItem} key={orderItem.id} />)}
+                        {order.items.map(orderItem => <OrderItemDetailsCard {...orderItem} key={orderItem.id} />)}
                     </div>
                 </section>
             </>
@@ -86,7 +86,7 @@ export default function OrderDetails() {
                 <section className={styles.section}>
                     <h2>Products in Order</h2>
                     <div className={styles.productsOrdered}>
-                        {order.orderItems.map(orderItem => <OrderItemDetailsCard {...orderItem} key={orderItem.id} />)}
+                        {order.items.map(orderItem => <OrderItemDetailsCard {...orderItem} key={orderItem.id} />)}
                     </div>
                 </section>
 

@@ -9,7 +9,7 @@ export default function CartItemsContainer() {
 
     return (
         <section className={styles.cartItemsContainer}>
-            {cart.cartItems.map(cartItem => <CartItem {...cartItem} key={cartItem.id} />)}
+            {cart.items.map(cartItem => <CartItem {...cartItem} key={cartItem.id} />)}
         </section>
     )
 }

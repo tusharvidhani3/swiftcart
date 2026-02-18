@@ -2,14 +2,8 @@ package com.swiftcart.swiftcart.features.cart;
 
 import com.swiftcart.swiftcart.features.product.ProductResponse;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@NoArgsConstructor
-public class CartItemResponse {
-
-    private Long id;
-    private ProductResponse product;
-    private int quantity;
-}
+public record CartItemResponse(
+    Long id,
+    ProductResponse product,
+    int quantity
+) {}

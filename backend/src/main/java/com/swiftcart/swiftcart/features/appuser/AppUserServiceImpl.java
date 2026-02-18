@@ -10,7 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.swiftcart.swiftcart.common.security.UserDetailsImpl;
+import com.swiftcart.swiftcart.common.security.UserPrincipal;
 import com.swiftcart.swiftcart.features.auth.AuthRequest;
 
 @Service
@@ -37,28 +37,23 @@ public class AppUserServiceImpl implements AppUserService {
         AppUser user = userMapper.toEntity(registerRequest);
         Role role=roleRepo.findByName("ROLE_CUSTOMER");
         user.setRole(role);
-        user.setPassword(encoder.encode(registerRequest.getPassword()));
+        user.setPassword(encoder.encode(registerRequest.password()));
         userRepo.save(user);
     }
 
     @Override
-    public UserDetailsImpl authenticate(AuthRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getMobileNumber(), loginRequest.getPassword()));
-        UserDetailsImpl userDetailsImpl = (UserDetailsImpl)authentication.getPrincipal();
-        return userDetailsImpl;
+    public UserPrincipal authenticate(AuthRequest loginRequest) {
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.mobileNumber(), loginRequest.password()));
+        UserPrincipal userPrincipal = (UserPrincipal)authentication.getPrincipal();
+        return userPrincipal;
     }
 
     @Override
     @Transactional
-    public AppUserDto updateUser(AppUserDto userDto) {
-        AppUser user = userRepo.findById(userDto.getId()).get();
-        user.setFirstName(userDto.getFirstName());
-        user.setLastName(userDto.getLastName());
-        user.setMobileNumber(userDto.getMobileNumber());
-        user.setEmail(userDto.getEmail());
+    public AppUserDto updateUser(Long userId, AppUserDto userDto) {
+        AppUser user = userRepo.findById(userId).get();
+        userMapper.update(userDto, user);
         user = userRepo.save(user);
-        userMapper.update(user, userDto);
-        userDto.setRole(user.getRole().getName());
         return userDto;
     }
 

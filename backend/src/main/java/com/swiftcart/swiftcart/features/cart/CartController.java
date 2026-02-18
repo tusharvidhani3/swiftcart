@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.swiftcart.swiftcart.common.security.UserDetailsImpl;
+import com.swiftcart.swiftcart.common.security.UserPrincipal;
 
 import jakarta.validation.Valid;
 
@@ -30,45 +30,45 @@ public class CartController {
     private CartService cartService;
 
     @GetMapping
-    public ResponseEntity<CartResponse> getCart(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        return ResponseEntity.ok(cartService.getCartResponse(userDetailsImpl.getUser().getId()));
+    public ResponseEntity<CartResponse> getCart(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return ResponseEntity.ok(cartService.getCartResponse(userPrincipal.getUser().getId()));
     }
     
     @PostMapping("/items")
-    public ResponseEntity<CartResponse> addProductToCart(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @RequestBody @Valid AddToCartRequest addToCartRequest) {
-        CartResponse cartResponse=cartService.addProductToCart(userDetailsImpl.getUser(), addToCartRequest.getProductId(), addToCartRequest.getQuantity());
+    public ResponseEntity<CartResponse> addProductToCart(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestBody @Valid AddToCartRequest addToCartRequest) {
+        CartResponse cartResponse=cartService.addProductToCart(userPrincipal.getUser(), addToCartRequest.productId(), addToCartRequest.quantity());
         return ResponseEntity.status(HttpStatus.CREATED).body(cartResponse);
     }
 
     @PutMapping("/items/{cartItemId}")
-    public ResponseEntity<CartResponse> updateQty(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @PathVariable Long cartItemId, @RequestBody @Valid UpdateCartItemQtyRequest req){
-        CartResponse cartResponse = cartService.updateQuantity(userDetailsImpl.getUser().getId(), cartItemId, req.getQuantity());
+    public ResponseEntity<CartResponse> updateQty(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long cartItemId, @RequestBody @Valid UpdateCartItemQtyRequest req){
+        CartResponse cartResponse = cartService.updateQuantity(userPrincipal.getUser().getId(), cartItemId, req.quantity());
         return ResponseEntity.ok(cartResponse);
     }
 
     @DeleteMapping("/items/{cartItemId}")
-    public ResponseEntity<CartResponse> removeProductFromCart(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl, @PathVariable Long cartItemId) {
-        CartResponse cartResponse = cartService.removeProductFromCart(userDetailsImpl.getUser().getId(), cartItemId);
+    public ResponseEntity<CartResponse> removeProductFromCart(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long cartItemId) {
+        CartResponse cartResponse = cartService.removeProductFromCart(userPrincipal.getUser().getId(), cartItemId);
         return ResponseEntity.ok(cartResponse);
     }
 
     @PostMapping("/checkout/buy-now/product/{productId}")
-    public ResponseEntity<CartResponse> buyNow(@PathVariable Long productId, @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        CartResponse cartResponse = cartService.initiateBuyNow(productId, userDetailsImpl.getUser());
+    public ResponseEntity<CartResponse> buyNow(@PathVariable Long productId, @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        CartResponse cartResponse = cartService.initiateBuyNow(productId, userPrincipal.getUser());
         return ResponseEntity.ok(cartResponse);
     }
 
     @GetMapping("/count")
-    public ResponseEntity<Integer> getCartQtyCount(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        return ResponseEntity.ok(cartService.getCartQuantityCount(userDetailsImpl.getUser().getId()));
+    public ResponseEntity<Integer> getCartQtyCount(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return ResponseEntity.ok(cartService.getCartQuantityCount(userPrincipal.getUser().getId()));
     }
 
     @GetMapping("/summary")
-    public ResponseEntity<Map<String, Object>> getCartSummary(@AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
-        CartResponse cartResponse =  cartService.getCartResponse(userDetailsImpl.getUser().getId());
+    public ResponseEntity<Map<String, Object>> getCartSummary(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        CartResponse cartResponse =  cartService.getCartResponse(userPrincipal.getUser().getId());
         Map<String, Object> summary = new HashMap<>();
-        summary.put("totalPrice", cartResponse.getTotalPrice());
-        summary.put("cartItemsCount", cartResponse.getCartItems().size());
+        summary.put("totalPrice", cartResponse.totalPrice());
+        summary.put("cartItemsCount", cartResponse.items().size());
         return ResponseEntity.ok(summary);
     }
     

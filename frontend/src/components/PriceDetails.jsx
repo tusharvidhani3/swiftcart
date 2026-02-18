@@ -5,7 +5,7 @@ import PaymentButton from './PaymentButton'
 export default function PriceDetails({ nextBtnClick, cart, isCheckoutMode, isCod }) {
 
     const navigate = useNavigate()
-    const totalAmount=cart?.totalPrice, cartItemsCount=cart?.cartItems.length
+    const totalAmount=cart?.totalPrice, cartItemsCount=cart?.items.length
 
     return (
         <section className={`${styles.priceDetails} ${isCheckoutMode?styles.checkoutMode:''}`}>

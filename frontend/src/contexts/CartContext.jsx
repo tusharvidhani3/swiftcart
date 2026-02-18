@@ -17,7 +17,7 @@ export function CartProvider({ children }) {
             method: "GET"
         })
         const cartResponse = await res.json()
-        if (cartResponse.cartItems.length)
+        if (cartResponse.items.length)
             setCart(cartResponse)
         else
             setCart(null)

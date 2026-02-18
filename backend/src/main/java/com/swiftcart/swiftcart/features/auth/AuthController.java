@@ -3,18 +3,21 @@ package com.swiftcart.swiftcart.features.auth;
 import java.time.Duration;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.swiftcart.swiftcart.common.security.UserDetailsImpl;
+import com.swiftcart.swiftcart.common.security.UserPrincipal;
 import com.swiftcart.swiftcart.features.appuser.AppUser;
 import com.swiftcart.swiftcart.features.appuser.AppUserDto;
 import com.swiftcart.swiftcart.features.appuser.AppUserMapper;
@@ -23,7 +26,7 @@ import com.swiftcart.swiftcart.features.appuser.AppUserService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("api/auth")
 public class AuthController {
 
     @Autowired
@@ -38,20 +41,25 @@ public class AuthController {
     @Autowired
     private AppUserMapper userMapper;
 
+    @Value("${app.security.auth.access-token.expiration-minutes}")
+    private long accessTokenExpirationMinutes;
+
+    @Value("${app.security.auth.refresh-token.expiration-days}")
+    private long refreshTokenExpirationDays;
+
     @PostMapping(value = {"/register", "/signup"})
-    public ResponseEntity<AppUserDto> register(@RequestBody @Valid AuthRequest registerRequest) {
-        userService.register(registerRequest);
-        UserDetailsImpl userDetailsImpl = userService.authenticate(registerRequest);
-        AppUser user = userDetailsImpl.getUser();
+    public ResponseEntity<AppUserDto> register(@RequestBody @Valid AuthRequest authRequest) {
+        userService.register(authRequest);
+        UserPrincipal userPrincipal = userService.authenticate(authRequest);
+        AppUser user = userPrincipal.getUser();
         AppUserDto userDto = userMapper.toDto(user);
-        userDto.setRole(user.getRole().getName());
         String jwt = jwtService.generateToken(user.getId(), user.getRole().getName());
-        String refreshToken = tokenService.generateRefreshToken(userDetailsImpl.getUser());
+        String refreshToken = tokenService.generateRefreshToken(userPrincipal.getUser());
         ResponseCookie accessCookie = ResponseCookie.from("access_token", jwt)
             .httpOnly(true)
             .secure(true)
             .path("/")
-            .maxAge(Duration.ofMinutes(60))
+            .maxAge(Duration.ofMinutes(accessTokenExpirationMinutes))
             .sameSite("None")
             .build();
 
@@ -59,7 +67,7 @@ public class AuthController {
             .httpOnly(true)
             .secure(true)
             .path("/api/auth")
-            .maxAge(Duration.ofDays(30))
+            .maxAge(Duration.ofDays(refreshTokenExpirationDays))
             .sameSite("None")
             .build();
 
@@ -72,18 +80,17 @@ public class AuthController {
     }
 
     @PostMapping(value = {"/login", "/signin"})
-    public ResponseEntity<AppUserDto> login(@RequestBody @Valid AuthRequest loginRequest) {
-        UserDetailsImpl userDetailsImpl = userService.authenticate(loginRequest);
-        AppUser user = userDetailsImpl.getUser();
+    public ResponseEntity<AppUserDto> login(@RequestBody @Valid AuthRequest authRequest) {
+        UserPrincipal userPrincipal = userService.authenticate(authRequest);
+        AppUser user = userPrincipal.getUser();
         AppUserDto userDto = userMapper.toDto(user);
-        userDto.setRole(user.getRole().getName());
         String jwt = jwtService.generateToken(user.getId(), user.getRole().getName());
-        String refreshToken = tokenService.generateRefreshToken(userDetailsImpl.getUser());
+        String refreshToken = tokenService.generateRefreshToken(userPrincipal.getUser());
         ResponseCookie accessCookie = ResponseCookie.from("access_token", jwt)
             .httpOnly(true)
             .secure(true)
             .path("/")
-            .maxAge(Duration.ofMinutes(60))
+            .maxAge(Duration.ofMinutes(accessTokenExpirationMinutes))
             .sameSite("None")
             .build();
 
@@ -91,7 +98,7 @@ public class AuthController {
             .httpOnly(true)
             .secure(true)
             .path("/api/auth")
-            .maxAge(Duration.ofDays(30))
+            .maxAge(Duration.ofDays(refreshTokenExpirationDays))
             .sameSite("None")
             .build();
 
@@ -133,7 +140,14 @@ public class AuthController {
         .build();
     }
 
-    @PostMapping("/refresh-token")
+    @GetMapping("me")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<AppUserDto> getAuthenticatedUser(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        AppUserDto userDto = userMapper.toDto(userPrincipal.getUser());
+        return ResponseEntity.ok(userDto);
+    }
+
+    @PostMapping("refresh-token")
     public ResponseEntity<Void> refreshAccessToken(@CookieValue(name = "refresh_token", required = false) String refreshToken) {
         if (refreshToken == null || !tokenService.isValid(refreshToken))
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -144,7 +158,7 @@ public class AuthController {
             .httpOnly(true)
             .secure(true)
             .path("/")
-            .maxAge(Duration.ofMinutes(60))
+            .maxAge(Duration.ofMinutes(accessTokenExpirationMinutes))
             .sameSite("None")
             .build();
         
@@ -152,7 +166,7 @@ public class AuthController {
             .httpOnly(true)
             .secure(true)
             .path("/api/auth")
-            .maxAge(Duration.ofDays(30))
+            .maxAge(Duration.ofDays(refreshTokenExpirationDays))
             .sameSite("None")
             .build();
         return ResponseEntity.ok()
