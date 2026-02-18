@@ -22,10 +22,10 @@ import jakarta.servlet.http.HttpServletRequest;
 @Service
 public class JwtService {
 
-    @Value("${application.security.jwt.secret-key}")
+    @Value("${app.security.auth.access-token.secret-key}")
     private String secretKey;
 
-    @Value("${application.security.jwt.expiration}")
+    @Value("${app.security.auth.access-token.expiration-minutes}")
     private long expiration;
 
     public String generateToken(Long userId, String role) {
@@ -35,7 +35,7 @@ public class JwtService {
                 .claims(claims)
                 .subject(userId.toString())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .expiration(new Date(System.currentTimeMillis() + expiration * 60))
                 .signWith(getSignInKey())
                 .compact();
     }

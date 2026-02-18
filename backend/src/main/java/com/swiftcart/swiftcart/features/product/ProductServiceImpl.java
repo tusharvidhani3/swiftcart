@@ -22,7 +22,7 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private StorageService storageService;
 
-    @Value("${product.images.directory}")
+    @Value("${app.product.images-dir}")
     private String uploadDir;
 
     @Autowired
