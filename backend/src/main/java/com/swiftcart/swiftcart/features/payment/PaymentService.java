@@ -4,8 +4,7 @@ import com.razorpay.RazorpayException;
 import com.swiftcart.swiftcart.features.order.Order;
 
 public interface PaymentService {
-
-    public PaymentDto createOrder(Order order) throws RazorpayException;
-    public void verifyPaymentAndConfirmOrder(String payload, String signature) throws RazorpayException;
-    public PaymentDto getPayment(Long orderId);
+    PaymentDto createOrder(Order order) throws RazorpayException;
+    void verifyPaymentAndConfirmOrder(String payload, String signature) throws RazorpayException;
+    PaymentDto getPayment(Long orderId);
 }

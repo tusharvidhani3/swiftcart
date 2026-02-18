@@ -12,18 +12,18 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AddressRepository extends JpaRepository<Address,Long> {
 
-    public List<Address> findByUserId(Long id);
+    List<Address> findByUserId(Long id);
     
     @Query("SELECT a FROM Address a WHERE a.user.id = :userId AND a.defaultShipping = true")
-    public Optional<Address> findDefaultShippingAddress(@Param("userId") Long userId);
+    Optional<Address> findDefaultShippingAddress(@Param("userId") Long userId);
 
     @Modifying
     @Query("UPDATE Address a SET a.defaultShipping = false WHERE a.user.id = :userId")
-    public void unsetDefaultShipping(@Param("userId") Long userId);
+    void unsetDefaultShipping(@Param("userId") Long userId);
 
     @Modifying
     @Query("UPDATE Address a SET a.defaultShipping = true WHERE a.id = :addressId")
-    public void setDefaultShipping(@Param("addressId") Long addressId);
+    void setDefaultShipping(@Param("addressId") Long addressId);
 
-    public long countByUserId(Long userId);
+    long countByUserId(Long userId);
 }

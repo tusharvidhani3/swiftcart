@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 public interface ProductImageRepository extends JpaRepository<ProductImage, Long> {
 
     @Query("SELECT pi FROM ProductImage pi WHERE pi.product.id = :productId ORDER BY pi.sortOrder")
-    public List<ProductImage> findByProductId(@Param("productId") Long productId);
+    List<ProductImage> findByProductId(@Param("productId") Long productId);
 
-    public void deleteByProductId(Long productId);
+    void deleteByProductId(Long productId);
 }

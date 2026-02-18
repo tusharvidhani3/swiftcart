@@ -8,8 +8,8 @@ import com.swiftcart.swiftcart.features.auth.AuthRequest;
 
 public interface AppUserService {
 
-    public void register(AuthRequest registerRequest);
-    public UserPrincipal authenticate(AuthRequest loginRequest);
-    public AppUserDto updateUser(Long userId, AppUserDto userDto);
-    public Page<AppUserDto> getAllUsers(Pageable pageable);
+    void register(AuthRequest registerRequest);
+    UserPrincipal authenticate(AuthRequest loginRequest);
+    AppUserDto updateUser(Long userId, AppUserDto userDto);
+    Page<AppUserDto> getAllUsers(Pageable pageable);
 }

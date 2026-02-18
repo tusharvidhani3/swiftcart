@@ -11,12 +11,12 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
 
-    public RefreshToken findByToken(String token);
+    RefreshToken findByToken(String token);
 
     @Modifying
-    public void deleteByExpiresAtBefore(Instant now);
+    void deleteByExpiresAtBefore(Instant now);
 
     @Query("SELECT r FROM RefreshToken r JOIN FETCH r.user u JOIN FETCH u.role WHERE r.token = :token")
-    public RefreshToken findByTokenWithUserAndRole(@Param("token") String token);
+    RefreshToken findByTokenWithUserAndRole(@Param("token") String token);
 
 }
