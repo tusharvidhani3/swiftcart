@@ -6,15 +6,15 @@ import { apiBaseUrl } from "../config";
 
 export default function Orders() {
 
-    const [orders, setOrders] = useState([])
+    const [ordersPagedModel, setOrdersPagedModel] = useState(null)
     const { authFetch } = useAuthFetch()
 
     async function getOrders() {
         const res = await authFetch(`${apiBaseUrl}/api/orders`, {
             method: "GET"
         })
-        const ordersPage = await res.json()
-        setOrders(ordersPage.content)
+        const pagedModel = await res.json()
+        setOrdersPagedModel(pagedModel)
     }
 
     useEffect(() => {
@@ -22,11 +22,11 @@ export default function Orders() {
         loadOrders()
     }, [])
 
-    return orders.length ? (
+    return ordersPagedModel ? (
         <>
             <h2 className={styles.yourOrders}>Your Orders</h2>
             <div className={styles.ordersContainer}>
-                {orders.map(order => <OrderCard order={order} key={order.id} orders={orders} />)}
+                {ordersPagedModel.orders.map(order => <OrderCard order={order} key={order.id} orders={ordersPagedModel.orders} />)}
             </div>
         </>
     ):"Empty Orders"

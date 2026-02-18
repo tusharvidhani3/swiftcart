@@ -14,6 +14,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -42,10 +45,10 @@ public class OrderController {
 
     @GetMapping
     @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<Page<OrderResponse>> getLoggedInCustomerOrders(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "placedAt") String sortBy) {
+    public ResponseEntity<PagedModel<EntityModel<OrderResponse>>> getLoggedInCustomerOrders(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "placedAt") String sortBy, PagedResourcesAssembler<OrderResponse> assembler) {
         Pageable pageable=PageRequest.of(page, size, Sort.by(sortBy).descending());
         Page<OrderResponse> orders=orderService.getOrdersForAuthenticatedUser(userPrincipal.getUser().getId(), pageable);
-        return ResponseEntity.ok(orders);
+        return ResponseEntity.ok(assembler.toModel(orders));
     }
     
     @PatchMapping("/items/{orderItemId}/cancel")
@@ -78,9 +81,9 @@ public class OrderController {
 
     @GetMapping("/all")
     @PreAuthorize("hasAnyRole('SELLER','ADMIN')")
-    public ResponseEntity<Page<OrderResponseForSeller>> getAllOrders(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "placedAt") String sortBy) {
+    public ResponseEntity<PagedModel<EntityModel<OrderResponseForSeller>>> getAllOrders(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "placedAt") String sortBy, PagedResourcesAssembler<OrderResponseForSeller> assembler) {
         Page<OrderResponseForSeller> orders = orderService.getAllOrders(PageRequest.of(page, size, Sort.by(sortBy).descending()));
-        return ResponseEntity.ok(orders);
+        return ResponseEntity.ok(assembler.toModel(orders));
     }
 
     @PatchMapping("/{orderId}/cancel-full")

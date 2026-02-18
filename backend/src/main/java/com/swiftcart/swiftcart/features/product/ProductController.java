@@ -7,6 +7,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -46,10 +49,10 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<ProductResponse>> searchProducts(@RequestParam(defaultValue = "") String keyword, @RequestParam(defaultValue = "") String category, @RequestParam(defaultValue = "0") long minPrice, @RequestParam(defaultValue = "10000000") long maxPrice, @RequestParam(defaultValue = "asc") String sortOrder, @RequestParam(defaultValue = "true") boolean inStock, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "100") int size, @RequestParam(defaultValue = "id") String sortBy) {
+    public ResponseEntity<PagedModel<EntityModel<ProductResponse>>> searchProducts(@RequestParam(defaultValue = "") String keyword, @RequestParam(required = false) List<String> categories, @RequestParam(defaultValue = "0") long minPrice, @RequestParam(defaultValue = "10000000") long maxPrice, @RequestParam(defaultValue = "asc") String sortOrder, @RequestParam(defaultValue = "false") boolean includeOutOfStock, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "100") int size, @RequestParam(defaultValue = "id") String sortBy, PagedResourcesAssembler<ProductResponse> assembler) {
         Pageable pageable = PageRequest.of(page, size, sortOrder.equals("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy));
-        Page<ProductResponse> productPage = productService.searchProducts(keyword, pageable, category, minPrice, maxPrice, inStock);
-        return new ResponseEntity<Page<ProductResponse>>(productPage, HttpStatus.OK);
+        Page<ProductResponse> products = productService.searchProducts(keyword, pageable, categories, minPrice, maxPrice, includeOutOfStock);
+        return ResponseEntity.ok(assembler.toModel(products));
     }
 
     @DeleteMapping("/{productId}")
@@ -61,7 +64,7 @@ public class ProductController {
 
     @PutMapping("/{productId}")
     @PreAuthorize("hasRole('SELLER')")
-    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long productId,@RequestBody @Valid ProductRequest productRequest, @RequestPart List<MultipartFile> productImages) {
+    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long productId, @RequestPart(required = false) @Valid ProductRequest productRequest, @RequestPart(required = false) List<MultipartFile> productImages) {
         ProductResponse productResponse = productService.updateProduct(productId, productRequest, productImages);
         return ResponseEntity.ok(productResponse);
     }
