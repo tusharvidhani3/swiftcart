@@ -12,5 +12,5 @@ public interface ProductMapper {
 
     String toImageUrl(ProductImage image);
 
-    void update(CreateProductRequest productRequest, @MappingTarget Product existingProduct);
+    void update(ProductRequest productRequest, @MappingTarget Product existingProduct);
 }

@@ -36,14 +36,14 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public ProductResponse createProduct(CreateProductRequest createProductRequest, List<MultipartFile> productImages) {
+    public ProductResponse createProduct(ProductRequest productRequest, List<MultipartFile> productImages) {
         Product product=new Product();
-        product.setName(createProductRequest.name());
-        product.setPrice(createProductRequest.price());
-        product.setMrp(createProductRequest.mrp());
-        product.setStock(createProductRequest.stock());
-        product.setCategory(createProductRequest.category());
-        product.setDescription(createProductRequest.description());
+        product.setName(productRequest.name());
+        product.setPrice(productRequest.price());
+        product.setMrp(productRequest.mrp());
+        product.setStock(productRequest.stock());
+        product.setCategory(productRequest.category());
+        product.setDescription(productRequest.description());
         List<ProductImage> images = new ArrayList<>();
         productImages.stream().forEach(productImage -> {
             String fullPath = storageService.store(productImage, uploadDir);
@@ -76,7 +76,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public ProductResponse updateProduct(Long productId, CreateProductRequest productRequest, List<MultipartFile> productImages) {
+    public ProductResponse updateProduct(Long productId, ProductRequest productRequest, List<MultipartFile> productImages) {
         Product existingProduct = productRepo.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         productMapper.update(productRequest, existingProduct);

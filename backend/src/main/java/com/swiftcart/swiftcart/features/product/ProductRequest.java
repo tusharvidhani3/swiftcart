@@ -3,7 +3,7 @@ package com.swiftcart.swiftcart.features.product;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 
-public record CreateProductRequest(
+public record ProductRequest(
 
     @Size(min = 3, max = 200, message = "Product name must be between 3 and 200 characters")
     String name,
