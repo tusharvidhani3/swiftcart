@@ -7,13 +7,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface ProductService {
-
-    public ProductResponse createProduct(ProductRequest productRequest, List<MultipartFile> productImages);
-    public void deleteProduct(Long productId);
-    public ProductResponse getProduct(Long productId);
-    public ProductResponse updateProduct(Long productId, ProductRequest productRequest, List<MultipartFile> productImages);
-    public Page<ProductResponse> searchProducts(String keyword, Pageable pageable, String category, long minPrice, long maxPrice, boolean inStock);
-    public ProductResponse updateStock(Long productId, int stock);
-    public Product getProductById(Long productId);
-    public List<String> getProductImages(Long productId);
+    ProductResponse createProduct(ProductRequest productRequest, List<MultipartFile> productImages);
+    void deleteProduct(Long productId);
+    ProductResponse getProduct(Long productId);
+    ProductResponse updateProduct(Long productId, ProductRequest productRequest, List<MultipartFile> productImages);
+    Page<ProductResponse> searchProducts(String keyword, Pageable pageable, List<String> categories, long minPrice, long maxPrice, boolean includeOutOfStock);
+    ProductResponse updateStock(Long productId, int stock);
+    Product getProductById(Long productId);
+    List<String> getProductImages(Long productId);
 }

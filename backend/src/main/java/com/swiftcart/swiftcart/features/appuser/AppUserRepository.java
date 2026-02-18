@@ -13,13 +13,13 @@ import org.springframework.stereotype.Repository;
 public interface AppUserRepository extends JpaRepository<AppUser,Integer> {
 
     @Query("SELECT u FROM AppUser u JOIN FETCH u.role WHERE u.email = :email")
-    public Optional<AppUser> findByEmailWithRole(@Param("email") String email);
+    Optional<AppUser> findByEmailWithRole(@Param("email") String email);
 
     @Query("SELECT u FROM AppUser u JOIN FETCH u.role WHERE u.mobileNumber = :mobileNumber")
-    public Optional<AppUser> findByMobileNumberWithRole(@Param("mobileNumber") String mobileNumber);
+    Optional<AppUser> findByMobileNumberWithRole(@Param("mobileNumber") String mobileNumber);
 
-    public Page<AppUser> findAll(Pageable pageable);
+    Page<AppUser> findAll(Pageable pageable);
 
-    public Optional<AppUser> findById(Long id);
+    Optional<AppUser> findById(Long id);
 
 }

@@ -11,16 +11,16 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CartItemRepository extends JpaRepository<CartItem,Integer> {
 
-    public List<CartItem> findByCartUserId(Long userId);
+    List<CartItem> findByCartUserId(Long userId);
 
-    public List<CartItem> findByCartId(Long cartId);
+    List<CartItem> findByCartId(Long cartId);
 
-    public Optional<CartItem> findByCartUserIdAndProductId(Long userId, Long productId);
+    Optional<CartItem> findByCartUserIdAndProductId(Long userId, Long productId);
 
-    public Optional<CartItem> findById(Long id);
+    Optional<CartItem> findById(Long id);
 
     @Query("SELECT SUM(ci.quantity) FROM CartItem ci WHERE ci.cart.id = :cartId")
-    public Integer sumQuantityByCartId(@Param("cartId") Long cartId);
+    Integer sumQuantityByCartId(@Param("cartId") Long cartId);
 
-    public void deleteByCartUserId(Long userId);
+    void deleteByCartUserId(Long userId);
 }
