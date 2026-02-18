@@ -6,17 +6,11 @@ import java.util.List;
 import com.swiftcart.swiftcart.features.address.AddressSnapshot;
 import com.swiftcart.swiftcart.features.payment.PaymentDto;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@NoArgsConstructor
-public class OrderResponse {
-
-    private Long id;
-    private AddressSnapshot shippingAddress;
-    private double totalAmount;
-    private LocalDateTime placedAt;
-    private List<OrderItemResponse> orderItems;
-    private PaymentDto payment;
-}
+public record OrderResponse(
+    Long id,
+    AddressSnapshot shippingAddress,
+    double totalAmount,
+    LocalDateTime placedAt,
+    List<OrderItemResponse> items,
+    PaymentDto payment
+) {}

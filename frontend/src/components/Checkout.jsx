@@ -63,7 +63,7 @@ export default function Checkout() {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                cartItemId: checkoutCart.cartItems[0].id,
+                cartItemId: checkoutCart.items[0].id,
                 shippingAddressId: selectedAddress.id,
                 prepaid: isPrepaid
             })

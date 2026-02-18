@@ -21,7 +21,7 @@ export default function OrderItemDetailsCard({ id, product, orderItemStatus, del
             setOrders(orders => orders.map(order => {
                 if(order.id === cancelledOrderItem.order.id) {
                     const modifiedOrder = {...order}
-                    modifiedOrder.orderItems.map(orderItem => {
+                    modifiedOrder.items.map(orderItem => {
                         if(orderItem.id === cancelledOrderItem.id) {
                             return cancelledOrderItem
                         }

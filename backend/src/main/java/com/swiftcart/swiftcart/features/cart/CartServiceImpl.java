@@ -14,8 +14,6 @@ import com.swiftcart.swiftcart.common.exception.InsufficientStockException;
 import com.swiftcart.swiftcart.common.exception.ResourceNotFoundException;
 import com.swiftcart.swiftcart.features.appuser.AppUser;
 import com.swiftcart.swiftcart.features.product.Product;
-import com.swiftcart.swiftcart.features.product.ProductMapper;
-import com.swiftcart.swiftcart.features.product.ProductResponse;
 import com.swiftcart.swiftcart.features.product.ProductService;
 
 @Service
@@ -30,8 +28,6 @@ public class CartServiceImpl implements CartService {
     @Autowired
     private ProductService productService;
 
-    @Autowired
-    private ProductMapper productMapper;
 
     @Autowired
     private CartItemMapper cartItemMapper;
@@ -95,19 +91,11 @@ public class CartServiceImpl implements CartService {
         List<CartItemResponse> cartItemResponses = new ArrayList<>();
         for (CartItem ci : cartItems) {
             totalPrice += ci.getProduct().getPrice() * ci.getQuantity();
-            List<String> productImages = productService.getProductImages(ci.getProduct().getId());
-            ProductResponse productResponse = productMapper.toResponse(ci.getProduct());
-            productResponse.setImageUrls(productImages);
             CartItemResponse cartItemResponse = cartItemMapper.toResponse(ci);
-            cartItemResponse.setProduct(productResponse);
             cartItemResponses.add(cartItemResponse);
         }
-        CartResponse cartResponse = new CartResponse();
-        Cart cart = cartRepo.findByUserId(userId)
-        .orElseGet(() -> new Cart());
-        cartResponse.setId(cart.getId());
-        cartResponse.setTotalPrice(totalPrice);
-        cartResponse.setCartItems(cartItemResponses);
+        Cart cart = cartRepo.findByUserId(userId).orElseGet(() -> new Cart());
+        CartResponse cartResponse = new CartResponse(cart.getId(), cartItemResponses, totalPrice);
         return cartResponse;
     }
 
@@ -121,8 +109,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public CartResponse initiateBuyNow(Long productId, AppUser user) {
-        CartItem cartItem = cartItemRepo.findByCartUserIdAndProductId(user.getId(),
-                productId)
+        CartItem cartItem = cartItemRepo.findByCartUserIdAndProductId(user.getId(),productId)
                 .orElseGet(() -> {
                     CartItem ci = new CartItem();
                     ci.setCart(cartRepo.findByUserId(user.getId()).orElseGet(() -> createNewCartForUser(user)));
@@ -136,9 +123,7 @@ public class CartServiceImpl implements CartService {
                 });
 
         CartItemResponse cartItemResponse = cartItemMapper.toResponse(cartItem);
-        CartResponse cartResponse = new CartResponse();
-        cartResponse.setCartItems(List.of(cartItemResponse));
-        cartResponse.setTotalPrice(cartItemResponse.getProduct().getPrice());
+        CartResponse cartResponse = new CartResponse(null, List.of(cartItemResponse), cartItemResponse.product().price());
         return cartResponse;
     }
 

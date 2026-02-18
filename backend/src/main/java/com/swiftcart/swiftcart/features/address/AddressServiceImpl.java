@@ -62,7 +62,7 @@ public class AddressServiceImpl implements AddressService {
     @Transactional
     public AddressDto updateAddress(AddressDto addressDto, AppUser user) {
         Address address = addressMapper.toEntity(addressDto);
-        Address oldAddress = addressRepo.findById(addressDto.getId()).get();
+        Address oldAddress = addressRepo.findById(addressDto.id()).get();
         if (!oldAddress.getUser().getId().equals(user.getId()))
             throw new AccessDeniedException("Unauthorized access to this address");
         address.setUser(user);

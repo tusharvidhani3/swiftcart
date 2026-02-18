@@ -2,28 +2,24 @@ package com.swiftcart.swiftcart.features.product;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
-@Getter
-@NoArgsConstructor
-public class CreateProductRequest {
+public record CreateProductRequest(
 
     @Size(min = 3, max = 200, message = "Product name must be between 3 and 200 characters")
-    private String name;
+    String name,
 
     @Min(value = 1, message = "Price of a product cannot be less than 1 rupee")
-    private Double price;
+    Double price,
     
     @Min(value = 1, message = "MRP of a product cannot be less than 1 rupee")
-    private Double mrp;
+    Double mrp,
 
     @Size(min = 3, max = 50, message = "Category name must be between 3 and 50 characters")
-    private String category;
+    String category,
 
     @Size(min = 10, max = 1000, message = "Description must be between 10 & 1000 characters")
-    private String description;
+    String description,
 
     @Min(value = 0, message = "Stock quantity cannot be less than 0")
-    private Integer stock;
-}
+    Integer stock
+) {}

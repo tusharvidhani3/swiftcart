@@ -20,7 +20,7 @@ export default function Cart() {
         setCheckoutCart(cart)
     }, [cart])
     
-    return cart?.cartItems.length ? (
+    return cart?.items.length ? (
         <>
             <CartItemsContainer />
             <PriceDetails cart={cart} nextBtnTxt={"Proceed to Checkout"} nextBtnClick={() => {navigate('/checkout')}} />

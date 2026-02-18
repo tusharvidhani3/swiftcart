@@ -55,12 +55,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // If user is not yet authenticated in this context
         if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetailsImpl userDetailsImpl = this.context.getBean("userDetailsService", UserDetailsServiceImpl.class).loadUserByUserId(Long.parseLong(userId));
-            if (jwtService.isTokenValid(jwtToken, userDetailsImpl)) {
+            UserPrincipal userPrincipal = this.context.getBean("userDetailsService", UserDetailsServiceImpl.class).loadUserByUserId(Long.parseLong(userId));
+            if (jwtService.isTokenValid(jwtToken, userPrincipal)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetailsImpl,
+                        userPrincipal,
                         null,
-                        userDetailsImpl.getAuthorities());
+                        userPrincipal.getAuthorities());
 
                 authToken.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(request));

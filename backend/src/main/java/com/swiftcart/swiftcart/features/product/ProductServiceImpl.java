@@ -38,26 +38,24 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public ProductResponse createProduct(CreateProductRequest createProductRequest, List<MultipartFile> productImages) {
         Product product=new Product();
-        product.setName(createProductRequest.getName());
-        product.setPrice(createProductRequest.getPrice());
-        product.setMrp(createProductRequest.getMrp());
-        product.setStock(createProductRequest.getStock());
-        product.setCategory(createProductRequest.getCategory());
-        product.setDescription(createProductRequest.getDescription());
+        product.setName(createProductRequest.name());
+        product.setPrice(createProductRequest.price());
+        product.setMrp(createProductRequest.mrp());
+        product.setStock(createProductRequest.stock());
+        product.setCategory(createProductRequest.category());
+        product.setDescription(createProductRequest.description());
         List<ProductImage> images = new ArrayList<>();
-        List<String> relativePaths = productImages.stream().map(productImage -> {
+        productImages.stream().forEach(productImage -> {
             String fullPath = storageService.store(productImage, uploadDir);
             int relativeStartIndex = fullPath.indexOf("uploads/");
             String relativePath = fullPath.substring(relativeStartIndex);
             ProductImage image = new ProductImage();
             image.setImageUrl(relativePath);
             images.add(image);
-            return relativePath;
-        }).collect(Collectors.toList());
+        });
         productImageRepo.saveAllAndFlush(images);
         product = productRepo.save(product);
         ProductResponse productResponse = productMapper.toResponse(product);
-        productResponse.setImageUrls(relativePaths);
         return productResponse;
     }
 
@@ -73,7 +71,6 @@ public class ProductServiceImpl implements ProductService {
         Product product=productRepo.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         ProductResponse productResponse = productMapper.toResponse(product);
-        productResponse.setImageUrls(productImageRepo.findByProductId(productId).stream().map(productImage -> productImage.getImageUrl()).collect(Collectors.toList()));
         return productResponse;
     }
 
@@ -84,33 +81,26 @@ public class ProductServiceImpl implements ProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         productMapper.update(productRequest, existingProduct);
         Product updatedProduct = productRepo.save(existingProduct);
-        ProductResponse productResponse = productMapper.toResponse(updatedProduct);
         if (productImages != null) {
             productImageRepo.deleteByProductId(productId);
             List<ProductImage> images = new ArrayList<>();
-            List<String> relativePaths = productImages.stream().map(productImage -> {
+            productImages.stream().forEach(productImage -> {
                 String fullPath = storageService.store(productImage, uploadDir);
                 int relativeStartIndex = fullPath.indexOf("uploads/");
                 String relativePath = fullPath.substring(relativeStartIndex);
                 ProductImage image = new ProductImage();
                 image.setImageUrl(relativePath);
                 images.add(image);
-                return relativePath;
-            }).collect(Collectors.toList());
+            });
             productImageRepo.saveAllAndFlush(images);
-            productResponse = productMapper.toResponse(updatedProduct);
-            productResponse.setImageUrls(relativePaths);
         }
+        ProductResponse productResponse = productMapper.toResponse(updatedProduct);
         return productResponse;
     }
 
     @Override
     public Page<ProductResponse> searchProducts(String keyword, Pageable pageable, String category, long minPrice, long maxPrice, boolean inStock) {
-        Page<ProductResponse> productPage = productRepo.searchProducts(keyword, pageable, minPrice, maxPrice, category, inStock).map(product -> {
-                    ProductResponse productResponse = productMapper.toResponse(product);
-            productResponse.setImageUrls(productImageRepo.findByProductId(product.getId()).stream().map(productImage -> productImage.getImageUrl()).collect(Collectors.toList()));
-                    return productResponse;
-                });
+        Page<ProductResponse> productPage = productRepo.searchProducts(keyword, pageable, minPrice, maxPrice, category, inStock).map(product -> productMapper.toResponse(product));
         return productPage;
     }
 
@@ -124,8 +114,6 @@ public class ProductServiceImpl implements ProductService {
         product.setStock(stock);
         product = productRepo.save(product);
         ProductResponse productResponse = productMapper.toResponse(product);
-        productResponse.setImageUrls(productImageRepo.findByProductId(productId).stream()
-                .map(productImage -> productImage.getImageUrl()).collect(Collectors.toList()));
         return productResponse;
     }
 

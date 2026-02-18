@@ -17,12 +17,12 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         AppUser user=userRepo.findByMobileNumberWithRole(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        return new UserDetailsImpl(user);
+        return new UserPrincipal(user);
     }
 
-    public UserDetailsImpl loadUserByUserId(Long userId) {
+    public UserPrincipal loadUserByUserId(Long userId) {
         AppUser user = userRepo.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        return new UserDetailsImpl(user);
+        return new UserPrincipal(user);
     }
 
 }

@@ -75,7 +75,7 @@ function Header({ keyword, setKeyword, setSideMenuOpen }) {
                         <li className={styles.logout} onClick={handleLogout}><Link><img src={logout} />Logout</Link></li>
                     </ul>
                 </div>}
-                <Link to="/cart" className={`${styles.cart} ${styles.link}`}><img src={cartIcon} alt="cart" /><span className={styles.label}>Cart</span><span className={styles.cartCount}>{(cart?.cartItems)?(cart.cartItems.reduce((accumulator, cartItem) => accumulator+cartItem.quantity, 0)):0}</span></Link>
+                <Link to="/cart" className={`${styles.cart} ${styles.link}`}><img src={cartIcon} alt="cart" /><span className={styles.label}>Cart</span><span className={styles.cartCount}>{(cart?.items)?(cart.items.reduce((accumulator, cartItem) => accumulator+cartItem.quantity, 0)):0}</span></Link>
             </div>
         </header>
     )
