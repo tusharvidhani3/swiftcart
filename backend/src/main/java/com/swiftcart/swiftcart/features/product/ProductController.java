@@ -40,8 +40,8 @@ public class ProductController {
 
     @PostMapping
     @PreAuthorize("hasRole('SELLER')")
-    public ResponseEntity<ProductResponse> createProduct(@RequestPart @Valid CreateProductRequest createProductRequest, @RequestPart List<MultipartFile> productImages) {
-        ProductResponse productResponse=productService.createProduct(createProductRequest, productImages);
+    public ResponseEntity<ProductResponse> createProduct(@RequestPart @Valid ProductRequest productRequest, @RequestPart List<MultipartFile> productImages) {
+        ProductResponse productResponse=productService.createProduct(productRequest, productImages);
         return new ResponseEntity<>(productResponse, HttpStatus.CREATED);
     }
 
@@ -61,12 +61,12 @@ public class ProductController {
 
     @PutMapping("/{productId}")
     @PreAuthorize("hasRole('SELLER')")
-    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long productId,@RequestBody @Valid CreateProductRequest productRequest, @RequestPart List<MultipartFile> productImages) {
+    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long productId,@RequestBody @Valid ProductRequest productRequest, @RequestPart List<MultipartFile> productImages) {
         ProductResponse productResponse = productService.updateProduct(productId, productRequest, productImages);
         return ResponseEntity.ok(productResponse);
     }
 
-    @PatchMapping("/{productId}")
+    @PatchMapping("/{productId}/stock")
     @PreAuthorize("hasRole('SELLER')")
     public ResponseEntity<ProductResponse> updateProductStock(@PathVariable Long productId, @RequestBody @Valid UpdateProductStockRequest req) {
         ProductResponse productResponse = productService.updateStock(productId, req.stock());
