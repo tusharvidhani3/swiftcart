@@ -4,10 +4,12 @@ import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,6 +19,7 @@ public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Setter(AccessLevel.NONE)
     private Long id;
     @Setter
     private String name;
@@ -32,7 +35,7 @@ public class Product {
     @Setter
     private Integer stock;
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(mappedBy = "product", fetch = FetchType.EAGER)
     private List<ProductImage> images;
 
     // private int minOrderQty;
