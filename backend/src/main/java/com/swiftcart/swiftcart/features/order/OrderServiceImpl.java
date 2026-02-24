@@ -70,7 +70,7 @@ public class OrderServiceImpl implements OrderService {
         order.setShippingAddress(addressMapper.toSnapshot(shippingAddress));
         order.setUser(shippingAddress.getUser());
         List<OrderItem> orderItems = new ArrayList<>();
-        double totalAmount = 0;
+        long totalAmount = 0;
         for (CartItem ci : cartItems) {
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(order);

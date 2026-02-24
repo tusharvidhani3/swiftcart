@@ -2,17 +2,17 @@ package com.swiftcart.swiftcart.features.product;
 
 import java.util.List;
 
-import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
 
 public record ProductResponse(
     Long id,
     String name,
 
-    @DecimalMin("1.0")
-    double price,
+    @Min(100)
+    long price,
 
-    @DecimalMin("1.0")
-    double mrp,
+    @Min(100)
+    long mrp,
 
     List<String> imageUrls,
     String category,

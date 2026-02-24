@@ -37,7 +37,7 @@ public class Order {
     private AddressSnapshot shippingAddress;
 
     @Setter
-    private double totalAmount;
+    private long totalAmount;
 
     @Setter
     private LocalDateTime placedAt;

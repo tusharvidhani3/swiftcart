@@ -24,9 +24,9 @@ public class Product {
     @Setter
     private String name;
     @Setter
-    private double mrp;
+    private long mrp;
     @Setter
-    private double price;
+    private long price;
     @Setter
     private String category;
     @Setter

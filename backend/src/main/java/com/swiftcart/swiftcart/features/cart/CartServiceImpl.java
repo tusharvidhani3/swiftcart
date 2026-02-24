@@ -86,7 +86,7 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public CartResponse getCartResponse(Long userId) {
-        double totalPrice = 0;
+        long totalPrice = 0;
         List<CartItem> cartItems = cartItemRepo.findByCartUserId(userId);
         List<CartItemResponse> cartItemResponses = new ArrayList<>();
         for (CartItem ci : cartItems) {
