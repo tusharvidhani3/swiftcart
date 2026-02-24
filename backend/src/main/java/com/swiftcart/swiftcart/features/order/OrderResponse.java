@@ -9,7 +9,7 @@ import com.swiftcart.swiftcart.features.payment.PaymentDto;
 public record OrderResponse(
     Long id,
     AddressSnapshot shippingAddress,
-    double totalAmount,
+    long totalAmount,
     LocalDateTime placedAt,
     List<OrderItemResponse> items,
     PaymentDto payment

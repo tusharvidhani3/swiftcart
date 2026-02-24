@@ -6,6 +6,8 @@ import OrderItemDetailsCard from './OrderItemDetailsCard'
 import useMediaQuery from '../hooks/useMediaQuery'
 import { apiBaseUrl } from '../config'
 import razorpayLogo from '../assets/icons/razorpay-logo.svg'
+import loadingGif from '../assets/images/loading.gif'
+import { formatPaiseToRupees } from '../utils/currency'
 
 export default function OrderDetails() {
 
@@ -59,9 +61,9 @@ export default function OrderDetails() {
                     <section className={styles.section}>
                         <h2>Order Summary</h2>
                         <div className={styles.orderSummary}>
-                            <div><span>Items</span> <span className={styles.itemsTotal}>₹{order.totalAmount.toLocaleString('en-IN')}</span></div>
+                            <div><span>Items</span> <span className={styles.itemsTotal}>{formatPaiseToRupees(order.totalAmount)}</span></div>
                             <div><span>Delivery</span><span className={styles.deliveryCharge}>FREE DELIVERY</span></div>
-                            <div className={styles.orderSummaryTotal}><span>Order total</span> <span className={styles.orderTotal}>₹{order.totalAmount.toLocaleString('en-IN')}</span></div>
+                            <div className={styles.orderSummaryTotal}><span>Order total</span> <span className={styles.orderTotal}>{formatPaiseToRupees(order.totalAmount)}</span></div>
                         </div>
                     </section>
                 </div>
@@ -79,7 +81,7 @@ export default function OrderDetails() {
                     <div className={styles.orderData}>
                         <div><span>Order Id</span> <span className={styles.orderId}>{order.id}</span></div>
                         <div><span>Order placed</span> <span className={styles.orderDate}>{orderDate.getDate()} {orderDate.toLocaleString('default', { month: 'long' })} {orderDate.getFullYear()}</span></div>
-                        <div><span>Order total</span> <span className={styles.orderTotal}>₹{order.totalAmount.toLocaleString('en-IN')}</span></div>
+                        <div><span>Order total</span> <span className={styles.orderTotal}>{formatPaiseToRupees(order.totalAmount)}</span></div>
                     </div>
                 </section>
 
@@ -107,11 +109,11 @@ export default function OrderDetails() {
                 <section className={styles.section}>
                     <h2>Order Summary</h2>
                     <div className={styles.orderSummary}>
-                        <div><span>Items</span> <span className={styles.itemsTotal}>₹{order.totalAmount.toLocaleString('en-IN')}</span></div>
+                        <div><span>Items</span> <span className={styles.itemsTotal}>{formatPaiseToRupees(order.totalAmount)}</span></div>
                         <div><span>Delivery</span><span className={styles.deliveryCharge}>FREE DELIVERY</span></div>
-                        <div className={styles.orderSummaryTotal}><span>Order total</span> <span className={styles.orderTotal}>₹{order.totalAmount.toLocaleString('en-IN')}</span></div>
+                        <div className={styles.orderSummaryTotal}><span>Order total</span> <span className={styles.orderTotal}>{formatPaiseToRupees(order.totalAmount)}</span></div>
                     </div>
                 </section>
             </>
-    ) : 'loading...'
+    ) : <img className='loadingGif' src={loadingGif} alt="Loading..." />
 }

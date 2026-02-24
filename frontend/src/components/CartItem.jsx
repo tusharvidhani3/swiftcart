@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router'
 import CartContext from '../contexts/CartContext'
 import { useAuthFetch } from '../hooks/useAuthFetch'
 import { apiBaseUrl } from '../config'
+import { formatPaiseToRupees } from '../utils/currency'
 
 export default function CartItem({ id, product, quantity }) {
 
@@ -24,11 +25,9 @@ export default function CartItem({ id, product, quantity }) {
             body: JSON.stringify({ "quantity": quantity + changeInQty })
         })
         let cartResponse = null
-        if (res.ok) {
             cartResponse = await res.json()
             setCart(cartResponse)
-        }
-        else
+        if(res.status === 409)
             showToast("Cannot add more items. Stock limit reached")
     }
 
@@ -46,7 +45,7 @@ export default function CartItem({ id, product, quantity }) {
                 <img alt="product image preview" className={styles.productImage} src={product.imageUrls[0]} />
                 <div>
                     <h2 className={styles.productTitle}>{product.productName}</h2>
-                    <h3 className={styles.producPrice}>₹{product.price.toLocaleString('en-IN')}</h3>
+                    <h3 className={styles.productPrice}>{formatPaiseToRupees(product.price)}</h3>
                 </div>
             </div>
             <div className={styles.cartItemActions}>
