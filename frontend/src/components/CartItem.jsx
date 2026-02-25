@@ -24,11 +24,9 @@ export default function CartItem({ id, product, quantity }) {
             body: JSON.stringify({ "quantity": quantity + changeInQty })
         })
         let cartResponse = null
-        if (res.ok) {
             cartResponse = await res.json()
             setCart(cartResponse)
-        }
-        else
+        if(res.status === 409)
             showToast("Cannot add more items. Stock limit reached")
     }
 

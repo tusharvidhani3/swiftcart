@@ -1,4 +1,4 @@
-import { useContext, useState } from "react"
+import { useContext } from "react"
 import UIContext from "../contexts/UIContext"
 import { CartProvider } from "../contexts/CartContext"
 import { ToastProvider } from "../contexts/ToastContext"
@@ -9,18 +9,16 @@ import SideMenu from './SideMenu'
 
 export default function CustomerApp({ mainClass }) {
 
-    const [keyword, setKeyword] = useState("")
     const { isMobile, isSideMenuOpen, setSideMenuOpen } = useContext(UIContext)
 
     return (
         <CartProvider>
             <ToastProvider>
-                <Header keyword={keyword} setKeyword={setKeyword} setSideMenuOpen={setSideMenuOpen} />
+                <Header setSideMenuOpen={setSideMenuOpen} />
                 {isMobile && <SideMenu isSideMenuOpen={isSideMenuOpen} setSideMenuOpen={setSideMenuOpen} />}
-                {isSideMenuOpen && <div className="backdrop-overlay" onClick={() => setSideMenuOpen(false)} />}
                 <main className={mainClass}>
                     <CheckoutProvider>
-                        <Outlet context={{ keyword }} />
+                        <Outlet />
                     </CheckoutProvider>
                 </main>
             </ToastProvider>

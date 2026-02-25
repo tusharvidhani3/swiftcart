@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import UserContext from "./UserContext";
 import { useAuthFetch } from "../hooks/useAuthFetch";
 import { apiBaseUrl } from "../config";
@@ -23,7 +23,7 @@ export function CartProvider({ children }) {
             setCart(null)
     }
 
-    async function addToCart(productId, showToast) {
+    const addToCart = useCallback(async (productId, showToast) => {
         const res = await authFetch(`${apiBaseUrl}/api/cart/items`, {
             method: "POST",
             headers: {
@@ -34,7 +34,7 @@ export function CartProvider({ children }) {
         const cartResponse = await res.json()
         setCart(cartResponse)
         showToast("Product added to cart")
-    }
+    }, [])
 
     useEffect(() => {
         if (userInfo) {

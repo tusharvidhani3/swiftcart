@@ -99,8 +99,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<ProductResponse> searchProducts(String keyword, Pageable pageable, String category, long minPrice, long maxPrice, boolean inStock) {
-        Page<ProductResponse> productPage = productRepo.searchProducts(keyword, pageable, minPrice, maxPrice, category, inStock).map(product -> productMapper.toResponse(product));
+    public Page<ProductResponse> searchProducts(String keyword, Pageable pageable, List<String> categories, long minPrice, long maxPrice, boolean includeOutOfStock) {
+        Page<ProductResponse> productPage = productRepo.searchProducts(keyword, pageable, minPrice, maxPrice, categories, includeOutOfStock).map(product -> {ProductResponse productResponse = productMapper.toResponse(product); System.out.println(product.getImages().get(0).getImageUrl()); return productResponse;});
         return productPage;
     }
 
@@ -127,6 +127,14 @@ public class ProductServiceImpl implements ProductService {
     public List<String> getProductImages(Long productId) {
         return productImageRepo.findByProductId(productId).stream()
                 .map(productImage -> productImage.getImageUrl()).collect(Collectors.toList());
+    }
+
+    @Override
+    public ProductStats getProductStats() {
+        ProductStats productStats = new ProductStats(0);
+        long productsOutOfStock = productRepo.countOutOfStockProducts();
+        // productStats.setProductsOutOfStock(productsOutOfStock);
+        return productStats;
     }
 
 }

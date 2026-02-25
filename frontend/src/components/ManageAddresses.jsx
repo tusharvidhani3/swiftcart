@@ -6,12 +6,13 @@ import { useNavigate } from 'react-router'
 import AddressesContext from '../contexts/AddressesContext'
 import { useAuthFetch } from '../hooks/useAuthFetch'
 import { apiBaseUrl } from '../config'
+import loadingGif from '../assets/images/loading.gif'
 
 export default function ManageAddresses({ isSelectMode, setShowAddressSelector }) {
 
     const { addresses, setAddresses } = useContext(AddressesContext)
-    const { selectedAddress, setSelectedAddress } = useContext(AddressesContext)
-    const [addressCards, setAddressCards] = useState([])
+    const { setSelectedAddress } = useContext(AddressesContext)
+    const [addressCards, setAddressCards] = useState(null)
     const [threeDotsMenuOpenId, setThreeDotsMenuOpenId] = useState(null)
     const navigate = useNavigate()
     const { authFetch } = useAuthFetch()
@@ -38,10 +39,10 @@ export default function ManageAddresses({ isSelectMode, setShowAddressSelector }
         init()
     }, [])
 
-    return (
+    return addressCards ? (
         <div className={`${styles.addressesContainer} ${isSelectMode ? styles.selectMode : ''}`} onClick={() => threeDotsMenuOpenId ? setThreeDotsMenuOpenId(null) : undefined}>
             <button className={styles.btnAddAddress} onClick={() => navigate('/addresses/add')}><img src={addIcon} alt="add icon" />Add a New Address</button>
             {...addressCards}
         </div>
-    )
+    ) : <img className='loadingGif' src={loadingGif} alt="Loading..." />
 }

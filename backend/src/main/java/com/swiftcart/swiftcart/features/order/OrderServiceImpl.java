@@ -1,5 +1,6 @@
 package com.swiftcart.swiftcart.features.order;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -110,8 +111,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Page<OrderResponse> getOrdersForAuthenticatedUser(Long userId, Pageable pageable) {
-        return orderRepo.findByUserId(userId, pageable)
-                .map(order -> {
+        return orderRepo.findByUserId(userId, pageable).map(order -> {
                     List<OrderItem> orderItems = orderItemRepo.findByOrderId(order.getId());
                     PaymentDto payment = paymentService.getPayment(order.getId());
                     OrderResponse orderResponse = orderMapper.toResponse(order, orderItems, payment);
@@ -150,12 +150,13 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new ResourceNotFoundException("Order Item not found"));
         if (!orderItem.getOrder().getUser().getId().equals(userId))
             throw new AccessDeniedException("You are not allowed to perform this action");
-        if (orderItem.getOrderItemStatus() == OrderStatus.CONFIRMED || orderItem.getOrderItemStatus() == OrderStatus.OUT_FOR_DELIVERY || orderItem.getOrderItemStatus() == OrderStatus.SHIPPED) {
+        if (orderItem.getOrderItemStatus() == OrderStatus.CONFIRMED
+                || orderItem.getOrderItemStatus() == OrderStatus.OUT_FOR_DELIVERY
+                || orderItem.getOrderItemStatus() == OrderStatus.SHIPPED) {
             orderItem.setOrderItemStatus(OrderStatus.CANCELLED);
             productService.updateStock(orderItem.getProduct().getId(), orderItem.getQuantity());
             orderItem = orderItemRepo.save(orderItem);
-        }
-        else {
+        } else {
             throw new BadRequestException("Cannot cancel an order item that is already delivered");
         }
         return orderItemMapper.toResponse(orderItem);
@@ -198,17 +199,42 @@ public class OrderServiceImpl implements OrderService {
 
         List<OrderItem> orderItems = orderItemRepo.findByOrderId(orderId);
         orderItems.stream().forEach(orderItem -> {
-            if (orderItem.getOrderItemStatus() == OrderStatus.CONFIRMED || orderItem.getOrderItemStatus() == OrderStatus.OUT_FOR_DELIVERY || orderItem.getOrderItemStatus() == OrderStatus.SHIPPED) {
+            if (orderItem.getOrderItemStatus() == OrderStatus.CONFIRMED
+                    || orderItem.getOrderItemStatus() == OrderStatus.OUT_FOR_DELIVERY
+                    || orderItem.getOrderItemStatus() == OrderStatus.SHIPPED) {
                 orderItem.setOrderItemStatus(OrderStatus.CANCELLED);
                 productService.updateStock(orderItem.getProduct().getId(), orderItem.getQuantity());
                 orderItem = orderItemRepo.save(orderItem);
-            }
-            else {
+            } else {
                 throw new BadRequestException("Cannot cancel order, one or more item(s) delivered");
             }
         });
         PaymentDto payment = paymentService.getPayment(orderId);
         return orderMapper.toResponse(order, orderItems, payment);
     }
+
+    // @Override
+    // public OrderStats getOrderStats(LocalDate startDate) {
+    //     OrderStatsProjection orderStatsProjection = orderItemRepo.getOrderStats();
+    //     orderMapper.toStats(orderStatsProjection);
+    //     List<DailyOrderStats> dailyOrderStats = orderItemRepo.getDailyOrderStats(startDate.atStartOfDay()).stream()
+    //             .map(dailyOrderStat -> modelMapper.map(dailyOrderStat, DailyOrderStats.class))
+    //             .collect(Collectors.toList());
+
+    //     // LocalDate today = LocalDate.now();
+    //     // for (LocalDate date = startDate; !date.isAfter(today); date = date.plusDays(1)) {
+    //     //     DailyOrderStatsProjection dbStat = statsMap.get(date);
+
+    //     //     DailyOrderStats stat = new DailyOrderStats();
+    //     //     stat.setDate(date);
+    //     //     stat.setRevenue(dbStat != null ? dbStat.getRevenue() : 0.0);
+    //     //     stat.setOrders(dbStat != null ? dbStat.getOrders() : 0);
+    //     //     stat.setOrderItems(dbStat != null ? dbStat.getOrderItems() : 0);
+
+    //     //     finalStats.add(stat);
+    //     // }
+    //     orderStats.setDailyOrderStats(dailyOrderStats);
+    //     return orderStats;
+    // }
 
 }

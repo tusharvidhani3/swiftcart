@@ -10,7 +10,9 @@ public interface ProductMapper {
     @Mapping(source = "images", target = "imageUrls")
     ProductResponse toResponse(Product product);
 
-    String toImageUrl(ProductImage image);
+    default String toImageUrl(ProductImage image) {
+        return image != null ? image.getImageUrl() : null;
+    }
 
     void update(ProductRequest productRequest, @MappingTarget Product existingProduct);
 }

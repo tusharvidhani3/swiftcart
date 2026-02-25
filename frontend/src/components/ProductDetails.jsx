@@ -7,6 +7,8 @@ import { useAuthFetch } from '../hooks/useAuthFetch'
 import CheckoutContext from '../contexts/CheckoutContext'
 import ProductImageGallery from './ProductImageGallery'
 import { apiBaseUrl } from '../config'
+import loadingGif from '../assets/images/loading.gif'
+import { useApi } from '../hooks/useApi'
 
 export default function ProductDetails() {
 
@@ -17,11 +19,11 @@ export default function ProductDetails() {
     const { authFetch } = useAuthFetch()
     const { setCheckoutCart, setBuyNow } = useContext(CheckoutContext)
     const navigate = useNavigate()
+    const apiFetch = useApi()
 
     async function fetchProduct() {
-        const res = await fetch(`${apiBaseUrl}/api/products/${productId}`, {
-            method: "GET",
-            credentials: "include"
+        const res = await apiFetch(`${apiBaseUrl}/api/products/${productId}`, {
+            method: "GET"
         })
         const productResponse = await res.json()
         setProduct(productResponse)
@@ -63,5 +65,5 @@ export default function ProductDetails() {
                 </div>}
             </div>
         </div>
-    ):"loading"
+    ):<img className='loadingGif' src={loadingGif} alt="Loading..." />
 }
