@@ -1,0 +1,265 @@
+.razorpayLogo {
+    width: 80px;
+}
+
+.productImage {
+    width: 120px;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+}
+
+.productDetails {
+    display: flex;
+    align-items: flex-start;
+    gap: 4px;
+}
+
+.productTitle {
+    line-height: 1.5em;
+    height: calc(1.5em * 4);
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    overflow: hidden;
+}
+
+.badge {
+    padding: 4px;
+    background-color: gray;
+    border-radius: 12px;
+    display: inline-block;
+    color: white;
+    text-align: center;
+    font-weight: 600;
+}
+
+.btnAction {
+    width: 130px;
+    background-color: white;
+    height: 30px;
+    border: 1px solid black;
+    border-radius: 20px;
+}
+
+.orders {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    font-size: 12px;
+    border-spacing: 0;
+    gap: 12px;
+}
+
+.orders h2 {
+    text-align: center;
+    margin: 0;
+    font-size: 16px;
+}
+
+.ordersTitle {
+    align-self: flex-start;
+    margin-block: 4px;
+}
+
+.orderedOn {
+    grid-column: 1 / span 1;
+    justify-content: center;
+}
+
+.orderedOn p {
+    margin: 0;
+}
+
+.orderStatus {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.threeDotsIcon {
+    cursor: pointer;
+}
+
+.btnThreeDots {
+    display: absolute;
+}
+
+.orderItem {
+    display: grid;
+    grid-template-columns: 5fr 1.5fr;
+    gap: 8px;
+}
+
+.orderItemContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-inline: 12px;
+    padding-bottom: 12px;
+}
+
+.orderItemTitle {
+    display: flex;
+    padding: unset;
+}
+
+.orderItemTitle h2:first-child {
+    flex-basis: 50%;
+}
+
+.orderItemTitle h2:nth-child(2) {
+    flex-basis: 15%;
+}
+
+.orderItemTitle h2:nth-child(3) {
+    flex-basis: 35%;
+}
+
+.created {
+    background-color: #90a4ae;
+}
+
+.confirmed {
+    background-color: #42a5f5;
+}
+
+.cancelled {
+    background-color: #e53935;
+}
+
+.cancelled_by_seller {
+    background-color: #f4511e;
+}
+
+.shipped {
+    background-color: #1e88e5;
+}
+
+.out_for_delivery {
+    background-color: #fbc02d;
+}
+
+.returned {
+    background-color: #8e24aa;
+}
+
+.orderCard {
+    background-color: white;
+    display: flex;
+    gap: 8px;
+    flex-direction: column;
+    border: 1px solid;
+}
+
+.orderInfo, .orderInfoTitle {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 8px;
+}
+
+.orderInfo {
+    background-color: #D9D9D9;
+    padding: 8px;
+    font-size: 14px;
+    text-align: center;
+    grid-template-columns: 1fr 2fr;
+}
+
+.orderItem + .orderItem {
+    border-top: 1px dashed;
+    padding-top: 8px;
+}
+
+.orderId {
+    font-weight: 600;
+    font-size: 14px
+}
+
+.orderDetails {
+    display: flex;
+    gap: 8px;
+}
+
+.orderDetails > div, .orderedOn {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.orderDetails > div {
+    flex-basis: 50%;
+    min-width: max-content;
+}
+
+.orderInfo h2 {
+    margin: 0;
+    font-size: 14px;
+}
+
+@media screen and (min-width: 768px) {
+
+    .orderDetails {
+        display: block;
+    }
+
+    .orderCard, .orderHeader {
+        display: grid;
+        grid-template-columns: 2.2fr 5fr;
+    }
+
+    .orderHeader {
+        border-bottom: 1px solid;
+        gap: 8px;
+        padding-block: 8px;
+    }
+
+    .orderItem {
+        grid-template-columns: 5fr 1.5fr 3.5fr;
+    }
+
+    .orderCard {
+        flex-direction: row;
+        border: unset;
+    }
+
+    .orderCard + .orderCard {
+        border-top: 1px dashed;
+        padding-top: 12px;
+    }
+
+    .orderItemTitle {
+        gap: 8px;
+    }
+
+    .orders {
+        background-color: white;
+    }
+
+    .orderInfo {
+        background-color: unset;
+        padding: unset;
+    }
+
+    .orderedOn p {
+        
+    }
+}
+
+@media screen and (min-width: 1080px) {
+
+    .actions {
+        position: static;
+    }
+
+    .orderInfo {
+        font-size: 14px;
+    }
+}

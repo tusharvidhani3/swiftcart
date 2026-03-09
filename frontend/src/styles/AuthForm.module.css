@@ -35,7 +35,6 @@
 #authForm a {
     text-decoration-line: none;
     display: block;
-    margin-block: 16px;
     font-weight: 600;
     font-size: 14px;
 }
@@ -97,17 +96,41 @@
 }
 
 .error {
-    visibility: hidden;
     color: red;
+    height: 22px;
+    font-size: 14px;
+    margin-block: 4px 0;
 }
 
-.show.error {
-    visibility: visible;
+.passwordError {
+    height: 44px;
 }
 
 .formTitle {
     margin-block: 4px;
     font-size: 20px;
+}
+
+.instruction {
+    color: #6B7280;
+    font-size: 14px;
+    height: 44px;
+    margin-block: 4px 0;
+}
+
+.btnTogglePasswordVisibility {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: inherit;
+    position: absolute;
+    right: 4px;
+    top: 28px;
+    height: 36px;
+}
+
+.passwordField {
+    position: relative;
 }
 
 @media screen and (min-width: 768px) {

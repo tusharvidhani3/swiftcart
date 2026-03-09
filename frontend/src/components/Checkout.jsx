@@ -49,11 +49,9 @@ export default function Checkout() {
                 shippingAddressId: selectedAddress.id
             })
         })
-        if (res.ok) {
-            const orderResponse = await res.json()
-            setCart(null)
-            return orderResponse
-        }
+        const orderResponse = await res.json()
+        setCart(null)
+        return orderResponse
     }
 
     async function placeBuyNowOrder() {
@@ -68,10 +66,8 @@ export default function Checkout() {
                 prepaid: isPrepaid
             })
         })
-        if (res.ok) {
-            const orderResponse = await res.json()
-            return orderResponse
-        }
+        const orderResponse = await res.json()
+        return orderResponse
     }
 
     async function getAddresses() {
@@ -90,7 +86,7 @@ export default function Checkout() {
         }
     }, [showAddressSelector])
 
-    return checkoutCart?(
+    return checkoutCart ? (
         <>
             <section className={styles.addressPreview}>
                 {!showAddressSelector ?
@@ -124,5 +120,5 @@ export default function Checkout() {
                 </form>
             </section>
         </>
-    ):'No cart'
+    ) : 'No cart'
 }

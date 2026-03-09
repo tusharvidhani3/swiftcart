@@ -23,12 +23,15 @@
 .productInfo {
     display: flex;
     gap: 12px;
+    max-height: 120px;
 }
 
 .productTitle {
     font-size: 16px;
     margin: 8px;
     font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .productTitle + div {
@@ -74,4 +77,8 @@
     font-weight: 700;
     font-size: 16px;
     margin-left: 12px;
+}
+
+.orderItemCard + .orderItemCard {
+    border-top: 1px dashed #c2c2c2;
 }

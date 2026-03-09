@@ -17,6 +17,7 @@ public interface AppUserMapper {
     AppUserDto toDto(AppUser user);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "role", ignore = true)
     void update(AppUserDto userDto, @MappingTarget AppUser user);
     AppUser toEntity(AuthRequest authRequest);
 }

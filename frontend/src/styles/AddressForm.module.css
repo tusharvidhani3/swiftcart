@@ -55,6 +55,25 @@
     border: none;
 }
 
+#addressForm .addressTypes {
+    display: flex;
+    gap: 20px;
+}
+
+#addressForm .addressTypes > div {
+    display: flex;
+    align-items: center;
+    width: unset;
+    margin-block: unset;
+}
+
+.error {
+    color: red;
+    margin-block: 4px;
+    height: 22px;
+    font-size: 14px;
+}
+
 @media screen and (min-width: 768px) {
     
     #addressForm {

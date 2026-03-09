@@ -1,5 +1,7 @@
 package com.swiftcart.swiftcart.features.order;
 
+import java.time.LocalDate;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -15,4 +17,5 @@ public interface OrderService {
     Page<OrderResponseForSeller> getAllOrders(Pageable pageable);
     OrderResponse cancelOrder(Long orderId);
     OrderItemResponse cancelOrderItem(Long userId, Long orderItemId);
+    // OrderStats getOrderStats(LocalDate startDate);
 }

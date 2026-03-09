@@ -230,6 +230,7 @@
         flex-direction: column;
         flex-basis: 30%;
         min-width: 280px;
+        min-height: 160px;
         height: unset;
     }
 
@@ -237,6 +238,7 @@
         flex-direction: row;
         height: 50px;
         flex-basis: auto;
+        min-height: unset;
     }
 
     .btnDeliverAddress {

@@ -11,8 +11,8 @@ import { Loader2 } from 'lucide-react'
 export default function ManageAddresses({ isSelectMode, setShowAddressSelector }) {
 
     const { addresses, setAddresses } = useContext(AddressesContext)
-    const { selectedAddress, setSelectedAddress } = useContext(AddressesContext)
-    const [addressCards, setAddressCards] = useState([])
+    const { setSelectedAddress } = useContext(AddressesContext)
+    const [addressCards, setAddressCards] = useState(null)
     const [threeDotsMenuOpenId, setThreeDotsMenuOpenId] = useState(null)
     const navigate = useNavigate()
     const { authFetch } = useAuthFetch()

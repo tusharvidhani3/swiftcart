@@ -1,0 +1,29 @@
+version: '3.8'
+services:
+  db:
+    image: mariadb:latest
+    environment:
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+      - MARIADB_DATABASE=${MARIADB_DATABASE}
+      - MARIADB_USER=${SPRING_DATASOURCE_USERNAME}
+      - MARIADB_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+    volumes:
+      - mysql-data:/var/lib/mysql:Z
+    ports:
+      - "127.0.0.1:3306:3306"
+
+  app:
+    build: .
+    image: tusharvidhani3/swiftcart-api:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mariadb://db:3306/${MARIADB_DATABASE}
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+      - APP_SECURITY_AUTH_ACCESS_TOKEN_SECRET_KEY=${APP_SECURITY_AUTH_ACCESS_TOKEN_SECRET_KEY}
+
+volumes:
+  mysql-data:
