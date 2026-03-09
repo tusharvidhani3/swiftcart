@@ -1,5 +1,6 @@
 package com.swiftcart.swiftcart.features.product;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -20,5 +21,8 @@ public interface ProductRepository extends JpaRepository<Product,Integer> {
     
     @Query("SELECT p FROM Product p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')) AND p.price<=:maxPrice AND p.price>=:minPrice AND (:categories IS NULL OR p.category IN :categories) AND (:includeOutOfStock = TRUE OR p.stock > 0)")
     Page<Product> searchProducts(@Param("keyword") String keyword, Pageable pageable, @Param("minPrice") long minPrice, @Param("maxPrice") long maxPrice, @Param("categories") List<String> categories, @Param("includeOutOfStock") boolean includeOutOfStock);
+
+    @Query("SELECT COUNT(p) FROM Product p WHERE p.stock = 0")
+    long countOutOfStockProducts();
 
 }

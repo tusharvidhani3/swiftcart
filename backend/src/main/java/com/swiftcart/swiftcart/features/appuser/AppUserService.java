@@ -12,4 +12,5 @@ public interface AppUserService {
     UserPrincipal authenticate(AuthRequest loginRequest);
     AppUserDto updateUser(Long userId, AppUserDto userDto);
     Page<AppUserDto> getAllUsers(Pageable pageable);
+    // CustomerStats getCustomerStats();
 }

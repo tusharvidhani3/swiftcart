@@ -1,0 +1,25 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 48px;
+    padding: 8px 16px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    box-sizing: border-box;
+    width: 100%;
+    background-color: white;
+    box-shadow: 0 1px 4px 1px gray;
+    z-index: 2;
+}
+
+.hamburger {
+    position: relative;
+    cursor: pointer;
+    border: none;
+    background-color: inherit;
+    padding: 0;
+    font-family: inherit;
+    width: 28px;
+}

@@ -62,4 +62,10 @@ public class AppUserServiceImpl implements AppUserService {
         return userRepo.findAll(pageable).map(user -> userMapper.toDto(user));
     }
 
+    // @Override
+    // public CustomerStats getCustomerStats() {
+    //     CustomerStats customerStats = userRepo.getCustomerStats(LocalDate.now().minusMonths(1));
+    //     return customerStats;
+    // }
+
 }

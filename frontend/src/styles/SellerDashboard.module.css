@@ -1,0 +1,19 @@
+.metricsCard {
+    border-radius: 8px;
+    border: 2px solid;
+    text-align: end;
+    background-color: white;
+    padding: 8px;
+    box-shadow: 4px 4px 4px 2px #c2c2c2;
+}
+
+.metricsCard h2 {
+    font-size: 48px;
+    margin-block: 4px;
+}
+
+.metricsCard h3 {
+    margin-block: 2px;
+    font-weight: 500;
+    font-size: 16px;
+}

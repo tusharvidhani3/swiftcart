@@ -1,37 +1,50 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext, useMemo } from "react";
 import ProductsContainer from "./ProductsContainer";
 import SearchSummary from "./SearchSummary";
-import { useOutletContext } from "react-router";
-import SearchFilters from "./SearchFilters";
+import SortMenu from './SortMenu'
+import FilterMenu from './FilterMenu'
+import { useSearchParams } from "react-router";
+import sortIcon from '../assets/icons/sort.svg'
+import filterIcon from '../assets/icons/filter.svg'
 import { apiBaseUrl } from "../config";
+import UIContext from "../contexts/UIContext";
+import styles from '../styles/Home.module.css'
+import { useApi } from "../hooks/useApi";
 
 export default function Home() {
 
-    const [products, setProducts] = useState([])
+    const [productsPagedModel, setProductsPagedModel] = useState(null)
     const [searchSummary, setSearchSummary] = useState({})
-    const { keyword } = useOutletContext()
-    const [searchFilters, setSearchFilters] = useState({
-        category: "",
-        minPrice: "",
-        maxPrice: "",
-        sortBy: "price",
-        sortOrder: "desc",
-        inStock: true
-    })
+    const { isMobile } = useContext(UIContext)
+    const [sortDropDownOpen, setSortDropDownOpen] = useState(false)
+    const [filterMenuOpen, setFilterMenuOpen] = useState(false)
+    const [searchParams] = useSearchParams()
+    const keyword = searchParams.get('k')
+    const categories = useMemo(() => searchParams.getAll('categories'), [searchParams])
+    const minPrice = searchParams.get('min_price')
+    const maxPrice = searchParams.get('max_price')
+    const sort = searchParams.get('sort')
+    const [sortBy, sortOrder] = sort ? sort.split('_') : []
+    const includeOutOfStock = searchParams.get('include_out_of_stock')
+    const apiFetch = useApi()
 
-    async function fetchProducts({ category, minPrice, maxPrice, sortBy, sortOrder, inStock }) {
+    async function fetchProducts() {
         const baseUrl = `${apiBaseUrl}/api/products`
         const filters = []
         if (keyword) filters.push(`keyword=${keyword}`)
-        if (category) filters.push(`category=${category}`)
-        if (filters.length) {
-            if (minPrice !== undefined && minPrice !== "") filters.push(`minPrice=${minPrice}`);
-            if (maxPrice !== undefined && maxPrice !== "") filters.push(`maxPrice=${maxPrice}`);
-            if (sortBy) filters.push(`sortBy=${sortBy}`);
-            if (sortOrder) filters.push(`sortOrder=${sortOrder}`);
+        if (categories.length) {
+            categories.forEach(category => {
+                filters.push(`categories=${category}`)
+            })
         }
-        filters.push(`inStock=${inStock}`);
-        const res = await fetch(`${baseUrl}?${filters.join("&")}`, {
+        if (filters.length) {
+            if (minPrice || minPrice === 0) filters.push(`minPrice=${Number(minPrice)}`);
+            if (maxPrice) filters.push(`maxPrice=${Number(maxPrice)}`);
+            if (sortBy) filters.push(`sortBy=${sortBy}`);
+            if (sortOrder === 'desc') filters.push(`sortOrder=${sortOrder}`);
+            if (includeOutOfStock) filters.push(`includeOutOfStock=${includeOutOfStock}`)
+        }
+        const res = await apiFetch(`${baseUrl}${filters.length ? '?'+filters.join("&") : ''}`, {
             method: 'GET'
         })
         const pagedModel = await res.json()
@@ -44,7 +57,17 @@ export default function Home() {
     }
 
     useEffect(() => {
-        const init = async () => await fetchProducts(searchFilters)
+        if (isMobile && (sortDropDownOpen || filterMenuOpen)) {
+            document.body.classList.add("no-scroll");
+        } else {
+            document.body.classList.remove("no-scroll");
+        }
+
+        return () => document.body.classList.remove("no-scroll");
+    }, [sortDropDownOpen, filterMenuOpen]);
+
+    useEffect(() => {
+        const init = async () => await fetchProducts()
         init()
     }, [keyword, categories, minPrice, maxPrice, sort, includeOutOfStock])
 

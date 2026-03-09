@@ -107,10 +107,6 @@
     transition: transform .2s;
 }
 
-.show .btnProfile {
-    background-color: #FAFAFA;
-}
-
 .profile {
     position: relative;
 }
@@ -253,6 +249,10 @@
 
     .btnProfile {
         height: 40px;
+    }
+
+    .show .btnProfile {
+        background-color: #FAFAFA;
     }
 
 }

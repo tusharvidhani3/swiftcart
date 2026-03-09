@@ -129,4 +129,12 @@ public class ProductServiceImpl implements ProductService {
                 .map(productImage -> productImage.getImageUrl()).collect(Collectors.toList());
     }
 
+    @Override
+    public ProductStats getProductStats() {
+        ProductStats productStats = new ProductStats(0);
+        long productsOutOfStock = productRepo.countOutOfStockProducts();
+        // productStats.setProductsOutOfStock(productsOutOfStock);
+        return productStats;
+    }
+
 }

@@ -1,3 +1,4 @@
+import { useContext, useEffect, useState } from 'react'
 import styles from '../styles/SellerOrders.module.css'
 import { useAuthFetch } from '../hooks/useAuthFetch'
 import { apiBaseUrl } from '../config'
@@ -7,8 +8,9 @@ import { Loader2 } from 'lucide-react'
 
 export default function SellerOrders() {
 
-    return (
-        <div className="ordersContainer">
+    const { authFetch } = useAuthFetch()
+    const [ordersPagedModel, setOrdersPagedModel] = useState(null)
+    const { isMobile } = useContext(UIContext)
 
     async function getOrders() {
         const res = await authFetch(`${apiBaseUrl}/api/orders/all`, {

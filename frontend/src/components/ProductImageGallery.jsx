@@ -8,10 +8,10 @@ import styles from '../styles/ProductDetails.module.css'
 
 export default function ProductImageGallery({ imageUrls }) {
 
-    const isMobile = useMediaQuery('(max-width: 767px)')
+    const isDesktop = useMediaQuery('(min-width: 1080px)')
     const [selectedIndex, setSelectedIndex] = useState(0)
 
-    return isMobile ? (
+    return !isDesktop ? (
         <Swiper slidesPerView={1} spaceBetween={10} modules={[Pagination]} pagination={{clickable: true}} className={styles.productImageSwiper}>
             {imageUrls.map((imageUrl, i) => <SwiperSlide key={i}><img className={styles.productImageSlide} src={imageUrl} style={{ width: '100%', height: 'auto', objectFit: 'contain' }} /></SwiperSlide>)}
         </Swiper>

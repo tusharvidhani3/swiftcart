@@ -15,4 +15,5 @@ public interface ProductService {
     ProductResponse updateStock(Long productId, int stock);
     Product getProductById(Long productId);
     List<String> getProductImages(Long productId);
+    ProductStats getProductStats();
 }

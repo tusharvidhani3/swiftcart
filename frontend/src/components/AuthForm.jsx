@@ -27,18 +27,18 @@ export default function AuthForm({ mode }) {
     }
     const navigate = useNavigate()
     useEffect(() => {
-        if (userInfo) {
-            if(userInfo.role === 'ROLE_CUSTOMER')
-                navigate(`/`)
-            else if(userInfo.role === 'ROLE_SELLER')
-                navigate('/seller/dashboard')
-        }
+        if (userInfo)
+            navigate(redirectTo || (userInfo.role === 'ROLE_CUSTOMER' ? '/' : '/seller'))
     }, [userInfo])
 
-    const isRegisterMode = mode === "register"
+    useEffect(() => {
+        setErrorData({})
+    }, [mode])
+
+    const apiFetch = useApi()
 
     async function register() {
-        const res = await fetch(`${apiBaseUrl}/api/auth/register`, {
+        const res = await apiFetch(`${apiBaseUrl}/api/auth/register`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

@@ -1,15 +1,15 @@
 import { useContext } from "react";
 import UserContext from "../contexts/UserContext";
 import { useNavigate } from "react-router";
+import { useApi } from "./useApi";
 
 export function useAuthFetch() {
-    const { isTokenExpired, setTokenExpired, userInfo } = useContext(UserContext)
+    const { isTokenExpired, setTokenExpired } = useContext(UserContext)
     const navigate = useNavigate()
+    const apiFetch = useApi()
 
     async function authFetch(url, options = {}) {
-        if(!userInfo)
-            navigate(`/auth/login`)
-        const res = await fetch(url, {
+        const res = await apiFetch(url, {
             ...options,
             credentials: 'include'
         })

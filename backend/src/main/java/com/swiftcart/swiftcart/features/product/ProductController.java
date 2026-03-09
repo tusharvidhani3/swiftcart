@@ -50,6 +50,8 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<ProductResponse>>> searchProducts(@RequestParam(defaultValue = "") String keyword, @RequestParam(required = false) List<String> categories, @RequestParam(defaultValue = "0") long minPrice, @RequestParam(defaultValue = "1000000000") long maxPrice, @RequestParam(defaultValue = "asc") String sortOrder, @RequestParam(defaultValue = "false") boolean includeOutOfStock, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "100") int size, @RequestParam(defaultValue = "id") String sortBy, PagedResourcesAssembler<ProductResponse> assembler) {
+        if(sortBy.equals("relevance"))
+        sortBy = "id";
         Pageable pageable = PageRequest.of(page, size, sortOrder.equals("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy));
         Page<ProductResponse> products = productService.searchProducts(keyword, pageable, categories, minPrice, maxPrice, includeOutOfStock);
         return ResponseEntity.ok(assembler.toModel(products));

@@ -1,3 +1,8 @@
+.h1 {
+    font-size: 28px;
+    margin-block: 8px;
+}
+
 #productForm {
     display: flex;
     flex-direction: column;
@@ -7,7 +12,7 @@
     justify-content: center;
     background-color: #EFEEEE;
     height: fit-content;
-    padding-block: 10px;
+    padding-block: 8px;
 }
 
 #productForm .fields {
@@ -22,7 +27,8 @@
     display: block;
     font-weight: 700;
     font-size: 14px;
-
+    flex-basis: 28%;
+    text-align: end;
 }
 
 #productForm .btnImageUpload {
@@ -33,13 +39,22 @@
     flex-direction: column;
     cursor: pointer;
     font-size: 14px;
-    padding-inline: 12px;
-    width: 180px;
-    height: 180px;
+    padding: 12px;
+    width: 120px;
+    min-height: 120px;
+    height: 100%;
+    justify-content: space-evenly;
+    align-self: flex-start;
+    box-sizing: border-box;
 }
 
 .btnImageUpload h2 {
     font-size: 14px;
+    margin-block: 0;
+}
+
+.btnImageUpload img {
+    max-width: 80%;
 }
 
 #productForm input,
@@ -51,12 +66,16 @@
     border: 1.5px solid rgb(118, 118, 118);
 }
 
+#productForm textarea {
+    height: 50px;
+}
+
 .imageUploader {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 12px;
-    padding-block: 12px 24px;
+    gap: 20px;
+    padding: 12px;
 }
 
 .imageUploadButton {
@@ -66,25 +85,14 @@
 }
 
 .uploadedImage {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    background-color: white;
+    width: 120px;
     aspect-ratio: 1/1;
     object-fit: cover;
+    height: 100%;
 }
 
-#productForm .multiImageUploader {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    cursor: pointer;
-}
-
-.multiImageUploader img {
-    width: 24px;
+.previewImageContainer {
+    position: relative;
 }
 
 .cancelX {
@@ -97,7 +105,7 @@
 }
 
 #productForm .btnSubmit {
-    width: 150px;
+    min-width: 150px;
     border-radius: 24px;
     height: 48px;
     background-color: var(--accent-color);
@@ -108,16 +116,34 @@
     cursor: pointer;
     border: 0;
     align-self: center;
+    padding-inline: 12px;
 }
 
 #productForm textarea {
     resize: none;
-    height: 50px;
+    height: 100px;
 }
 
 .error {
     color: red;
     margin-block: 4px 12px;
+    height: 22px;
+    font-size: 14px;
+}
+
+.imageError {
+    text-align: center;
+}
+
+.main {
+    position: absolute;
+    background-color: var(--accent-color);
+    font-size: 16px;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    font-weight: 600;
 }
 
 @media screen and (min-width: 768px) {
@@ -126,15 +152,24 @@
         align-items: center;
     }
 
-    #productForm .fields > div {
+    #productForm .fields .field {
         display: flex;
         justify-content: flex-end;
         gap: 16px;
         width: 90%;
     }
 
-    #productForm input, #productForm textarea {
-        flex-basis: 75%;
+    #productForm .field > div {
+        flex-basis: 72%;
+    }
+
+    #productForm .btnImageUpload {
+        width: 160px;
+        min-height: 160px;
+    }
+
+    .uploadedImage {
+        width: 160px;
     }
 
 }

@@ -5,31 +5,25 @@ import { useContext } from 'react'
 import AddressesContext from '../contexts/AddressesContext'
 import { useAuthFetch } from '../hooks/useAuthFetch'
 import pencilEditIcon from '../assets/icons/edit-pencil.svg'
-import useMediaQuery from '../hooks/useMediaQuery'
 import { apiBaseUrl } from '../config'
 
-export default function AddressCard({ address, threeDotsMenuOpenId, setThreeDotsMenuOpenId, desktopSelectStyles, isSelectMode, setShowAddressSelector }) {
+export default function AddressCard({ address, threeDotsMenuOpenId, setThreeDotsMenuOpenId, desktopSelectStyles, setShowAddressSelector }) {
 
     const { addresses, setAddresses, selectedAddress, setSelectedAddress } = useContext(AddressesContext)
     const { id, name, addressLine1, addressLine2, pincode, city, state, mobileNumber, addressType, defaultShipping } = address
     const navigate = useNavigate()
     const { setEditingAddress } = useContext(AddressesContext)
     const { authFetch } = useAuthFetch()
-    // const isMobile = useMediaQuery('(max-width: 767px)')
 
     async function deleteAddress() {
-        const res = await authFetch(`${apiBaseUrl}/api/addresses/${id}`, { method: 'DELETE' })
-        if (res.ok) {
-            setAddresses(addresses.filter(address => address.id != id))
-            navigate('/addresses')
-        }
+        await authFetch(`${apiBaseUrl}/api/addresses/${id}`, { method: 'DELETE' })
+        setAddresses(addresses.filter(address => address.id != id))
+        navigate('/addresses')
     }
 
     async function changeDefaultAddress() {
         const res = await authFetch(`${apiBaseUrl}/api/addresses/${id}/default`, { method: 'PUT' })
-        if (res.ok) {
-            setAddresses(addresses => addresses.map(addressData => ({ ...addressData, defaultShipping: addressData.id === id })))
-        }
+        setAddresses(addresses => addresses.map(addressData => ({ ...addressData, defaultShipping: addressData.id === id })))
     }
 
     return (
