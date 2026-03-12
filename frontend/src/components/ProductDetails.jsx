@@ -7,9 +7,9 @@ import { useAuthFetch } from '../hooks/useAuthFetch'
 import CheckoutContext from '../contexts/CheckoutContext'
 import ProductImageGallery from './ProductImageGallery'
 import { apiBaseUrl } from '../config'
-import loadingGif from '../assets/images/loading.gif'
 import { useApi } from '../hooks/useApi'
 import { formatPaiseToRupees } from '../utils/currency'
+import { Loader2 } from 'lucide-react'
 
 export default function ProductDetails() {
 
@@ -66,5 +66,5 @@ export default function ProductDetails() {
                 </div>}
             </div>
         </div>
-    ):<img className='loadingGif' src={loadingGif} alt="Loading..." />
+    ) : <Loader2 className='animate-spin' />
 }

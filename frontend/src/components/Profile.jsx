@@ -3,6 +3,8 @@ import styles from "../styles/Profile.module.css";
 import UserContext from "../contexts/UserContext";
 import { useAuthFetch } from "../hooks/useAuthFetch";
 import { apiBaseUrl } from "../config";
+import ToastContext from '../contexts/ToastContext'
+import { Loader2 } from "lucide-react";
 
 export default function Profile() {
 
@@ -82,5 +84,5 @@ export default function Profile() {
             </div>
             <button className={styles.btnSaveChanges}>Save changes</button>
         </form>
-    )
+    ) : <Loader2 className="animate-spin" />
 }

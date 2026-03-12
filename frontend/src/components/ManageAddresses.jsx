@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router'
 import AddressesContext from '../contexts/AddressesContext'
 import { useAuthFetch } from '../hooks/useAuthFetch'
 import { apiBaseUrl } from '../config'
+import { Loader2 } from 'lucide-react'
 
 export default function ManageAddresses({ isSelectMode, setShowAddressSelector }) {
 
@@ -38,10 +39,10 @@ export default function ManageAddresses({ isSelectMode, setShowAddressSelector }
         init()
     }, [])
 
-    return (
+    return addressCards ? (
         <div className={`${styles.addressesContainer} ${isSelectMode ? styles.selectMode : ''}`} onClick={() => threeDotsMenuOpenId ? setThreeDotsMenuOpenId(null) : undefined}>
             <button className={styles.btnAddAddress} onClick={() => navigate('/addresses/add')}><img src={addIcon} alt="add icon" />Add a New Address</button>
             {...addressCards}
         </div>
-    )
+    ) : <Loader2 className='animate-spin' />
 }

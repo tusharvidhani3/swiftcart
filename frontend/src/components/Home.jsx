@@ -45,7 +45,7 @@ export default function Home() {
     useEffect(() => {
         const init = async () => await fetchProducts(searchFilters)
         init()
-    }, [keyword, searchFilters])
+    }, [keyword, categories, minPrice, maxPrice, sort, includeOutOfStock])
 
     return (
         <>

@@ -3,6 +3,7 @@ import styles from '../styles/Orders.module.css'
 import OrderCard from "./OrderCard";
 import { useAuthFetch } from "../hooks/useAuthFetch";
 import { apiBaseUrl } from "../config";
+import { Loader2 } from "lucide-react";
 
 export default function Orders() {
 
@@ -29,5 +30,5 @@ export default function Orders() {
                 {ordersPagedModel.orders.map(order => <OrderCard order={order} key={order.id} orders={ordersPagedModel.orders} />)}
             </div>
         </>
-    ):"Empty Orders"
+    ): <Loader2 className="animate-spin" />
 }

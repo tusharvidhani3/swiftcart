@@ -1,8 +1,8 @@
 import OrderItemCard from "./OrderItemCard"
 import styles from '../styles/Orders.module.css'
 import { useNavigate } from "react-router"
-import loadingGif from '../assets/images/loading.gif'
 import { formatPaiseToRupees } from "../utils/currency"
+import { Loader2 } from "lucide-react"
 
 export default function OrderCard({ order }) {
 
@@ -21,5 +21,5 @@ export default function OrderCard({ order }) {
                 {items.map(orderItem => <OrderItemCard {...orderItem} key={orderItem.id} />)}
             </div>
         </div>
-    ):<img className='loadingGif' src={loadingGif} alt="Loading..." />
+    ) : <Loader2 className="animate-spin" />
 }

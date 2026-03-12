@@ -5,7 +5,7 @@ import SellerApp from './components/SellerApp';
 import { Suspense, useContext } from 'react';
 import UserContext from './contexts/UserContext';
 import { UIProvider } from './contexts/UIContext';
-import loadingGif from './assets/images/loading.gif'
+import { Loader2 } from 'lucide-react';
 
 function App() {
 
@@ -15,7 +15,7 @@ function App() {
   const mainClass = `${mainClassKey && mainClassKey}`;
 
   return (
-    <Suspense fallback={<img src={loadingGif} alt='Loading...' />}>
+    <Suspense fallback={<Loader2 className='animate-spin' />}>
       <UIProvider>
         {
           userInfo?.role === 'ROLE_SELLER' ? <SellerApp mainClass={mainClass} /> : <CustomerApp mainClass={mainClass} />

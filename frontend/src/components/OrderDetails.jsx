@@ -6,8 +6,8 @@ import OrderItemDetailsCard from './OrderItemDetailsCard'
 import useMediaQuery from '../hooks/useMediaQuery'
 import { apiBaseUrl } from '../config'
 import razorpayLogo from '../assets/icons/razorpay-logo.svg'
-import loadingGif from '../assets/images/loading.gif'
 import { formatPaiseToRupees } from '../utils/currency'
+import { Loader2 } from 'lucide-react'
 
 export default function OrderDetails() {
 
@@ -115,5 +115,5 @@ export default function OrderDetails() {
                     </div>
                 </section>
             </>
-    ) : <img className='loadingGif' src={loadingGif} alt="Loading..." />
+    ) : <Loader2 className='animate-spin' />
 }
