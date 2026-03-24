@@ -43,7 +43,7 @@ public class AppUserServiceImpl implements AppUserService {
 
     @Override
     public UserPrincipal authenticate(AuthRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.mobileNumber(), loginRequest.password()));
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.email(), loginRequest.password()));
         UserPrincipal userPrincipal = (UserPrincipal)authentication.getPrincipal();
         return userPrincipal;
     }

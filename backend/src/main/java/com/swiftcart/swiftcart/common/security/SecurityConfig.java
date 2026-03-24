@@ -22,6 +22,11 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.swiftcart.swiftcart.common.security.oauth2.CustomOidcUserService;
+import com.swiftcart.swiftcart.common.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
+import com.swiftcart.swiftcart.common.security.oauth2.OAuth2LoginFailureHandler;
+import com.swiftcart.swiftcart.common.security.oauth2.OAuth2LoginSuccessHandler;
+
 @EnableWebSecurity
 @Configuration
 @EnableMethodSecurity
@@ -30,20 +35,38 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    @Autowired
+    private CustomOidcUserService customOidcUserService;
+
+    @Autowired
+    private OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+
+    @Autowired
+    private OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(csrf -> csrf.disable())
-        .authorizeHttpRequests(authorize -> authorize.requestMatchers("/api/auth/**").permitAll()
-        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-        .requestMatchers("/api/orders/**").authenticated()
-        .requestMatchers("/api/cart/**").authenticated()
-        .requestMatchers("/api/addresses/**").authenticated()
-        .anyRequest().permitAll())
+        .authorizeHttpRequests(authorize -> authorize.requestMatchers("/api/auth/**, /oauth2/**").permitAll()
+            .requestMatchers("/api/admin/**").hasRole("ADMIN")
+            .requestMatchers("/api/orders/**").authenticated()
+            .requestMatchers("/api/cart/**").authenticated()
+            .requestMatchers("/api/addresses/**").authenticated()
+            .anyRequest().permitAll())
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .httpBasic(httpBasic -> httpBasic.disable())
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
         .cors(Customizer.withDefaults())
+        .oauth2Login(oauth2 -> oauth2.userInfoEndpoint(userInfo -> userInfo.oidcUserService(customOidcUserService))
+            .successHandler(oAuth2LoginSuccessHandler)
+            .failureHandler(oAuth2LoginFailureHandler)
+            .authorizationEndpoint(auth -> auth.baseUri("/oauth2/authorization").authorizationRequestRepository(cookieAuthorizationRequestRepository())))
         .build();
+    }
+
+    @Bean
+    public HttpCookieOAuth2AuthorizationRequestRepository cookieAuthorizationRequestRepository() {
+        return new HttpCookieOAuth2AuthorizationRequestRepository();
     }
 
     @Value("${app.security.cors.allowed-origins}")

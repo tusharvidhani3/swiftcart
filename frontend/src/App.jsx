@@ -15,7 +15,7 @@ function App() {
   const mainClass = `${mainClassKey && mainClassKey}`;
 
   return (
-    <Suspense fallback={<Loader2 className='animate-spin' />}>
+    <Suspense fallback={<div className='flex h-full w-full items-center justify-center'><Loader2 className='animate-spin' /></div>}>
       <UIProvider>
         {
           userInfo?.role === 'ROLE_SELLER' ? <SellerApp mainClass={mainClass} /> : <CustomerApp mainClass={mainClass} />

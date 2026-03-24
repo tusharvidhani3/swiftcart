@@ -34,12 +34,13 @@ export default function Home() {
         const res = await fetch(`${baseUrl}?${filters.join("&")}`, {
             method: 'GET'
         })
-        const productsPage = await res.json()
-        const rangeStart = productsPage.number * productsPage.size + productsPage.numberOfElements ? 1 : 0
-        const rangeEnd = productsPage.number * productsPage.size + productsPage.numberOfElements
-        const resultsCount = productsPage.totalElements
-        setProducts(productsPage.content)
-        setSearchSummary({ rangeStart, rangeEnd, resultsCount, keyword, category })
+        const pagedModel = await res.json()
+        const rangeStart = pagedModel.number * pagedModel.size + pagedModel.numberOfElements ? 1 : 0
+        const rangeEnd = pagedModel.number * pagedModel.size + pagedModel.numberOfElements
+        const resultsCount = pagedModel.totalElements
+        console.log(pagedModel)
+        setProductsPagedModel(pagedModel)
+        setSearchSummary({ rangeStart, rangeEnd, resultsCount, keyword, categories })
     }
 
     useEffect(() => {
@@ -49,9 +50,13 @@ export default function Home() {
 
     return (
         <>
-            <SearchSummary {...searchSummary} />
-            {(keyword || searchFilters.category) && <SearchFilters searchFilters={searchFilters} setSearchFilters={setSearchFilters} />}
-            <ProductsContainer products={products} />
+            {(keyword || categories.length>0) && <FilterMenu filterMenuOpen={filterMenuOpen} setFilterMenuOpen={setFilterMenuOpen} />}
+            <div className={styles.mainWindow}>
+                {(keyword || categories.length>0) && isMobile && <div className={styles.searchFilters}><button onClick={() => setSortDropDownOpen(!sortDropDownOpen)} className={styles.btnSort}><img src={sortIcon} /> Sort</button> <button className={styles.btnFilter} onClick={() => setFilterMenuOpen(true)}><img src={filterIcon} />Filter</button></div>}
+                <SearchSummary {...searchSummary} />
+                {(keyword || categories.length>0) && <SortMenu sortDropDownOpen={sortDropDownOpen} setSortDropDownOpen={setSortDropDownOpen} />}
+                <ProductsContainer products={productsPagedModel?._embedded?.productResponseList} />
+            </div>
         </>
     )
 }

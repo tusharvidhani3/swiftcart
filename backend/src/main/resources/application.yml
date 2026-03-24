@@ -25,6 +25,18 @@ app:
         expiration-days: 30
     cors:
       allowed-origins: ${APP_SECURITY_CORS_ALLOWED_ORIGINS:http://localhost:5173}
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID}
+            client-secret: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET}
+            scope: email,profile,openid
+  frontend:
+    url: ${APP_FRONTEND_URL:http://localhost:5173}
+    auth:
+      success-path: /auth/success
+      failure-path: /auth/login
   product:
       images-dir: ${APP_PRODUCT_IMAGES_DIR:${user.home}/cdn/${spring.application.name}_uploads}
 logging:

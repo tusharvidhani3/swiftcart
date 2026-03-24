@@ -1,4 +1,4 @@
-package com.swiftcart.swiftcart.features.auth;
+package com.swiftcart.swiftcart.common.security;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -9,8 +9,6 @@ import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import com.swiftcart.swiftcart.common.security.UserPrincipal;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
