@@ -1,12 +1,4 @@
-import hamburgerIcon from '../assets/icons/hamburger-icon.svg'
-import search from "../assets/icons/search.svg";
-import profile from "../assets/icons/profile.svg";
-import dropDownArrow from "../assets/icons/drop-down-arrow.svg";
-import myProfile from "../assets/icons/my-profile.svg";
-import orders from "../assets/icons/orders.svg";
-import locationIcon from '../assets/icons/location.svg'
-import logout from "../assets/icons/logout.svg";
-import cartIcon from "../assets/icons/cart.svg";
+import { Menu, Search, User, ChevronDown, CircleUser, Package, MapPin, LogOut, ShoppingCart } from 'lucide-react'
 import styles from "../styles/Header.module.css";
 import { Link, useLocation, useSearchParams } from "react-router";
 import { useNavigate } from "react-router";
@@ -37,7 +29,7 @@ function Header({ setSideMenuOpen }) {
                 <button className={styles.hamburger} onClick={e => {
                     e.stopPropagation()
                     setSideMenuOpen(true)
-                }}><img src={hamburgerIcon} alt="hamburger" /></button>
+                }}><Menu /></button>
                 <Link to="/" onClick={() => setSearchParams({})} className={`${styles.swiftcart} ${styles.link}`}>
                     <span>SwiftCart</span>
                 </Link>
@@ -47,22 +39,22 @@ function Header({ setSideMenuOpen }) {
                 handleSearch()
             }}>
                 <input type="search" name="keyword" placeholder="Search for products" value={currKeyword} onChange={e => setCurrKeyword(e.target.value)} />
-                <button><img src={search} alt="search button" /></button>
+                <button><Search /></button>
             </form>
             <div className={`${styles.headerRight} ${userInfo ? styles.loggedIn : ''}`}>
                 {!location.pathname.startsWith('/auth') && <div className={`${styles.profile} ${userInfo && showProfileDropDown ? styles.show : ''}`} onMouseEnter={userInfo ? () => setShowProfileDropDown(true) : undefined} onMouseLeave={userInfo ? () => setShowProfileDropDown(false) : undefined}>
                     <button className={styles.btnProfile} onClick={userInfo ? undefined : () => navigate('/auth/login')}>
-                        <img src={profile} alt="profile icon" />
-                        <span>{userInfo ? userInfo.firstName || 'User' : "Login"}</span><img src={dropDownArrow} alt="drop down" className={styles.dropDownArrow} />
+                        <User />
+                        <span>{userInfo ? userInfo.firstName || 'User' : "Login"}</span><ChevronDown className={styles.dropDownArrow} />
                     </button>
                     <ul className={styles.dropDownMenu} onClick={() => setShowProfileDropDown(false)}>
-                        <li className={styles.myProfile}><Link to="/profile"><img src={myProfile} />My Profile</Link></li>
-                        <li className={styles.orders}><Link to="/orders" className={styles.orders}><img src={orders} />Orders</Link></li>
-                        <li className={styles.manageAddresses}><Link to="/addresses" className={styles.addresses}><img src={locationIcon} />Saved Addresses</Link></li>
-                        <li className={styles.logout} onClick={handleLogout}><Link><img src={logout} />Logout</Link></li>
+                        <li className={styles.myProfile}><Link to="/profile"><CircleUser />My Profile</Link></li>
+                        <li className={styles.orders}><Link to="/orders" className={styles.orders}><Package />Orders</Link></li>
+                        <li className={styles.manageAddresses}><Link to="/addresses" className={styles.addresses}><MapPin />Saved Addresses</Link></li>
+                        <li className={styles.logout} onClick={handleLogout}><Link><LogOut />Logout</Link></li>
                     </ul>
                 </div>}
-                <Link to="/cart" className={`${styles.cart} ${styles.link}`}><img src={cartIcon} alt="cart" /><span className={styles.label}>Cart</span><span className={styles.cartCount}>{(cart?.items)?(cart.items.reduce((accumulator, cartItem) => accumulator + cartItem.quantity, 0)):0}</span></Link>
+                <Link to="/cart" className={`${styles.cart} ${styles.link}`}><ShoppingCart /><span className={styles.label}>Cart</span><span className={styles.cartCount}>{(cart?.items)?(cart.items.reduce((accumulator, cartItem) => accumulator + cartItem.quantity, 0)):0}</span></Link>
             </div>
         </header>
     )

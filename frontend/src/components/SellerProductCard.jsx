@@ -4,8 +4,8 @@ import { useAuthFetch } from '../hooks/useAuthFetch'
 import styles from '../styles/SellerProducts.module.css'
 import ProductsContext from '../contexts/ProductsContext'
 import { useNavigate } from 'react-router'
-import threeDotsIcon from '../assets/icons/three-dots.svg'
 import { formatPaiseToRupees } from '../utils/currency'
+import { EllipsisVertical } from 'lucide-react'
 
 export default function SellerProductCard({ product, threeDotsMenuOpen, setThreeDotsMenuOpen }) {
 
@@ -64,7 +64,7 @@ export default function SellerProductCard({ product, threeDotsMenuOpen, setThree
                     }}>{price !== product.price ? 'Update' : 'Update Stock'}</button>}
                 </div>
                 <div className={styles.threeDots}>
-                    <img className={styles.threeDotsIcon} src={threeDotsIcon} alt="three dots menu" onClick={e => {
+                    <EllipsisVertical className={styles.threeDotsIcon} onClick={e => {
                         e.stopPropagation()
                         setThreeDotsMenuOpen(threeDotsMenuOpen => threeDotsMenuOpen === productId ? null : productId)
                     }} />

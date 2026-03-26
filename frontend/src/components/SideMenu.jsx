@@ -1,16 +1,8 @@
 import { Link, NavLink } from "react-router";
-import myProfile from "../assets/icons/my-profile.svg";
-import orders from "../assets/icons/orders.svg";
-import locationIcon from '../assets/icons/location.svg'
-import logout from "../assets/icons/logout.svg";
-import login from '../assets/icons/login.svg'
-import cartIcon from "../assets/icons/cart.svg";
-import closeIcon from '../assets/icons/close-x.svg'
+import { CircleUser, Package, MapPin, LogOut, LogIn, ShoppingCart, X, Tag, LayoutDashboard } from 'lucide-react'
 import styles from '../styles/SideMenu.module.css'
 import { useContext, useEffect } from "react";
 import UserContext from "../contexts/UserContext";
-import dashboardIcon from '../assets/icons/dashboard.svg'
-import productTagIcon from '../assets/icons/product-tag.svg'
 
 export default function SideMenu({ isSideMenuOpen, setSideMenuOpen }) {
 
@@ -39,24 +31,24 @@ export default function SideMenu({ isSideMenuOpen, setSideMenuOpen }) {
                 <nav className={styles.navLinks}>
                     {userInfo?.role === 'ROLE_SELLER' ?
                         <>
-                            <NavLink className={({ isActive }) => isActive ? styles.activeLink : ''} to='/seller' end><img src={dashboardIcon} />Dashboard</NavLink>
-                            <NavLink className={({ isActive }) => isActive ? styles.activeLink : ''} to="/seller/orders" end><img src={orders} />Orders</NavLink>
-                            <NavLink className={({ isActive }) => isActive ? styles.activeLink : ''} to='/seller/products' end><img src={productTagIcon} alt="products" />Products</NavLink>
-                            <NavLink className={({ isActive }) => isActive ? styles.activeLink : ''} to="/profile" end><img src={myProfile} />Profile</NavLink>
+                            <NavLink className={({ isActive }) => isActive ? styles.activeLink : ''} to='/seller' end><LayoutDashboard />Dashboard</NavLink>
+                            <NavLink className={({ isActive }) => isActive ? styles.activeLink : ''} to="/seller/orders" end><Package />Orders</NavLink>
+                            <NavLink className={({ isActive }) => isActive ? styles.activeLink : ''} to='/seller/products' end><Tag />Products</NavLink>
+                            <NavLink className={({ isActive }) => isActive ? styles.activeLink : ''} to="/profile" end><CircleUser />Profile</NavLink>
                         </>
                         :
                         <>
-                            <NavLink className={({ isActive }) => isActive ? styles.activeLink : ''} to="/orders"><img src={orders} />Orders</NavLink>
-                            <NavLink className={({ isActive }) => isActive ? styles.activeLink : ''} to="/cart"><img src={cartIcon} />Cart</NavLink>
-                            <NavLink className={({ isActive }) => isActive ? styles.activeLink : ''} to="/profile"><img src={myProfile} />Profile</NavLink>
-                            <NavLink className={({ isActive }) => isActive ? styles.activeLink : ''} to="/addresses"><img src={locationIcon} />Saved Addresses</NavLink>
+                            <NavLink className={({ isActive }) => isActive ? styles.activeLink : ''} to="/orders"><Package />Orders</NavLink>
+                            <NavLink className={({ isActive }) => isActive ? styles.activeLink : ''} to="/cart"><ShoppingCart />Cart</NavLink>
+                            <NavLink className={({ isActive }) => isActive ? styles.activeLink : ''} to="/profile"><CircleUser />Profile</NavLink>
+                            <NavLink className={({ isActive }) => isActive ? styles.activeLink : ''} to="/addresses"><MapPin />Saved Addresses</NavLink>
                         </>}
-                    {userInfo ? <Link onClick={handleLogout}><img src={logout} />Logout</Link> : <NavLink className={({ isActive }) => isActive ? styles.activeLink : ''} to="/auth/login"><img src={login} />Login</NavLink>}
+                    {userInfo ? <Link onClick={handleLogout}><LogOut />Logout</Link> : <NavLink className={({ isActive }) => isActive ? styles.activeLink : ''} to="/auth/login"><LogIn color="black" />Login</NavLink>}
                 </nav>
                 {isSideMenuOpen && <button className={styles.btnClose} onClick={e => {
                     e.stopPropagation()
                     setSideMenuOpen(false)
-                }}><img src={closeIcon} /></button>}
+                }}><X /></button>}
             </aside>
         </>
     )

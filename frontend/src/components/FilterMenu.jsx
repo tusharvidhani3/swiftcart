@@ -1,5 +1,5 @@
 import styles from '../styles/Home.module.css'
-import backIcon from '../assets/icons/left-arrow.svg'
+import { ChevronLeft } from 'lucide-react'
 import { useContext, useEffect, useState } from 'react'
 import UIContext from '../contexts/UIContext'
 import { useSearchParams } from 'react-router'
@@ -57,7 +57,7 @@ export default function FilterMenu({ filterMenuOpen, setFilterMenuOpen }) {
             {isMobile && filterMenuOpen && <div className='backdrop-overlay'></div>}
             <div className={styles.filterMenu}>
                 <div className={styles.filterMenuHeader}>
-                    {isMobile && <button className={styles.btnBack} onClick={() => setFilterMenuOpen(false)}><img src={backIcon} alt="back" /></button>}
+                    {isMobile && <button className={styles.btnBack} onClick={() => setFilterMenuOpen(false)}><ChevronLeft /></button>}
                     <h2>Filters</h2>
                 </div>
                 <div className={styles.filtersList}>

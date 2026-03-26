@@ -4,8 +4,7 @@ import productUploadIcon from '../assets/images/product-upload.svg'
 import ToastContext from '../contexts/ToastContext';
 import { useNavigate } from 'react-router';
 import { useAuthFetch } from '../hooks/useAuthFetch';
-import plusIcon from '../assets/icons/plus.svg'
-import cancelXIcon from '../assets/icons/cancel-x.png'
+import { CirclePlus, CircleX } from 'lucide-react'
 import { apiBaseUrl } from '../config';
 import ProductsContext from '../contexts/ProductsContext';
 
@@ -195,10 +194,10 @@ export default function CreateProductListing({ isEditMode }) {
             <h1 className={styles.h1}>List a Product</h1>
             <div>
                 <div className={styles.imageUploader}>
-                    {previews.map((preview, i) => <div className={styles.previewImageContainer} key={i}><img src={preview} alt='Uploaded' className={styles.uploadedImage} /> <img onClick={() => cancelImage(i)} className={styles.cancelX} src={cancelXIcon} alt="cancel image" /> {i === 0 && <div className={styles.main}>MAIN</div>}</div>)}
+                    {previews.map((preview, i) => <div className={styles.previewImageContainer} key={i}><img src={preview} alt='Uploaded' className={styles.uploadedImage} /> <CircleX onClick={() => cancelImage(i)} className={styles.cancelX} /> {i === 0 && <div className={styles.main}>MAIN</div>}</div>)}
                     {previews.length < 9 && <div className={styles.imageUploadButton}>
                         <label htmlFor={'file-upload'} className={styles.btnImageUpload}>
-                            <img src={selectedFiles?.length ? plusIcon : productUploadIcon} alt="upload product image" />
+                            {selectedFiles?.length ? <CirclePlus /> : productUploadIcon}
                             <h2>Add Image(s)</h2>
                         </label>
                         <input type="file" accept="image/*" id='file-upload' name="productImage" hidden multiple onChange={handleFilesChange} />

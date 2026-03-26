@@ -1,10 +1,9 @@
 import { useNavigate } from 'react-router'
-import threeDotsIcon from '../assets/icons/three-dots.svg'
+import { EllipsisVertical, SquarePen } from 'lucide-react'
 import styles from '../styles/ManageAddresses.module.css'
 import { useContext } from 'react'
 import AddressesContext from '../contexts/AddressesContext'
 import { useAuthFetch } from '../hooks/useAuthFetch'
-import pencilEditIcon from '../assets/icons/edit-pencil.svg'
 import { apiBaseUrl } from '../config'
 
 export default function AddressCard({ address, threeDotsMenuOpenId, setThreeDotsMenuOpenId, desktopSelectStyles, setShowAddressSelector }) {
@@ -41,7 +40,7 @@ export default function AddressCard({ address, threeDotsMenuOpenId, setThreeDots
                     Phone: <span className={styles.mobileNumber}>{mobileNumber}</span>
                 </div>
                 <div className={`${styles.threeDotsMenu} ${threeDotsMenuOpenId === id || selectedAddress?.id === id ? styles.open : ''}`}>
-                    {!selectedAddress && <img className={styles.threeDots} src={threeDotsIcon} alt="More options" onClick={e => {
+                    {!selectedAddress && <EllipsisVertical className={styles.threeDots} onClick={e => {
                         e.stopPropagation()
                         setThreeDotsMenuOpenId(id)
                     }} />}
@@ -49,7 +48,7 @@ export default function AddressCard({ address, threeDotsMenuOpenId, setThreeDots
                         <li className={styles.edit} onClick={() => {
                             setEditingAddress(address)
                             navigate('/addresses/edit')
-                        }}><img src={pencilEditIcon} />Edit</li>
+                        }}><SquarePen />Edit</li>
                         {!selectedAddress && !defaultShipping && <li className={styles.delete} onClick={deleteAddress}>Delete</li>}
                         {!selectedAddress && !defaultShipping && <li className={styles.setDefault} onClick={changeDefaultAddress}>Set as default</li>}
                     </ul>

@@ -18,6 +18,8 @@ export default function Orders() {
         setOrdersPagedModel(pagedModel)
     }
 
+    console.log(ordersPagedModel)
+
     useEffect(() => {
         const loadOrders = async () => await getOrders()
         loadOrders()
@@ -27,7 +29,7 @@ export default function Orders() {
         <>
             <h2 className={styles.yourOrders}>Your Orders</h2>
             <div className={styles.ordersContainer}>
-                {ordersPagedModel.orders.map(order => <OrderCard order={order} key={order.id} orders={ordersPagedModel.orders} />)}
+                {ordersPagedModel.orders?.map(order => <OrderCard order={order} key={order.id} orders={ordersPagedModel.orders} />)}
             </div>
         </>
     ): <Loader2 className="animate-spin" />

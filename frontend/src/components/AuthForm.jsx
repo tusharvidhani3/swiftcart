@@ -4,10 +4,9 @@ import shoppingIcon from '../assets/icons/shopping-icon.svg'
 import { useContext, useEffect, useState } from 'react'
 import UserContext from '../contexts/UserContext'
 import { apiBaseUrl } from '../config'
-import eyeIcon from '../assets/icons/eye.svg'
-import eyeOffIcon from '../assets/icons/eye-off.svg'
 import { useApi } from '../hooks/useApi'
 import GoogleLoginButton from './GoogleLoginButton'
+import { Eye, EyeOff } from 'lucide-react'
 
 export default function AuthForm({ mode }) {
 
@@ -110,7 +109,7 @@ export default function AuthForm({ mode }) {
                 <p className={styles.bannerQuote}>{isRegisterMode ? 'Join SwiftCart - Where Smart Shopping Begins' : 'Get access to your Orders, Wishlist and Recommendations'}</p>
                 <img className={styles.bannerImage} src={shoppingIcon} alt="shopping cart" />
             </div>
-            <div className='flex flex-col items-center max-w-[544px] w-full'>
+            <div className='flex flex-col items-center max-w-[544px] w-full bg-white p-6'>
                 <form id={styles.authForm} onSubmit={e => {
                     e.preventDefault()
                     if (validateForm()) {
@@ -137,7 +136,7 @@ export default function AuthForm({ mode }) {
                         }} onBlur={e => validateFormField(e.target.name)} />
                         {authForm.password && <button type='button' className={styles.btnTogglePasswordVisibility} onMouseDown={(e) => e.preventDefault()} onClick={() => {
                             setShowPassword(showPassword => !showPassword)
-                        }}><img src={showPassword ? eyeOffIcon : eyeIcon} alt='toggle password visibility' /></button>}
+                        }}>{showPassword ? <EyeOff /> : <Eye />}</button>}
                         {isRegisterMode && !authForm.password ? <p className={styles.instruction}>Your password should be at least 8 characters long and include a mix of uppercase, lowercase, numbers, and special characters</p> : <p className={`${styles.error} ${styles.passwordError}`}>{errorData.password}</p>}
                     </div>
                     {isRegisterMode ? <Link to='/auth/login'>Existing User? Log in</Link> : <Link to='/auth/register'>New User? Create an account</Link>}

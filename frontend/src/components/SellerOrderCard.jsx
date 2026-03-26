@@ -3,9 +3,8 @@ import razorpayLogo from '../assets/icons/razorpay-logo.svg'
 import { useAuthFetch } from '../hooks/useAuthFetch'
 import { apiBaseUrl } from '../config'
 import { Link } from 'react-router'
-import { Fragment, useContext, useState } from 'react'
+import { useContext, useState } from 'react'
 import UIContext from '../contexts/UIContext'
-import threeDotsIcon from '../assets/icons/three-dots.svg'
 
 export default function SellerOrderCard({ orderId, placedAt, shippingAddress, totalAmount, orderItems, payment }) {
 

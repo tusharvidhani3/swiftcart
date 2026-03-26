@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react'
-import dropDownArrow from '../assets/icons/drop-down-arrow.svg'
+import { ChevronDown } from 'lucide-react'
 import styles from '../styles/Home.module.css'
 import UIContext from '../contexts/UIContext'
 import customRadio from '../assets/icons/radio.webp'

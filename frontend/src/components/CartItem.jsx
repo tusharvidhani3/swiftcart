@@ -1,6 +1,5 @@
 import styles from '../styles/Cart.module.css'
-import plus from '../assets/icons/plus.svg'
-import minus from '../assets/icons/minus.svg'
+import { CirclePlus, Minus } from 'lucide-react'
 import { useContext } from 'react'
 import ToastContext from '../contexts/ToastContext'
 import { useNavigate } from 'react-router'
@@ -49,9 +48,9 @@ export default function CartItem({ id, product, quantity }) {
                 </div>
             </div>
             <div className={styles.cartItemActions}>
-                <button className={styles.btnQty} onClick={() => changeQty(1)}><img src={plus} alt="increment button" /></button>
+                <button className={styles.btnQty} onClick={() => changeQty(1)}><CirclePlus /></button>
                 <span className={styles.qty}>{quantity}</span>
-                <button className={`${styles.btnQty} ${quantity==1?styles.grayedOut:""}`} onClick={() => changeQty(-1)}><img src={minus} alt="decrement button" /></button>
+                <button className={`${styles.btnQty} ${quantity==1?styles.grayedOut:""}`} onClick={() => changeQty(-1)}><Minus /></button>
                 <button className={styles.btnRemove} onClick={removeCartItem}>Remove</button>
             </div>
         </div>

@@ -4,12 +4,11 @@ import SearchSummary from "./SearchSummary";
 import SortMenu from './SortMenu'
 import FilterMenu from './FilterMenu'
 import { useSearchParams } from "react-router";
-import sortIcon from '../assets/icons/sort.svg'
-import filterIcon from '../assets/icons/filter.svg'
 import { apiBaseUrl } from "../config";
 import UIContext from "../contexts/UIContext";
 import styles from '../styles/Home.module.css'
 import { useApi } from "../hooks/useApi";
+import { ArrowDownWideNarrow, SlidersHorizontal } from "lucide-react";
 
 export default function Home() {
 
@@ -51,7 +50,6 @@ export default function Home() {
         const rangeStart = pagedModel.number * pagedModel.size + pagedModel.numberOfElements ? 1 : 0
         const rangeEnd = pagedModel.number * pagedModel.size + pagedModel.numberOfElements
         const resultsCount = pagedModel.totalElements
-        console.log(pagedModel)
         setProductsPagedModel(pagedModel)
         setSearchSummary({ rangeStart, rangeEnd, resultsCount, keyword, categories })
     }
@@ -75,7 +73,7 @@ export default function Home() {
         <>
             {(keyword || categories.length>0) && <FilterMenu filterMenuOpen={filterMenuOpen} setFilterMenuOpen={setFilterMenuOpen} />}
             <div className={styles.mainWindow}>
-                {(keyword || categories.length>0) && isMobile && <div className={styles.searchFilters}><button onClick={() => setSortDropDownOpen(!sortDropDownOpen)} className={styles.btnSort}><img src={sortIcon} /> Sort</button> <button className={styles.btnFilter} onClick={() => setFilterMenuOpen(true)}><img src={filterIcon} />Filter</button></div>}
+                {(keyword || categories.length>0) && isMobile && <div className={styles.searchFilters}><button onClick={() => setSortDropDownOpen(!sortDropDownOpen)} className={styles.btnSort}><ArrowDownWideNarrow /> Sort</button> <button className={styles.btnFilter} onClick={() => setFilterMenuOpen(true)}><SlidersHorizontal />Filter</button></div>}
                 <SearchSummary {...searchSummary} />
                 {(keyword || categories.length>0) && <SortMenu sortDropDownOpen={sortDropDownOpen} setSortDropDownOpen={setSortDropDownOpen} />}
                 <ProductsContainer products={productsPagedModel?._embedded?.productResponseList} />
