@@ -5,11 +5,11 @@ export default ProductsContext
 
 export function ProductsProvider({ children }) {
 
-    const [ products, setProducts ] = useState(null)
+    const [ productsPagedModel, setProductsPagedModel ] = useState(null)
     const [editingProduct, setEditingProduct] = useState(null)
 
     return (
-        <ProductsContext.Provider value={{products, setProducts, editingProduct, setEditingProduct}}>
+        <ProductsContext.Provider value={{productsPagedModel, setProductsPagedModel, editingProduct, setEditingProduct}}>
             {children}
         </ProductsContext.Provider>
     )

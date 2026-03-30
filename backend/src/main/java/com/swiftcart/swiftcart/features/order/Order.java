@@ -19,6 +19,7 @@ import lombok.Setter;
 
 @Entity
 @Getter
+@Setter
 @Table(name = "orders")
 public class Order {
 
@@ -29,17 +30,17 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @Setter
     private AppUser user;
 
-    @Setter
     @Embedded
     private AddressSnapshot shippingAddress;
 
-    @Setter
-    private long totalAmount;
+    private long subtotal;
 
-    @Setter
     private LocalDateTime placedAt;
+
+    private long shippingCharge;
+
+    private long totalAmount;
 
 }

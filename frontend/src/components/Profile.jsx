@@ -134,16 +134,6 @@ export default function Profile() {
                 </div>
             </div>
             <div>
-                <label htmlFor="mobileNumber">Mobile number</label>
-                <input type="tel" id="mobileNumber" name="mobileNumber" required value={modifiedUserInfo.mobileNumber} onChange={e => {
-                    setModifiedUserInfo({ ...modifiedUserInfo, mobileNumber: e.target.value })
-                    revokeError(e.target.name)
-                    if (e.target.value !== userInfo.mobileNumber)
-                        setFormModified(true)
-                }} onBlur={e => validateFormField(e.target.name)} />
-                <div className={styles.error}>{errorData.mobileNumber}</div>
-            </div>
-            <div>
                 <label htmlFor="email">Email Address</label>
                 <input type="email" id="email" name="email" autoComplete="email" value={modifiedUserInfo.email} onChange={e => {
                     setModifiedUserInfo({ ...modifiedUserInfo, email: e.target.value })

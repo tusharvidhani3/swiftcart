@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router'
 import CartContext from '../contexts/CartContext'
 import { formatPaiseToRupees } from '../utils/currency'
 
-export default function ProductCard({ id, productName, price, mrp, imageUrls }) {
+export default function ProductCard({ id, name, price, mrp, imageUrls }) {
 
     const { showToast } = useContext(ToastContext)
     const navigate = useNavigate()
@@ -14,7 +14,7 @@ export default function ProductCard({ id, productName, price, mrp, imageUrls }) 
     return (
         <div className={styles.productCard} onClick={() => navigate(`/products/${id}`)}>
             <img alt="product image" className={styles.productImage} src={`${imageUrls[0]}`} />
-            <h2 className={styles.productTitle}>{productName}</h2>
+            <h2 className={styles.productTitle}>{name}</h2>
             <div>
                 <span className={styles.productPrice}>{formatPaiseToRupees(price)}</span>
                 <span className={styles.productMrp}>{formatPaiseToRupees(mrp)}</span>

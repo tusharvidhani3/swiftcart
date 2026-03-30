@@ -28,7 +28,6 @@
     font-weight: 700;
     font-size: 14px;
     flex-basis: 28%;
-    text-align: end;
 }
 
 #productForm .btnImageUpload {
@@ -170,6 +169,10 @@
 
     .uploadedImage {
         width: 160px;
+    }
+
+    #productForm label {
+        text-align: end;
     }
 
 }

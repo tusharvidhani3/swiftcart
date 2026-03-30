@@ -14,7 +14,7 @@ export default function OrderItemCard({ product, deliveryAt, orderItemStatus }) 
             <div className={styles.orderItemStatus}>{status}</div>
             <div className={styles.productInfo}>
                 <img src={product.imageUrls[0]} alt="product image preview" />
-                <h3 className={styles.productTitle}>{product.productName}</h3>
+                <h3 className={styles.productTitle}>{product.name}</h3>
             </div>
         </div>
     )

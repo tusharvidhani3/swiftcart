@@ -1,8 +1,5 @@
 package com.swiftcart.swiftcart.features.cart;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +19,7 @@ import com.swiftcart.swiftcart.common.security.UserPrincipal;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/cart")
+@RequestMapping("/api/carts")
 @PreAuthorize("hasRole('CUSTOMER')")
 public class CartController {
 
@@ -64,11 +61,8 @@ public class CartController {
     }
 
     @GetMapping("/summary")
-    public ResponseEntity<Map<String, Object>> getCartSummary(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        CartResponse cartResponse =  cartService.getCartResponse(userPrincipal.getUser().getId());
-        Map<String, Object> summary = new HashMap<>();
-        summary.put("totalPrice", cartResponse.totalPrice());
-        summary.put("cartItemsCount", cartResponse.items().size());
+    public ResponseEntity<CartSummary> getCartSummary(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        CartSummary summary =  cartService.getCartSummary(userPrincipal.getUser().getId());
         return ResponseEntity.ok(summary);
     }
     

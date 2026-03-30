@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 public record UpdateProductRequest(
     
     @Size(min = 3, max = 200, message = "Product name must be between 3 and 100 characters")
-    String productName,
+    String name,
 
     @Min(value = 100, message = "Price of a product cannot be less than 1 rupee")
     Long price,

@@ -57,6 +57,9 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private OrderItemMapper orderItemMapper;
 
+    @Autowired
+    private ShippingService shippingService;
+
     @Override
     @Transactional
     public OrderResponse createOrder(PlaceOrderRequest placeOrderRequest, Long userId) throws RazorpayException {
@@ -71,7 +74,7 @@ public class OrderServiceImpl implements OrderService {
         order.setShippingAddress(addressMapper.toSnapshot(shippingAddress));
         order.setUser(shippingAddress.getUser());
         List<OrderItem> orderItems = new ArrayList<>();
-        long totalAmount = 0;
+        long subtotal = 0;
         for (CartItem ci : cartItems) {
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(order);
@@ -81,10 +84,13 @@ public class OrderServiceImpl implements OrderService {
             orderItem.setDeliveryAt(LocalDateTime.now().plusWeeks(1).withHour(20).withMinute(0).withSecond(0).withNano(0));
             orderItems.add(orderItem);
             productService.updateStock(ci.getProduct().getId(), -orderItem.getQuantity());
-            totalAmount += ci.getProduct().getPrice() * ci.getQuantity();
+            subtotal += ci.getProduct().getPrice() * ci.getQuantity();
         }
-        order.setTotalAmount(totalAmount);
         orderItems = orderItemRepo.saveAll(orderItems);
+        long shippingCharge = shippingService.calculate(subtotal);
+        order.setSubtotal(subtotal);
+        order.setShippingCharge(shippingCharge);
+        order.setTotalAmount(subtotal + shippingCharge);
         order = orderRepo.save(order);
         cartService.deleteCartItemsByUserId(userId);
 
@@ -172,7 +178,9 @@ public class OrderServiceImpl implements OrderService {
         Order order = new Order();
         order.setPlacedAt(LocalDateTime.now());
         order.setShippingAddress(addressMapper.toSnapshot(shippingAddress));
-        order.setTotalAmount(cartItem.getProduct().getPrice());
+        order.setSubtotal(cartItem.getProduct().getPrice());
+        order.setShippingCharge(order.getSubtotal());
+        order.setTotalAmount(order.getSubtotal() + order.getShippingCharge());
         order.setUser(user);
         order = orderRepo.save(order);
         Payment payment = new Payment();

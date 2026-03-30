@@ -1,5 +1,5 @@
 import styles from '../styles/Cart.module.css'
-import { CirclePlus, Minus } from 'lucide-react'
+import { CirclePlus, CircleMinus } from 'lucide-react'
 import { useContext } from 'react'
 import ToastContext from '../contexts/ToastContext'
 import { useNavigate } from 'react-router'
@@ -16,7 +16,7 @@ export default function CartItem({ id, product, quantity }) {
     const {authFetch} = useAuthFetch()
 
     async function changeQty(changeInQty) {
-        const res = await authFetch(`${apiBaseUrl}/api/cart/items/${id}`, {
+        const res = await authFetch(`${apiBaseUrl}/api/carts/items/${id}`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
@@ -31,7 +31,7 @@ export default function CartItem({ id, product, quantity }) {
     }
 
     async function removeCartItem() {
-        const res = await authFetch(`${apiBaseUrl}/api/cart/items/${id}`, {
+        const res = await authFetch(`${apiBaseUrl}/api/carts/items/${id}`, {
             method: "DELETE",
         })
         const cartResponse = await res.json()
@@ -43,14 +43,14 @@ export default function CartItem({ id, product, quantity }) {
             <div className={styles.productPreview} onClick={() => navigate(`/products/${product.id}`)}>
                 <img alt="product image preview" className={styles.productImage} src={product.imageUrls[0]} />
                 <div>
-                    <h2 className={styles.productTitle}>{product.productName}</h2>
+                    <h2 className={styles.productTitle}>{product.name}</h2>
                     <h3 className={styles.productPrice}>{formatPaiseToRupees(product.price)}</h3>
                 </div>
             </div>
             <div className={styles.cartItemActions}>
                 <button className={styles.btnQty} onClick={() => changeQty(1)}><CirclePlus /></button>
                 <span className={styles.qty}>{quantity}</span>
-                <button className={`${styles.btnQty} ${quantity==1?styles.grayedOut:""}`} onClick={() => changeQty(-1)}><Minus /></button>
+                <button className={`${styles.btnQty} ${quantity==1?styles.grayedOut:""}`} onClick={() => changeQty(-1)}><CircleMinus /></button>
                 <button className={styles.btnRemove} onClick={removeCartItem}>Remove</button>
             </div>
         </div>

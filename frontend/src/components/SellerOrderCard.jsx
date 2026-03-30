@@ -49,7 +49,7 @@ export default function SellerOrderCard({ orderId, placedAt, shippingAddress, to
                         <div className={styles.productDetails}>
                             <img className={styles.productImage} src={orderItem.product.imageUrls[0]} alt="product image" />
                             <div>
-                                <Link to={`/products/${orderItem.product.productId}`} className={styles.productTitle}>{orderItem.product.productName}</Link>
+                                <Link to={`/products/${orderItem.product.productId}`} className={styles.productTitle}>{orderItem.product.name}</Link>
                                 <div>Quantity: {orderItem.quantity}</div>
                                 <div>Item subtotal: ₹{orderItem.product.price}</div>
                                 <div>Order Item ID: {orderItem.orderItemId}</div>

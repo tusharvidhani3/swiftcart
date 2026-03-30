@@ -37,6 +37,9 @@ app:
     auth:
       success-path: /auth/success
       failure-path: /auth/login
+  shipping:
+    flat-rate: 70
+    free-threshold: 999
   product:
       images-dir: ${APP_PRODUCT_IMAGES_DIR:${user.home}/cdn/${spring.application.name}_uploads}
 logging:

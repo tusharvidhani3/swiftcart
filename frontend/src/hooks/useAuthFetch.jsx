@@ -13,7 +13,7 @@ export function useAuthFetch() {
             ...options,
             credentials: 'include'
         })
-        if(res.status === 403 || res.status === 401) {
+        if(res?.status === 403 || res?.status === 401) {
             setTokenExpired(true)
             await new Promise(resolve => setTimeout(() => {
                 if(!isTokenExpired)

@@ -9,7 +9,7 @@ import { EllipsisVertical } from 'lucide-react'
 
 export default function SellerProductCard({ product, threeDotsMenuOpen, setThreeDotsMenuOpen }) {
 
-    const { productId, productName, imageUrls, mrp } = product
+    const { productId, name, imageUrls, mrp } = product
     const { authFetch } = useAuthFetch()
     const { setEditingProduct, setProducts } = useContext(ProductsContext)
     const navigate = useNavigate()
@@ -47,9 +47,9 @@ export default function SellerProductCard({ product, threeDotsMenuOpen, setThree
         <div className={styles.productCard}>
             <img className={styles.productImage} src={imageUrls[0]} alt="product image" />
             <div className={styles.productInfo}>
-                <h2 className={styles.productTitle}>{productName}</h2>
+                <h2 className={styles.productTitle}>{name}</h2>
                 <div className={styles.inputFields}>
-                    <div className={styles.productPrice}>Price: <div className={styles.priceInputContainer}><span>₹</span><input id='price' value={formatPaiseToRupees(price)} onChange={e => setPrice(Number(e.target.value.replace(/,/g, "")))} /></div></div>
+                    <div className={styles.productPrice}>Price: <div className={styles.priceInputContainer}><span>₹</span><input id='price' value={formatPaiseToRupees(price).substring(1)} onChange={e => setPrice(Number(e.target.value.replace(/,/g, "")))} /></div></div>
                     <div className={styles.productMrp}>MRP: <span>{formatPaiseToRupees(mrp)}</span></div>
                     <div className={styles.productStock}>Stock: <input type="number" id='stock' value={stock} onChange={e => setStock(e.target.value)} /></div>
                     {(price !== product.price || stock !== product.stock) && <button className={styles.btnUpdate} onClick={() => {

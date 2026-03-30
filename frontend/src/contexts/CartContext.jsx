@@ -13,7 +13,7 @@ export function CartProvider({ children }) {
     const { authFetch } = useAuthFetch()
 
     async function updateCart() {
-        const res = await authFetch(`${apiBaseUrl}/api/cart`, {
+        const res = await authFetch(`${apiBaseUrl}/api/carts`, {
             method: "GET"
         })
         const cartResponse = await res.json()
@@ -24,7 +24,7 @@ export function CartProvider({ children }) {
     }
 
     const addToCart = useCallback(async (productId, showToast) => {
-        const res = await authFetch(`${apiBaseUrl}/api/cart/items`, {
+        const res = await authFetch(`${apiBaseUrl}/api/carts/items`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

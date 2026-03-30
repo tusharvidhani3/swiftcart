@@ -21,7 +21,7 @@ export default function AddressCard({ address, threeDotsMenuOpenId, setThreeDots
     }
 
     async function changeDefaultAddress() {
-        const res = await authFetch(`${apiBaseUrl}/api/addresses/${id}/default`, { method: 'PUT' })
+        const res = await authFetch(`${apiBaseUrl}/api/addresses/${id}/default`, { method: 'PATCH' })
         setAddresses(addresses => addresses.map(addressData => ({ ...addressData, defaultShipping: addressData.id === id })))
     }
 

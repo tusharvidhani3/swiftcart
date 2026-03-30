@@ -31,7 +31,7 @@ export default function ProductDetails() {
     }
 
     async function buyNow() {
-        const res = await authFetch(`${apiBaseUrl}/api/cart/checkout/buy-now/product/${productId}`, {
+        const res = await authFetch(`${apiBaseUrl}/api/carts/checkout/buy-now/product/${productId}`, {
             method: 'POST'
         })
         const cartResponse = await res.json()
@@ -55,7 +55,7 @@ export default function ProductDetails() {
                 </div>
             </div>
             <div>
-                <h1 className={styles.productTitle}>{product.productName}</h1>
+                <h1 className={styles.productTitle}>{product.name}</h1>
                 <div className={styles.prices}>
                     <span className={styles.productPrice}>{formatPaiseToRupees(product.price)}</span>
                     <span className={styles.productMrp}>{formatPaiseToRupees(product.mrp)}</span>

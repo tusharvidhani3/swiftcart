@@ -61,8 +61,8 @@ export default function OrderDetails() {
                     <section className={styles.section}>
                         <h2>Order Summary</h2>
                         <div className={styles.orderSummary}>
-                            <div><span>Items</span> <span className={styles.itemsTotal}>{formatPaiseToRupees(order.totalAmount)}</span></div>
-                            <div><span>Delivery</span><span className={styles.deliveryCharge}>FREE DELIVERY</span></div>
+                            <div><span>Items</span> <span className={styles.itemsTotal}>{formatPaiseToRupees(order.subtotal)}</span></div>
+                            <div><span>Shipping</span> <span>{formatPaiseToRupees(order.shippingCharge)}</span></div>
                             <div className={styles.orderSummaryTotal}><span>Order total</span> <span className={styles.orderTotal}>{formatPaiseToRupees(order.totalAmount)}</span></div>
                         </div>
                     </section>
@@ -110,7 +110,7 @@ export default function OrderDetails() {
                     <h2>Order Summary</h2>
                     <div className={styles.orderSummary}>
                         <div><span>Items</span> <span className={styles.itemsTotal}>{formatPaiseToRupees(order.totalAmount)}</span></div>
-                        <div><span>Delivery</span><span className={styles.deliveryCharge}>FREE DELIVERY</span></div>
+                        <div><span>Shipping</span><span>{formatPaiseToRupees(order.shippingCharge)}</span></div>
                         <div className={styles.orderSummaryTotal}><span>Order total</span> <span className={styles.orderTotal}>{formatPaiseToRupees(order.totalAmount)}</span></div>
                     </div>
                 </section>

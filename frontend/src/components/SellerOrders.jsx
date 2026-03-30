@@ -40,7 +40,7 @@ export default function SellerOrders() {
                         <h2>Action</h2>
                     </div>
                 </div>}
-                {ordersPagedModel.orders.map(order => <SellerOrderCard {...order} key={order.orderId} />)}
+                {ordersPagedModel.orders?.map(order => <SellerOrderCard {...order} key={order.orderId} />)}
             </div>
         </>
     ) : <Loader2 className='animate-spin' />

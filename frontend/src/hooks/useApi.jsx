@@ -26,7 +26,7 @@ export function useApi() {
                     errorType = 'unauthorized'
                     break
                 case 'Not found':
-                    errorType = 'not Found'
+                    errorType = 'not found'
                     break
                 case 'Server':
                     errorType = 'server'

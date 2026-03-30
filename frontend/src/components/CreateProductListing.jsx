@@ -1,10 +1,9 @@
 import { useContext, useEffect, useState } from 'react';
 import styles from '../styles/CreateProductListing.module.css'
-import productUploadIcon from '../assets/images/product-upload.svg'
 import ToastContext from '../contexts/ToastContext';
 import { useNavigate } from 'react-router';
 import { useAuthFetch } from '../hooks/useAuthFetch';
-import { CirclePlus, CircleX } from 'lucide-react'
+import { CirclePlus, CircleX, Upload } from 'lucide-react'
 import { apiBaseUrl } from '../config';
 import ProductsContext from '../contexts/ProductsContext';
 
@@ -18,7 +17,7 @@ export default function CreateProductListing({ isEditMode }) {
     const [previews, setPreviews] = useState([])
     const [preUploadedPreviews, setPreUploadedPreviews] = useState(isEditMode ? editingProduct.imageUrls : [])
     const [productData, setProductData] = useState(isEditMode ? editingProduct : {
-        productName: '',
+        name: '',
         description: '',
         price: '',
         mrp: '',
@@ -29,7 +28,7 @@ export default function CreateProductListing({ isEditMode }) {
     const [errorData, setErrorData] = useState({})
 
     const validationConfig = {
-        productName: [{ required: true, message: 'Please enter a product title' }, { minLength: 3, maxLength: 200, message: 'Title must be at between 3 & 200 characters long' }],
+        name: [{ required: true, message: 'Please enter a product title' }, { minLength: 3, maxLength: 200, message: 'Title must be at between 3 & 200 characters long' }],
         description: [{ required: true, message: 'Please enter description' }, { minLength: 10, maxLength: 1000, message: 'Description must be at between 10 & 1000 characters long' }],
         price: [{ required: true, message: 'Please enter price' }, { min: 1, message: 'Price must be at least ₹1' }],
         mrp: [{ required: true, message: 'Please enter Maximum Retail Price' }, { min: productData.price, message: 'MRP cannot be less than price' }],
@@ -194,10 +193,10 @@ export default function CreateProductListing({ isEditMode }) {
             <h1 className={styles.h1}>List a Product</h1>
             <div>
                 <div className={styles.imageUploader}>
-                    {previews.map((preview, i) => <div className={styles.previewImageContainer} key={i}><img src={preview} alt='Uploaded' className={styles.uploadedImage} /> <CircleX onClick={() => cancelImage(i)} className={styles.cancelX} /> {i === 0 && <div className={styles.main}>MAIN</div>}</div>)}
+                    {previews.map((preview, i) => <div className={styles.previewImageContainer} key={i}><img src={preview} className={styles.uploadedImage} /> <CircleX onClick={() => cancelImage(i)} className={styles.cancelX} /> {i === 0 && <div className={styles.main}>MAIN</div>}</div>)}
                     {previews.length < 9 && <div className={styles.imageUploadButton}>
                         <label htmlFor={'file-upload'} className={styles.btnImageUpload}>
-                            {selectedFiles?.length ? <CirclePlus /> : productUploadIcon}
+                            {selectedFiles?.length ? <CirclePlus /> : <Upload />}
                             <h2>Add Image(s)</h2>
                         </label>
                         <input type="file" accept="image/*" id='file-upload' name="productImage" hidden multiple onChange={handleFilesChange} />
@@ -209,11 +208,11 @@ export default function CreateProductListing({ isEditMode }) {
                 <div className={styles.field}>
                     <label htmlFor="product-title">Product Title</label>
                     <div>
-                        <input type="text" id="product-title" name="productName" value={productData.productName} onChange={e => {
-                            setProductData(productData => ({ ...productData, productName: e.target.value }))
+                        <input type="text" id="product-title" name="name" value={productData.name} onChange={e => {
+                            setProductData(productData => ({ ...productData, name: e.target.value }))
                             revokeError(e.target.name)
                             }} onBlur={e => validateFormField(e.target.name)} />
-                        <div className={styles.error}>{errorData.productName}</div>
+                        <div className={styles.error}>{errorData.name}</div>
                     </div>
                 </div>
                 <div className={styles.field}>

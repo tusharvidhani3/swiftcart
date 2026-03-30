@@ -10,6 +10,7 @@ import ManageAddresses from "./ManageAddresses"
 import CheckoutContext from "../contexts/CheckoutContext"
 import CartContext from "../contexts/CartContext"
 import { apiBaseUrl } from "../config"
+import { Loader2 } from "lucide-react"
 
 export default function Checkout() {
 
@@ -18,25 +19,23 @@ export default function Checkout() {
     const navigate = useNavigate()
     const { authFetch } = useAuthFetch()
     const { setAddresses } = useContext(AddressesContext)
-    const { checkoutCart, isBuyNow } = useContext(CheckoutContext)
+    const { isBuyNow } = useContext(CheckoutContext)
     const { setCart } = useContext(CartContext)
     const [showAddressSelector, setShowAddressSelector] = useState(false)
     const isMobile = useMediaQuery('(max-width: 767px)')
+    const [ cartSummary, setCartSummary ] = useState(null)
 
     async function getDefaultAddress() {
         const res = await authFetch(`${apiBaseUrl}/api/addresses/default`, {
             method: 'GET'
         })
-        const defaultAddress = await res.json()
-        setSelectedAddress(defaultAddress)
-    }
-
-    useEffect(() => {
-        if (!selectedAddress) {
-            const init = async () => await getDefaultAddress()
-            init()
+        if(res) {
+            const defaultAddress = await res.json()
+            setSelectedAddress(defaultAddress)
         }
-    }, [])
+        else
+            navigate('/addresses/select')
+    }
 
     async function placeOrder() {
         const res = await authFetch(`${apiBaseUrl}/api/orders/checkout`, {
@@ -61,7 +60,7 @@ export default function Checkout() {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                cartItemId: checkoutCart.items[0].id,
+                cartItemId: cartSummary.items[0].id,
                 shippingAddressId: selectedAddress.id,
                 prepaid: isPrepaid
             })
@@ -71,13 +70,31 @@ export default function Checkout() {
     }
 
     async function getAddresses() {
-
         const res = await authFetch(`${apiBaseUrl}/api/addresses`, {
             method: "GET"
         })
         const addressList = await res.json()
         setAddresses(addressList)
     }
+
+    async function getCartSummary() {
+        const res = await authFetch(`${apiBaseUrl}/api/carts/summary`, {
+            method: 'GET'
+        })
+        const summary = await res.json()
+        setCartSummary(summary)
+    }
+
+    useEffect(() => {
+
+        const initSummary = async () => await getCartSummary()
+        initSummary()
+
+        if (!selectedAddress) {
+            const init = async () => await getDefaultAddress()
+            init()
+        }
+    }, [])
 
     useEffect(() => {
         if (showAddressSelector) {
@@ -86,7 +103,7 @@ export default function Checkout() {
         }
     }, [showAddressSelector])
 
-    return checkoutCart ? (
+    return cartSummary ? (
         <>
             <section className={styles.addressPreview}>
                 {!showAddressSelector ?
@@ -105,7 +122,7 @@ export default function Checkout() {
                     <ManageAddresses isSelectMode={true} setShowAddressSelector={setShowAddressSelector} />
                 </div>}
             </section>
-            <PriceDetails nextBtnClick={isBuyNow ? placeBuyNowOrder : placeOrder} cart={checkoutCart} isCheckoutMode={true} isCod={!isPrepaid} />
+            <PriceDetails nextBtnClick={isBuyNow ? placeBuyNowOrder : placeOrder} cart={cartSummary} isCheckoutMode={true} isCod={!isPrepaid} />
             <section className={styles.paymentMethod}>
                 <h2>Payment Method</h2>
                 <form id={styles.paymentForm}>
@@ -120,5 +137,5 @@ export default function Checkout() {
                 </form>
             </section>
         </>
-    ) : 'No cart'
+    ) : <Loader2 />
 }

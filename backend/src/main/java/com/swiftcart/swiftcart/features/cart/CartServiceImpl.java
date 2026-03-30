@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.swiftcart.swiftcart.common.exception.InsufficientStockException;
 import com.swiftcart.swiftcart.common.exception.ResourceNotFoundException;
 import com.swiftcart.swiftcart.features.appuser.AppUser;
+import com.swiftcart.swiftcart.features.order.ShippingService;
 import com.swiftcart.swiftcart.features.product.Product;
 import com.swiftcart.swiftcart.features.product.ProductService;
 
@@ -28,6 +29,8 @@ public class CartServiceImpl implements CartService {
     @Autowired
     private ProductService productService;
 
+    @Autowired
+    private ShippingService shippingService;
 
     @Autowired
     private CartItemMapper cartItemMapper;
@@ -86,16 +89,16 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public CartResponse getCartResponse(Long userId) {
-        long totalPrice = 0;
         List<CartItem> cartItems = cartItemRepo.findByCartUserId(userId);
         List<CartItemResponse> cartItemResponses = new ArrayList<>();
+        long subtotal = 0;
         for (CartItem ci : cartItems) {
-            totalPrice += ci.getProduct().getPrice() * ci.getQuantity();
+            subtotal += ci.getProduct().getPrice() * ci.getQuantity();
             CartItemResponse cartItemResponse = cartItemMapper.toResponse(ci);
             cartItemResponses.add(cartItemResponse);
         }
         Cart cart = cartRepo.findByUserId(userId).orElseGet(() -> new Cart());
-        CartResponse cartResponse = new CartResponse(cart.getId(), cartItemResponses, totalPrice);
+        CartResponse cartResponse = new CartResponse(cart.getId(), cartItemResponses, subtotal);
         return cartResponse;
     }
 
@@ -164,6 +167,22 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartItem getCartItemByCartItemId(Long cartItemId) {
         return cartItemRepo.findById(cartItemId).orElseThrow(() -> new ResourceNotFoundException("No cart item found with this cart item id"));
+    }
+
+    @Override
+    public CartSummary getCartSummary(Long userId) {
+        List<CartItem> cartItems = cartItemRepo.findByCartUserId(userId);
+        List<CartItemResponse> cartItemResponses = new ArrayList<>();
+        long subtotal = 0;
+        for (CartItem ci : cartItems) {
+            subtotal += ci.getProduct().getPrice() * ci.getQuantity();
+            CartItemResponse cartItemResponse = cartItemMapper.toResponse(ci);
+            cartItemResponses.add(cartItemResponse);
+        }
+        long shippingCharge = shippingService.calculate(subtotal);
+        Cart cart = cartRepo.findByUserId(userId).get();
+        CartSummary cartSummary = new CartSummary(cart.getId(), cartItemResponses, subtotal, shippingCharge, subtotal + shippingCharge);
+        return cartSummary;
     }
 
 }

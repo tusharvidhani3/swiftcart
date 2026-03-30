@@ -44,7 +44,7 @@ export default function SellerProducts() {
             </form>
 
             <section className={styles.productsContainer} onClick={() => threeDotsMenuOpen?setThreeDotsMenuOpen(null) : undefined}>
-                {productsPagedModel.products.map(product => <SellerProductCard key={product.productId} product={product} threeDotsMenuOpen={threeDotsMenuOpen} setThreeDotsMenuOpen={setThreeDotsMenuOpen} />)}
+                {productsPagedModel._embedded.productResponseList?.map(product => <SellerProductCard key={product.id} product={product} threeDotsMenuOpen={threeDotsMenuOpen} setThreeDotsMenuOpen={setThreeDotsMenuOpen} />)}
             </section>
         </>
     ) : <Loader2 className='animate-spin' />
