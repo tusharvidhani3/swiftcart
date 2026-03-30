@@ -16,7 +16,7 @@ export default function SellerProducts() {
     const [threeDotsMenuOpen, setThreeDotsMenuOpen] = useState(null)
 
     async function getProducts() {
-        const res = await authFetch(`${apiBaseUrl}/api/products?includeOutOfStock=true${keyword?'?keyword='+keyword:''}`, {
+        const res = await authFetch(`${apiBaseUrl}/api/products/seller?${keyword?'?keyword='+keyword:''}`, {
             method: 'GET',
         })
         const pagedModel = await res.json()

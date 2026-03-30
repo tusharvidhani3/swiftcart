@@ -4,7 +4,7 @@ import java.util.List;
 
 import jakarta.validation.constraints.Min;
 
-public record ProductResponse(
+public record SellerProductResponse(
     Long id,
     String name,
 
@@ -17,5 +17,5 @@ public record ProductResponse(
     List<String> imageUrls,
     String category,
     String description,
-    boolean isOutOfStock
+    Integer stock
 ) {}

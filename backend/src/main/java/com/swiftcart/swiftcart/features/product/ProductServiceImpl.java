@@ -36,7 +36,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public ProductResponse createProduct(ProductRequest productRequest, List<MultipartFile> productImages) {
+    public SellerProductResponse createProduct(ProductRequest productRequest, List<MultipartFile> productImages) {
         Product product=new Product();
         product.setName(productRequest.name());
         product.setPrice(productRequest.price());
@@ -55,7 +55,7 @@ public class ProductServiceImpl implements ProductService {
         });
         productImageRepo.saveAllAndFlush(images);
         product = productRepo.save(product);
-        ProductResponse productResponse = productMapper.toResponse(product);
+        SellerProductResponse productResponse = productMapper.toSellerResponse(product);
         return productResponse;
     }
 
@@ -76,7 +76,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Transactional
-    public ProductResponse updateProduct(Long productId, ProductRequest productRequest, List<MultipartFile> productImages) {
+    public SellerProductResponse updateProduct(Long productId, ProductRequest productRequest, List<MultipartFile> productImages) {
         Product existingProduct = productRepo.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         productMapper.update(productRequest, existingProduct);
@@ -94,7 +94,7 @@ public class ProductServiceImpl implements ProductService {
             });
             productImageRepo.saveAllAndFlush(images);
         }
-        ProductResponse productResponse = productMapper.toResponse(updatedProduct);
+        SellerProductResponse productResponse = productMapper.toSellerResponse(updatedProduct);
         return productResponse;
     }
 
@@ -105,15 +105,28 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public SellerProductResponse getProductForSeller(Long productId) {
+        Product product=productRepo.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+        SellerProductResponse productResponse = productMapper.toSellerResponse(product);
+        return productResponse;
+    }
+
+    @Override
+    public Page<SellerProductResponse> searchProductsForSeller(String keyword, Pageable pageable, List<String> categories, long minPrice, long maxPrice) {
+        Page<SellerProductResponse> productPage = productRepo.searchProducts(keyword, pageable, minPrice, maxPrice, categories, true).map(product -> productMapper.toSellerResponse(product));
+        return productPage;
+    }
+
+    @Override
     @Transactional
-    public ProductResponse updateStock(Long productId, int stock) {
+    public SellerProductResponse updateStock(Long productId, int stock) {
         Product product = productRepo.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         if (product.getStock() < 0)
             throw new InsufficientStockException("Stock cannot be negative");
         product.setStock(stock);
         product = productRepo.save(product);
-        ProductResponse productResponse = productMapper.toResponse(product);
+        SellerProductResponse productResponse = productMapper.toSellerResponse(product);
         return productResponse;
     }
 

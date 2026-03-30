@@ -37,15 +37,15 @@ public class ProductController {
     
     @GetMapping("/{productId}")
     public ResponseEntity<ProductResponse> getProduct(@PathVariable Long productId) {
-        ProductResponse productResponse=productService.getProduct(productId);
-        return new ResponseEntity<ProductResponse>(productResponse, HttpStatus.OK);
+        ProductResponse productResponse = productService.getProduct(productId);
+        return ResponseEntity.ok(productResponse);
     }
 
     @PostMapping
     @PreAuthorize("hasRole('SELLER')")
-    public ResponseEntity<ProductResponse> createProduct(@RequestPart @Valid ProductRequest productRequest, @RequestPart List<MultipartFile> productImages) {
-        ProductResponse productResponse=productService.createProduct(productRequest, productImages);
-        return new ResponseEntity<>(productResponse, HttpStatus.CREATED);
+    public ResponseEntity<SellerProductResponse> createProduct(@RequestPart @Valid ProductRequest productRequest, @RequestPart List<MultipartFile> productImages) {
+        SellerProductResponse productResponse = productService.createProduct(productRequest, productImages);
+        return ResponseEntity.status(HttpStatus.CREATED).body(productResponse);
     }
 
     @GetMapping
@@ -57,6 +57,21 @@ public class ProductController {
         return ResponseEntity.ok(assembler.toModel(products));
     }
 
+    @GetMapping("/{productId}/seller")
+    @PreAuthorize("hasRole('SELLER')")
+    public ResponseEntity<PagedModel<EntityModel<SellerProductResponse>>> searchProductsForSeller(@RequestParam(defaultValue = "") String keyword, @RequestParam(required = false) List<String> categories, @RequestParam(defaultValue = "0") long minPrice, @RequestParam(defaultValue = "1000000000") long maxPrice, @RequestParam(defaultValue = "asc") String sortOrder, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "100") int size, @RequestParam(defaultValue = "id") String sortBy, PagedResourcesAssembler<SellerProductResponse> assembler) {
+        Pageable pageable = PageRequest.of(page, size, sortOrder.equals("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy));
+        Page<SellerProductResponse> products = productService.searchProductsForSeller(keyword, pageable, categories, minPrice, maxPrice);
+        return ResponseEntity.ok(assembler.toModel(products));
+    }
+
+    @GetMapping("/seller")
+    @PreAuthorize("hasRole('SELLER')")
+    public ResponseEntity<SellerProductResponse> getProductForSeller(@PathVariable Long productId) {
+        SellerProductResponse productResponse = productService.getProductForSeller(productId);
+        return ResponseEntity.ok(productResponse);
+    }
+
     @DeleteMapping("/{productId}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SELLER')")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long productId) {
@@ -66,15 +81,15 @@ public class ProductController {
 
     @PutMapping("/{productId}")
     @PreAuthorize("hasRole('SELLER')")
-    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long productId, @RequestPart(required = false) @Valid ProductRequest productRequest, @RequestPart(required = false) List<MultipartFile> productImages) {
-        ProductResponse productResponse = productService.updateProduct(productId, productRequest, productImages);
+    public ResponseEntity<SellerProductResponse> updateProduct(@PathVariable Long productId, @RequestPart(required = false) @Valid ProductRequest productRequest, @RequestPart(required = false) List<MultipartFile> productImages) {
+        SellerProductResponse productResponse = productService.updateProduct(productId, productRequest, productImages);
         return ResponseEntity.ok(productResponse);
     }
 
     @PatchMapping("/{productId}/stock")
     @PreAuthorize("hasRole('SELLER')")
-    public ResponseEntity<ProductResponse> updateProductStock(@PathVariable Long productId, @RequestBody @Valid UpdateProductStockRequest req) {
-        ProductResponse productResponse = productService.updateStock(productId, req.stock());
+    public ResponseEntity<SellerProductResponse> updateProductStock(@PathVariable Long productId, @RequestBody @Valid UpdateProductStockRequest req) {
+        SellerProductResponse productResponse = productService.updateStock(productId, req.stock());
         return ResponseEntity.ok(productResponse);
     }
 }

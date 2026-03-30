@@ -14,5 +14,12 @@ public interface ProductMapper {
         return image != null ? image.getImageUrl() : null;
     }
 
+    default boolean toOutOfStock(Integer stock) {
+        return stock == 0;
+    }
+
     void update(ProductRequest productRequest, @MappingTarget Product existingProduct);
+
+    @Mapping(source = "images", target = "imageUrls")
+    SellerProductResponse toSellerResponse(Product product);
 }

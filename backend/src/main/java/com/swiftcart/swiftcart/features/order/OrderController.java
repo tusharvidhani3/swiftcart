@@ -69,7 +69,7 @@ public class OrderController {
     @PreAuthorize("hasAnyRole('CUSTOMER','SELLER','ADMIN')")
     public ResponseEntity<OrderResponse> getOrder(@PathVariable Long orderId, @AuthenticationPrincipal UserPrincipal userPrincipal) {
         OrderResponse orderResponse = orderService.getOrder(orderId, userPrincipal.getUser());
-        return new ResponseEntity<OrderResponse>(orderResponse, HttpStatus.OK);
+        return ResponseEntity.ok(orderResponse);
     }
 
     @PostMapping("/checkout/buy-now")

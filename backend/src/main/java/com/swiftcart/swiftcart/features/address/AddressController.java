@@ -38,13 +38,13 @@ public class AddressController {
     
     @PostMapping
     public ResponseEntity<AddressDto> addAddress(@Valid @RequestBody AddressDto addressDto, @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        return new ResponseEntity<>(addressService.addAddress(addressDto, userPrincipal.getUser()), HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(addressService.addAddress(addressDto, userPrincipal.getUser()));
     }
 
     @GetMapping("/{addressId}")
     public ResponseEntity<AddressDto> getAddress(@PathVariable Long addressId, @AuthenticationPrincipal UserPrincipal userPrincipal) {
         AddressDto addressDto = addressService.getAddress(addressId, userPrincipal.getUser().getId());
-        return new ResponseEntity<>(addressDto, HttpStatus.OK);
+        return ResponseEntity.ok(addressDto);
     }
 
     @DeleteMapping("/{addressId}")
@@ -55,7 +55,7 @@ public class AddressController {
 
     @PutMapping("/{addressId}")
     public ResponseEntity<AddressDto> updateAddress(@PathVariable Long addressId, @RequestBody @Valid AddressDto addressDto, @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        return new ResponseEntity<>(addressService.updateAddress(addressDto, userPrincipal.getUser()), HttpStatus.OK);
+        return ResponseEntity.ok(addressService.updateAddress(addressDto, userPrincipal.getUser()));
     }
 
     @PatchMapping("/{addressId}/default")
