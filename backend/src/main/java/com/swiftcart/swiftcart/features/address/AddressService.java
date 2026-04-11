@@ -1,16 +1,90 @@
 package com.swiftcart.swiftcart.features.address;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.swiftcart.swiftcart.common.exception.ResourceNotFoundException;
 import com.swiftcart.swiftcart.features.appuser.AppUser;
 
-public interface AddressService {
-    AddressDto addAddress(AddressDto addressDto, AppUser user);
-    List<AddressDto> getAddressesForLoggedInUser(Long userId);
-    AddressDto getAddress(Long addressId, Long userId);
-    void deleteAddress(Long addressId, Long userId);
-    AddressDto updateAddress(AddressDto addressDto, AppUser user);
-    AddressDto changeDefaultAddress(Long addressId, Long userId);
-    AddressDto getDefaultAddressForUser(Long userId);
-    Address getAddressById(Long addressId);
+@Service
+public class AddressService {
+
+    @Autowired
+    private AddressRepository addressRepo;
+
+    @Autowired
+    private AddressMapper addressMapper;
+
+    @Transactional
+    public AddressDto addAddress(AddressDto addressDto, AppUser user) {
+        Address address=addressMapper.toEntity(addressDto);
+        address.setUser(user);
+        if(addressRepo.countByUserId(user.getId()) == 0)
+        address.setDefaultShipping(true);
+        address=addressRepo.save(address);
+        return addressMapper.toDto(address);
+    }
+
+    public List<AddressDto> getAddressesForLoggedInUser(Long userId) {
+        List<Address> userAddresses = addressRepo.findByUserId(userId);
+        return userAddresses.stream().map(address -> addressMapper.toDto(address)).collect(Collectors.toList());
+    }
+
+    public AddressDto getAddress(Long addressId, Long userId) {
+        Address address = addressRepo.findById(addressId)
+        .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
+        if (!address.getUser().getId().equals(userId))
+            throw new AccessDeniedException("Unauthorized access to this address");
+        return addressMapper.toDto(address);
+    }
+
+    @Transactional
+    public void deleteAddress(Long addressId, Long userId) {
+        Address address = addressRepo.findById(addressId)
+        .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
+        if (!address.getUser().getId().equals(userId))
+            throw new AccessDeniedException("Unauthorized access to this address");
+        if(address.getDefaultShipping() != null && address.getDefaultShipping())
+            throw new IllegalStateException("Cannot delete the default shipping address");
+        addressRepo.deleteById(addressId);
+    }
+
+    @Transactional
+    public AddressDto updateAddress(AddressDto addressDto, AppUser user) {
+        Address address = addressMapper.toEntity(addressDto);
+        Address oldAddress = addressRepo.findById(addressDto.id()).get();
+        if (!oldAddress.getUser().getId().equals(user.getId()))
+            throw new AccessDeniedException("Unauthorized access to this address");
+        address.setUser(user);
+        address.setDefaultShipping(oldAddress.getDefaultShipping());
+        address = addressRepo.save(address);
+        return addressMapper.toDto(address);
+    }
+
+    @Transactional
+    public AddressDto changeDefaultAddress(Long addressId, Long userId) {
+        Address address = addressRepo.findById(addressId)
+        .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
+        if(address.getUser().getId() != userId)
+        throw new AccessDeniedException("Access denied: This address does not belong to you");
+        addressRepo.unsetDefaultShipping(userId);
+        addressRepo.setDefaultShipping(addressId);
+        return addressMapper.toDto(address);
+    }
+
+    public AddressDto getDefaultAddressForUser(Long userId) {
+        Address address = addressRepo.findDefaultShippingAddress(userId)
+        .orElseThrow(() -> new ResourceNotFoundException("No address added"));
+        return addressMapper.toDto(address);
+    }
+
+    public Address getAddressById(Long addressId) {
+        return addressRepo.findById(addressId).orElseThrow(() -> new ResourceNotFoundException("Address not found"));
+    }
+
 }

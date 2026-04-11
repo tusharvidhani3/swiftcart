@@ -1,12 +1,76 @@
 package com.swiftcart.swiftcart.features.auth;
 
+import java.security.SecureRandom;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Base64;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.swiftcart.swiftcart.common.security.JwtService;
 import com.swiftcart.swiftcart.features.appuser.AppUser;
 
-public interface RefreshTokenService {
-    String generateRefreshToken(AppUser user);
-    String generateAccessToken(String refreshToken);
-    void invalidateRefreshToken(String refreshToken);
-    boolean isValid(String refreshToken);
-    String rotateRefreshToken(String refreshToken);
+@Service
+public class RefreshTokenService {
+
+    @Autowired
+    RefreshTokenRepository refreshTokenRepo;
+
+    @Autowired
+    JwtService jwtService;
+
+    public String generateRefreshToken(AppUser user) {
+        RefreshToken refreshToken = new RefreshToken();
+        refreshToken.setUser(user);
+        refreshToken.setCreatedAt(Instant.now());
+        refreshToken.setExpiresAt(Instant.now().plus(30, ChronoUnit.DAYS));
+        refreshToken.setToken(generateTokenString());
+        refreshTokenRepo.save(refreshToken);
+        return refreshToken.getToken();
+    }
+
+    public String generateAccessToken(String token) {
+        RefreshToken refreshToken = refreshTokenRepo.findByTokenWithUserAndRole(token);
+        AppUser user = refreshToken.getUser();
+        return jwtService.generateToken(user.getId(), user.getRole().getName());
+    }
+
+    public void invalidateRefreshToken(String token) {
+        RefreshToken refreshToken = refreshTokenRepo.findByToken(token);
+        if(!refreshToken.isRevoked()) {
+        refreshToken.setRevoked(true);
+        refreshTokenRepo.save(refreshToken);
+        }
+    }
+
+    public boolean isValid(String token) {
+        RefreshToken refreshToken = refreshTokenRepo.findByToken(token);
+        Instant currentTime = Instant.now();
+        if(refreshToken.isRevoked() || currentTime.isAfter(refreshToken.getExpiresAt()))
+        return false;
+        return true;
+    }
+
+    @Transactional
+    public String rotateRefreshToken(String token) {
+        RefreshToken refreshToken = refreshTokenRepo.findByToken(token);
+        refreshToken.setRevoked(true);
+        refreshTokenRepo.save(refreshToken);
+        return generateRefreshToken(refreshToken.getUser());
+    }
+
+    private String generateTokenString() {
+        byte[] bytes = new byte[64];
+        new SecureRandom().nextBytes(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+    }
+
+    @Scheduled(cron = "0 0 3 * * ?") // Every day at 3 AM
+    public void purgeExpiredTokens() {
+        refreshTokenRepo.deleteByExpiresAtBefore(Instant.now());
+    }
 
 }

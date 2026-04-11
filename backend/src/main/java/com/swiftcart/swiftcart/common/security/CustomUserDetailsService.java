@@ -9,7 +9,7 @@ import com.swiftcart.swiftcart.common.exception.ResourceNotFoundException;
 import com.swiftcart.swiftcart.features.appuser.AppUser;
 import com.swiftcart.swiftcart.features.appuser.AppUserRepository;
 
-public class UserDetailsServiceImpl implements UserDetailsService {
+public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired
     private AppUserRepository userRepo;
