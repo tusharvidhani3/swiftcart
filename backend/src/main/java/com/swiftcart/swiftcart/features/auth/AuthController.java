@@ -112,7 +112,6 @@ public class AuthController {
     }
 
     @PostMapping(value = {"/logout", "/signout"})
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> logout(@CookieValue(value = "refresh_token", required = false) String refreshToken) {
         if(refreshToken != null)
         tokenService.invalidateRefreshToken(refreshToken);
