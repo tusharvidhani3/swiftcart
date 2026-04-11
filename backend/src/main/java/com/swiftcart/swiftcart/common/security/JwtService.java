@@ -33,7 +33,7 @@ public class JwtService {
                 .claims(claims)
                 .subject(userId.toString())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expiration * 60))
+                .expiration(new Date(System.currentTimeMillis() + expiration * 60 * 1000))
                 .signWith(getSignInKey())
                 .compact();
     }
@@ -55,14 +55,9 @@ public class JwtService {
                 .getPayload();
     }
 
-    public boolean isTokenValid(String token, UserPrincipal userPrincipal) {
-        Date expirationDate = extractExpiration(token);
+    public boolean isTokenOwnedByUser(String token, UserPrincipal userPrincipal) {
         String userId = extractUserId(token);
-        return userPrincipal.getUser().getId().toString().equals(userId) && !expirationDate.before(new Date());
-    }
-
-    private Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
+        return userPrincipal.getUser().getId().toString().equals(userId);
     }
 
     private SecretKey getSignInKey() {
