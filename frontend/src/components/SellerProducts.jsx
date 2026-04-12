@@ -3,34 +3,33 @@ import { CirclePlus, Search, Loader2 } from 'lucide-react'
 import { useAuthFetch } from '../hooks/useAuthFetch'
 import styles from '../styles/SellerProducts.module.css'
 import { apiBaseUrl } from '../config'
-import { useContext, useEffect, useState } from 'react'
+import { useState } from 'react'
 import SellerProductCard from './SellerProductCard'
-import ProductsContext from '../contexts/ProductsContext'
+import { useQuery } from '@tanstack/react-query'
+
+async function getProducts(authFetch, keyword) {
+    const res = await authFetch(`${apiBaseUrl}/api/products/seller?${keyword ? '?keyword=' + keyword : ''}`, {
+        method: 'GET',
+    })
+    return await res.json()
+}
 
 export default function SellerProducts() {
 
     const [keyword, setKeyword] = useState("")
-    const { authFetch } = useAuthFetch()
+    const authFetch = useAuthFetch()
     const navigate = useNavigate()
-    const { productsPagedModel, setProductsPagedModel } = useContext(ProductsContext)
     const [threeDotsMenuOpen, setThreeDotsMenuOpen] = useState(null)
 
-    async function getProducts() {
-        const res = await authFetch(`${apiBaseUrl}/api/products/seller?${keyword?'?keyword='+keyword:''}`, {
-            method: 'GET',
-        })
-        const pagedModel = await res.json()
-        setProductsPagedModel(pagedModel)
-    }
+    const { data: productsPagedModel, isLoading } = useQuery({
+        queryKey: ['products',],
+        queryFn: () => getProducts(authFetch, keyword),
+        staleTime: 1000 * 60 * 5
+    })
 
-    useEffect(() => {
-        const init = async () => await getProducts()
-        init()
-    }, [])
-
-    return productsPagedModel ? (
+    return isLoading ? <SellerProductsSkeleton /> : (
         <>
-        <h1 className={styles.h1}>Listed Products</h1>
+            <h1 className={styles.h1}>Listed Products</h1>
             <section className={styles.secAction}>
                 <button className={styles.btnAddProduct} onClick={() => navigate('/seller/products/add')}><CirclePlus /> Add Product</button>
             </section>
@@ -43,9 +42,9 @@ export default function SellerProducts() {
                 <button><Search /></button>
             </form>
 
-            <section className={styles.productsContainer} onClick={() => threeDotsMenuOpen?setThreeDotsMenuOpen(null) : undefined}>
+            <section className={styles.productsContainer} onClick={() => threeDotsMenuOpen ? setThreeDotsMenuOpen(null) : undefined}>
                 {productsPagedModel._embedded.productResponseList?.map(product => <SellerProductCard key={product.id} product={product} threeDotsMenuOpen={threeDotsMenuOpen} setThreeDotsMenuOpen={setThreeDotsMenuOpen} />)}
             </section>
         </>
-    ) : <Loader2 className='animate-spin' />
+    )
 }

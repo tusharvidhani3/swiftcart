@@ -5,26 +5,32 @@ import { apiBaseUrl } from '../config'
 import { Link } from 'react-router'
 import { useContext, useState } from 'react'
 import UIContext from '../contexts/UIContext'
+import { useMutation } from '@tanstack/react-query'
+
+async function apiCancelOrder(authFetch, orderId) {
+    const res = await authFetch(`${apiBaseUrl}/api/orders/items/${orderId}`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            orderStatus: 'CANCELLED_BY_SELLER'
+        })
+    })
+    return await res.json()
+}
 
 export default function SellerOrderCard({ orderId, placedAt, shippingAddress, totalAmount, orderItems, payment }) {
 
     const orderDate = new Date(placedAt)
-    const { authFetch } = useAuthFetch()
+    const authFetch = useAuthFetch()
     const { isMobile } = useContext(UIContext)
     const [threeDotsMenuOpen, setThreeDotsMenuOpen] = useState(false)
 
-    async function cancel(orderItemId) {
-        const res = await authFetch(`${apiBaseUrl}/api/orders/items/${orderItemId}`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                orderStatus: 'CANCELLED_BY_SELLER'
-            })
-        })
-        const orderItemResponse = await res.json()
-    }
+    const { mutate: cancelOrder } = useMutation({
+        mutationFn: (orderId) => apiCancelOrder(authFetch, orderId),
+        onSuccess: apiCancelOrder
+    })
 
     return (
         <div className={styles.orderCard}>

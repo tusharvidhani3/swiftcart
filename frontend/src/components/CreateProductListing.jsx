@@ -10,7 +10,7 @@ import ProductsContext from '../contexts/ProductsContext';
 export default function CreateProductListing({ isEditMode }) {
 
     const { showToast } = useContext(ToastContext)
-    const { authFetch } = useAuthFetch()
+    const authFetch = useAuthFetch()
     const navigate = useNavigate()
     const { editingProduct } = useContext(ProductsContext)
     const [selectedFiles, setSelectedFiles] = useState([])

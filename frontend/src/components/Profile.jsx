@@ -5,12 +5,25 @@ import { useAuthFetch } from "../hooks/useAuthFetch";
 import { apiBaseUrl } from "../config";
 import ToastContext from '../contexts/ToastContext'
 import { Loader2 } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+async function apiUpdateProfile(authFetch, profileForm) {
+    const profileFormData = new FormData(profileForm)
+    const res = await authFetch(`${apiBaseUrl}/api/users`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(Object.fromEntries(profileFormData.entries()))
+    })
+    return await res.json()
+}
 
 export default function Profile() {
 
-    const { userInfo, setUserInfo } = useContext(UserContext)
+    const { userInfo } = useContext(UserContext)
     const [modifiedUserInfo, setModifiedUserInfo] = useState({})
-    const { authFetch } = useAuthFetch()
+    const authFetch = useAuthFetch()
     const [errorData, setErrorData] = useState({})
     const { showToast } = useContext(ToastContext)
     const validationConfig = {
@@ -34,19 +47,15 @@ export default function Profile() {
 
     const [isFormModified, setFormModified] = useState(false)
 
-    async function updateProfile(profileForm) {
-        const profileFormData = new FormData(profileForm)
-        const res = await authFetch(`${apiBaseUrl}/api/users`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(Object.fromEntries(profileFormData.entries()))
-        })
-        const updatedUserInfo = await res.json()
-        showToast('Profile updated successfully')
-        setUserInfo(updatedUserInfo)
-    }
+    const queryClient = useQueryClient()
+
+    const { mutate: updateProfile } = useMutation({
+        mutationFn: (profile) => apiUpdateProfile(authFetch, profile),
+        onSuccess: (updatedUser) => { 
+            queryClient.setQueryData(['user'], updatedUser)
+            showToast('Profile updated successfully')
+        }
+    })
 
     function validateForm() {
         const error = {}
@@ -74,7 +83,7 @@ export default function Profile() {
     }
 
     function validateFormField(field) {
-        const error = {...errorData}
+        const error = { ...errorData }
         validationConfig[field]?.some(rule => {
             if (rule.required && !modifiedUserInfo[field]) {
                 error[field] = rule.message

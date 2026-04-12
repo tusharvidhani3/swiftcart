@@ -1,38 +1,23 @@
-import { useContext } from "react";
-import ErrorContext from "../contexts/ErrorContext";
+import { useContext } from "react"
+import ErrorMessage from "../components/ErrorMessage"
+import ToastContext from "../contexts/ToastContext"
 
 export function useApi() {
 
-    const {setErrorType} = useContext(ErrorContext)
+    const { showToast } = useContext(ToastContext)
 
     async function apiFetch(url, options = {}) {
         try {
             const res = await fetch(url, options)
-            if(res.status > 403 && res.status != 409) {
-                if(res.status >= 500)
-                    throw new Error('Server')
-                else
-                    throw new Error()
-            }
+            if(res.status === 403)
+                return <ErrorMessage type='forbidden' />
+            else if(res.status === 500)
+                showToast("Unable to fetch data at the moment. Please try again later.")
             return res
         }
         catch(err) {
-            let errorType = null
-            switch(err.message) {
-                case 'Failed to fetch':
-                    errorType = 'network'
-                    break
-                case 'Unauthorized':
-                    errorType = 'unauthorized'
-                    break
-                case 'Not found':
-                    errorType = 'not found'
-                    break
-                case 'Server':
-                    errorType = 'server'
-                    break
-            }
-            setErrorType(errorType)
+            if(err.message === 'Failed to fetch')
+                showToast("No internet connection. Please check and try again.")
         }
     }
 

@@ -1,31 +1,31 @@
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useState } from 'react'
 import styles from '../styles/SellerOrders.module.css'
 import { useAuthFetch } from '../hooks/useAuthFetch'
 import { apiBaseUrl } from '../config'
 import SellerOrderCard from './SellerOrderCard'
 import UIContext from '../contexts/UIContext'
-import { Loader2 } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+
+async function getOrders(authFetch, page) {
+    const res = await authFetch(`${apiBaseUrl}/api/orders/all?page=${page}`, {
+        method: 'GET'
+    })
+    return await res.json()
+}
 
 export default function SellerOrders() {
 
-    const { authFetch } = useAuthFetch()
-    const [ordersPagedModel, setOrdersPagedModel] = useState(null)
+    const authFetch = useAuthFetch()
     const { isMobile } = useContext(UIContext)
+    const [page, setPage] = useState(0)
 
-    async function getOrders() {
-        const res = await authFetch(`${apiBaseUrl}/api/orders/all`, {
-            method: 'GET'
-        })
-        const pagedModel = await res.json()
-        setOrdersPagedModel(pagedModel)
-    }
+    const { data: ordersPagedModel, isLoading } = useQuery({
+        queryKey: ['orders', 'list', page],
+        queryFn: () => getOrders(authFetch, page),
+        staleTime: 1000 * 60 * 5
+    })
 
-    useEffect(() => {
-        const init = async () => await getOrders()
-        init()
-    }, [])
-
-    return ordersPagedModel ? (
+    return isLoading ? <SellerOrdersSkeleton /> : (
         <>
             <h1 className={styles.ordersTitle}>Orders</h1>
             <div className={styles.orders}>
@@ -43,5 +43,5 @@ export default function SellerOrders() {
                 {ordersPagedModel.orders?.map(order => <SellerOrderCard {...order} key={order.orderId} />)}
             </div>
         </>
-    ) : <Loader2 className='animate-spin' />
+    )
 }

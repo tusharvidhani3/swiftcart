@@ -8,7 +8,7 @@ import CartContext from "../contexts/CartContext";
 
 function Header({ setSideMenuOpen }) {
 
-    const { userInfo, handleLogout } = useContext(UserContext)
+    const { userInfo, logout } = useContext(UserContext)
     const navigate = useNavigate()
     const [searchParams, setSearchParams] = useSearchParams()
     const keyword = searchParams.get('k') || ""
@@ -51,7 +51,7 @@ function Header({ setSideMenuOpen }) {
                         <li className={styles.myProfile}><Link to="/profile"><CircleUser />My Profile</Link></li>
                         <li className={styles.orders}><Link to="/orders" className={styles.orders}><Package />Orders</Link></li>
                         <li className={styles.manageAddresses}><Link to="/addresses" className={styles.addresses}><MapPin />Saved Addresses</Link></li>
-                        <li className={styles.logout} onClick={handleLogout}><Link><LogOut />Logout</Link></li>
+                        <li className={styles.logout} onClick={() => logout()}><Link><LogOut />Logout</Link></li>
                     </ul>
                 </div>}
                 <Link to="/cart" className={`${styles.cart} ${styles.link}`}><ShoppingCart /><span className={styles.label}>Cart</span><span className={styles.cartCount}>{(cart?.items)?(cart.items.reduce((accumulator, cartItem) => accumulator + cartItem.quantity, 0)):0}</span></Link>

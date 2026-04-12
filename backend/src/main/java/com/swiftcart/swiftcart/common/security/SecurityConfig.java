@@ -61,6 +61,7 @@ public class SecurityConfig {
             .successHandler(oAuth2LoginSuccessHandler)
             .failureHandler(oAuth2LoginFailureHandler)
             .authorizationEndpoint(auth -> auth.baseUri("/oauth2/authorization").authorizationRequestRepository(cookieAuthorizationRequestRepository())))
+        .exceptionHandling(ex -> ex.authenticationEntryPoint(new JwtAuthenticationEntryPoint()).accessDeniedHandler(new CustomAccessDeniedHandler()))
         .build();
     }
 

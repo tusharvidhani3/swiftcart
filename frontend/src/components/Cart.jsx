@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react'
+import { useContext } from 'react'
 import CartItemsContainer from './CartItemsContainer'
 import PriceDetails from './PriceDetails'
 import EmptyCart from './EmptyCart'
@@ -13,6 +13,6 @@ export default function Cart() {
     return cart?.items.length ? (
         <>
             <CartItemsContainer />
-            <PriceDetails cart={cart} nextBtnTxt={"Proceed to Checkout"} nextBtnClick={() => {navigate('/checkout')}} />
+            <PriceDetails cart={cart} nextBtnTxt={"Proceed to Checkout"} nextBtnClick={() => navigate('/checkout')} />
         </>) : <EmptyCart />
 }

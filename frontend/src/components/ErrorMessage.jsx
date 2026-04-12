@@ -6,20 +6,8 @@ export default function ErrorMessage({ type }) {
   let errorMsg = null
 
   switch (type) {
-    case "network":
-      errorMsg = "No internet connection. Please check and try again.";
-      break;
-    // case "timeout":
-    //   errorMsg = "Server is taking too long to respond. Please try again later.";
-    //   break
-    case "server":
-      errorMsg = "Unable to fetch data at the moment. Please try again later.";
-      break
-    case 'unauthorized':
-      errorMsg = 'Access denied'
-      break
-    case 'not found':
-      errorMsg = "This item doesn't exist"
+    case 'forbidden':
+      errorMsg = "Access Denied: You do not have permission to perform this action"
       break
     default:
       errorMsg = "Something went wrong. Please try again.";

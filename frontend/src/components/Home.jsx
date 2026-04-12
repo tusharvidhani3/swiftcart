@@ -9,10 +9,32 @@ import UIContext from "../contexts/UIContext";
 import styles from '../styles/Home.module.css'
 import { useApi } from "../hooks/useApi";
 import { ArrowDownWideNarrow, SlidersHorizontal } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+
+async function fetchProducts(apiFetch, keyword, categories, minPrice, maxPrice, sortBy, includeOutOfStock) {
+    const baseUrl = `${apiBaseUrl}/api/products`
+    const filters = []
+    if (keyword) filters.push(`keyword=${keyword}`)
+    if (categories.length) {
+        categories.forEach(category => {
+            filters.push(`categories=${category}`)
+        })
+    }
+    if (filters.length) {
+        if (minPrice || minPrice === 0) filters.push(`minPrice=${Number(minPrice)}`);
+        if (maxPrice) filters.push(`maxPrice=${Number(maxPrice)}`);
+        if (sortBy) filters.push(`sortBy=${sortBy}`);
+        if (sortOrder === 'desc') filters.push(`sortOrder=${sortOrder}`);
+        if (includeOutOfStock) filters.push(`includeOutOfStock=${includeOutOfStock}`)
+    }
+    const res = await apiFetch(`${baseUrl}${filters.length ? '?' + filters.join("&") : ''}`, {
+        method: 'GET'
+    })
+    return await res.json()
+}
 
 export default function Home() {
 
-    const [productsPagedModel, setProductsPagedModel] = useState(null)
     const [searchSummary, setSearchSummary] = useState({})
     const { isMobile } = useContext(UIContext)
     const [sortDropDownOpen, setSortDropDownOpen] = useState(false)
@@ -27,32 +49,20 @@ export default function Home() {
     const includeOutOfStock = searchParams.get('include_out_of_stock')
     const apiFetch = useApi()
 
-    async function fetchProducts() {
-        const baseUrl = `${apiBaseUrl}/api/products`
-        const filters = []
-        if (keyword) filters.push(`keyword=${keyword}`)
-        if (categories.length) {
-            categories.forEach(category => {
-                filters.push(`categories=${category}`)
-            })
+    const { data: productsPagedModel, isLoading } = useQuery({
+        queryKey: ['products', 'search', { keyword, categories, minPrice, maxPrice, sort, includeOutOfStock }],
+        queryFn: () => fetchProducts(apiFetch, keyword, categories, minPrice, maxPrice, sort, includeOutOfStock),
+        staleTime: 1000 * 60 * 5
+    })
+
+    useEffect(() => {
+        if (productsPagedModel) {
+            const rangeStart = productsPagedModel.page.number * productsPagedModel.page.size + productsPagedModel.page.numberOfElements ? 1 : 0
+            const rangeEnd = productsPagedModel.page.number * productsPagedModel.page.size + productsPagedModel.page.numberOfElements
+            const resultsCount = productsPagedModel.page.totalElements
+            setSearchSummary({ rangeStart, rangeEnd, resultsCount, keyword, categories })
         }
-        if (filters.length) {
-            if (minPrice || minPrice === 0) filters.push(`minPrice=${Number(minPrice)}`);
-            if (maxPrice) filters.push(`maxPrice=${Number(maxPrice)}`);
-            if (sortBy) filters.push(`sortBy=${sortBy}`);
-            if (sortOrder === 'desc') filters.push(`sortOrder=${sortOrder}`);
-            if (includeOutOfStock) filters.push(`includeOutOfStock=${includeOutOfStock}`)
-        }
-        const res = await apiFetch(`${baseUrl}${filters.length ? '?'+filters.join("&") : ''}`, {
-            method: 'GET'
-        })
-        const pagedModel = await res.json()
-        const rangeStart = pagedModel.number * pagedModel.size + pagedModel.numberOfElements ? 1 : 0
-        const rangeEnd = pagedModel.number * pagedModel.size + pagedModel.numberOfElements
-        const resultsCount = pagedModel.totalElements
-        setProductsPagedModel(pagedModel)
-        setSearchSummary({ rangeStart, rangeEnd, resultsCount, keyword, categories })
-    }
+    }, [productsPagedModel])
 
     useEffect(() => {
         if (isMobile && (sortDropDownOpen || filterMenuOpen)) {
@@ -64,18 +74,13 @@ export default function Home() {
         return () => document.body.classList.remove("no-scroll");
     }, [sortDropDownOpen, filterMenuOpen]);
 
-    useEffect(() => {
-        const init = async () => await fetchProducts()
-        init()
-    }, [keyword, categories, minPrice, maxPrice, sort, includeOutOfStock])
-
     return (
         <>
-            {(keyword || categories.length>0) && <FilterMenu filterMenuOpen={filterMenuOpen} setFilterMenuOpen={setFilterMenuOpen} />}
+            {(keyword || categories.length > 0) && <FilterMenu filterMenuOpen={filterMenuOpen} setFilterMenuOpen={setFilterMenuOpen} />}
             <div className={styles.mainWindow}>
-                {(keyword || categories.length>0) && isMobile && <div className={styles.searchFilters}><button onClick={() => setSortDropDownOpen(!sortDropDownOpen)} className={styles.btnSort}><ArrowDownWideNarrow /> Sort</button> <button className={styles.btnFilter} onClick={() => setFilterMenuOpen(true)}><SlidersHorizontal />Filter</button></div>}
+                {(keyword || categories.length > 0) && isMobile && <div className={styles.searchFilters}><button onClick={() => setSortDropDownOpen(!sortDropDownOpen)} className={styles.btnSort}><ArrowDownWideNarrow /> Sort</button> <button className={styles.btnFilter} onClick={() => setFilterMenuOpen(true)}><SlidersHorizontal />Filter</button></div>}
                 <SearchSummary {...searchSummary} />
-                {(keyword || categories.length>0) && <SortMenu sortDropDownOpen={sortDropDownOpen} setSortDropDownOpen={setSortDropDownOpen} />}
+                {(keyword || categories.length > 0) && <SortMenu sortDropDownOpen={sortDropDownOpen} setSortDropDownOpen={setSortDropDownOpen} />}
                 <ProductsContainer products={productsPagedModel?._embedded?.productResponseList} />
             </div>
         </>

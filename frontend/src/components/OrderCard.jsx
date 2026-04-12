@@ -2,7 +2,6 @@ import OrderItemCard from "./OrderItemCard"
 import styles from '../styles/Orders.module.css'
 import { useNavigate } from "react-router"
 import { formatPaiseToRupees } from "../utils/currency"
-import { Loader2 } from "lucide-react"
 
 export default function OrderCard({ order }) {
 
@@ -10,7 +9,7 @@ export default function OrderCard({ order }) {
     const { id, totalAmount, placedAt, items } = order
     const orderDate = new Date(placedAt)
 
-    return items ? (
+    return (
         <div className={styles.orderCard} onClick={() => navigate(`./${id}`)}>
             <div className={styles.orderDetails}>
                 <div className={`${styles.orderPlaced} ${styles.orderField}`}><span>Order Placed</span> <span className={styles.placedOn}>{orderDate.getDate()} {orderDate.toLocaleString('default', { month: 'long' })} {orderDate.getFullYear()}</span></div>
@@ -21,5 +20,5 @@ export default function OrderCard({ order }) {
                 {items.map(orderItem => <OrderItemCard {...orderItem} key={orderItem.id} />)}
             </div>
         </div>
-    ) : <Loader2 className="animate-spin" />
+    )
 }

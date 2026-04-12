@@ -4,13 +4,12 @@ import shoppingIcon from '../assets/icons/shopping-icon.svg'
 import { useContext, useEffect, useState } from 'react'
 import UserContext from '../contexts/UserContext'
 import { apiBaseUrl } from '../config'
-import { useApi } from '../hooks/useApi'
 import GoogleLoginButton from './GoogleLoginButton'
 import { Eye, EyeOff } from 'lucide-react'
 
 export default function AuthForm({ mode }) {
 
-    const { userInfo, setUserInfo, handleLogin } = useContext(UserContext)
+    const { userInfo, login, register } = useContext(UserContext)
     const [authForm, setAuthForm] = useState({
         email: "",
         password: ""
@@ -33,20 +32,6 @@ export default function AuthForm({ mode }) {
     useEffect(() => {
         setErrorData({})
     }, [mode])
-
-    const apiFetch = useApi()
-
-    async function register() {
-        const res = await apiFetch(`${apiBaseUrl}/api/auth/register`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(authForm)
-        })
-        const user = await res.json()
-        setUserInfo(user)
-    }
 
     function validateForm() {
         const error = {}
@@ -116,13 +101,19 @@ export default function AuthForm({ mode }) {
                         if (isRegisterMode)
                             register(authForm)
                         else
-                            handleLogin(authForm, setErrorData)
+                            login(apiFetch, authForm, {
+                                onError: (error) => {
+                                    if(error.status === 401) {
+                                        setErrorData({ password: 'Invalid username or password' })
+                                    }
+                                }
+                            })
                     }
                 }}>
                     <h2 className={styles.formTitle}>{isRegisterMode ? "Register" : "Login"}</h2>
                     <div className={styles.field}>
                         <label htmlFor="email">Enter email</label>
-                        <div className={styles.email}><input type="email" id="email" name="email" onChange={e => {
+                        <div className={styles.email}><input type="email" id="email" name="email" autoComplete='email' onChange={e => {
                             setAuthForm(authForm => ({ ...authForm, email: e.target.value }))
                             revokeError(e.target.name)
                         }} onBlur={e => validateFormField(e.target.name)} /></div>

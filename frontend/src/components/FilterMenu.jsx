@@ -48,7 +48,7 @@ export default function FilterMenu({ filterMenuOpen, setFilterMenuOpen }) {
 
     useEffect(() => {
         if(!isMobile)
-        applyFilters()
+            applyFilters()
     }, [filters])
 
     return (

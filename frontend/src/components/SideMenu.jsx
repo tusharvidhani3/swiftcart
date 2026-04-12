@@ -3,10 +3,12 @@ import { CircleUser, Package, MapPin, LogOut, LogIn, ShoppingCart, X, Tag, Layou
 import styles from '../styles/SideMenu.module.css'
 import { useContext, useEffect } from "react";
 import UserContext from "../contexts/UserContext";
+import { useApi } from "../hooks/useApi";
 
 export default function SideMenu({ isSideMenuOpen, setSideMenuOpen }) {
 
-    const { userInfo, handleLogout } = useContext(UserContext)
+    const { userInfo, logout } = useContext(UserContext)
+    const apiFetch = useApi()
 
     useEffect(() => {
         if (isSideMenuOpen) {
@@ -43,7 +45,7 @@ export default function SideMenu({ isSideMenuOpen, setSideMenuOpen }) {
                             <NavLink className={({ isActive }) => isActive ? styles.activeLink : ''} to="/profile"><CircleUser />Profile</NavLink>
                             <NavLink className={({ isActive }) => isActive ? styles.activeLink : ''} to="/addresses"><MapPin />Saved Addresses</NavLink>
                         </>}
-                    {userInfo ? <Link onClick={handleLogout}><LogOut />Logout</Link> : <NavLink className={({ isActive }) => isActive ? styles.activeLink : ''} to="/auth/login"><LogIn color="black" />Login</NavLink>}
+                    {userInfo ? <Link onClick={() => logout(apiFetch)}><LogOut />Logout</Link> : <NavLink className={({ isActive }) => isActive ? styles.activeLink : ''} to="/auth/login"><LogIn color="black" />Login</NavLink>}
                 </nav>
                 {isSideMenuOpen && <button className={styles.btnClose} onClick={e => {
                     e.stopPropagation()

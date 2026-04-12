@@ -1,15 +1,15 @@
 import { useContext } from 'react'
 import styles from '../styles/Home.module.css'
-import ToastContext from '../contexts/ToastContext'
 import { useNavigate } from 'react-router'
 import CartContext from '../contexts/CartContext'
 import { formatPaiseToRupees } from '../utils/currency'
+import { useAuthFetch } from '../hooks/useAuthFetch'
 
 export default function ProductCard({ id, name, price, mrp, imageUrls }) {
 
-    const { showToast } = useContext(ToastContext)
     const navigate = useNavigate()
     const { addToCart } = useContext(CartContext)
+    const authFetch = useAuthFetch()
 
     return (
         <div className={styles.productCard} onClick={() => navigate(`/products/${id}`)}>
@@ -22,7 +22,7 @@ export default function ProductCard({ id, name, price, mrp, imageUrls }) {
             </div>
             <button className={styles.btnAddToCart} onClick={e => {
                 e.stopPropagation()
-                addToCart(id, showToast)
+                addToCart(id)
                 }}>Add to cart</button>
         </div>
     )

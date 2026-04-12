@@ -1,8 +1,14 @@
 package com.swiftcart.swiftcart.features.cart;
 
-public record AddToCartRequest(Long productId, int quantity) {
+import jakarta.validation.constraints.NotNull;
+
+public record AddToCartRequest(
+    @NotNull
+    Long productId,
+    int quantity
+) {
     public AddToCartRequest {
-        if(quantity == 0)
+        if(quantity <= 0)
             quantity = 1;
     }
 }

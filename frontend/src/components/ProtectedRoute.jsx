@@ -12,7 +12,7 @@ const ProtectedRoute = ({ allowedRoles, element }) => {
         return <Navigate to={`/auth/login?redirectTo=${location.pathname}`} replace />
     }
     else if(!allowedRoles.includes(userInfo.role))
-        return <ErrorMessage type='unauthorized' />
+        return <ErrorMessage type='forbidden' />
     if(element)
         return element
     return <Outlet />

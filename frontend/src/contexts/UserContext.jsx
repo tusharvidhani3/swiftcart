@@ -1,92 +1,110 @@
-import { createContext, useEffect, useState } from "react"
-import { useNavigate } from "react-router"
+import { createContext } from "react"
 import { apiBaseUrl } from "../config"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useApi } from "../hooks/useApi"
+import { useAuthFetch } from "../hooks/useAuthFetch"
 
 const UserContext = createContext()
 export default UserContext
+
+async function handleRegister(apiFetch, authForm) {
+    const res = await apiFetch(`${apiBaseUrl}/api/auth/register`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(authForm)
+    })
+    return await res.json()
+}
+
+async function handleLogout(apiFetch) {
+    await apiFetch(`${apiBaseUrl}/api/auth/logout`, {
+        method: "POST",
+        credentials: "include"
+    })
+}
+
+async function handleLogin(apiFetch, userCredentials) {
+    const res = await apiFetch(`${apiBaseUrl}/api/auth/login`, {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify(userCredentials)
+    })
+    if (res.ok)
+        return await res.json()
+    else if (res.status === 401) {
+        const error = new Error()
+        error.status = 401
+        throw error
+    }
+}
+
+async function getUserInfo(authFetch) {
+    const res = await authFetch(`${apiBaseUrl}/api/users/me`, {
+        method: "GET"
+    })
+    const response = await res.json()
+    if (!res.ok) {
+        const error = new Error()
+        error.message = response.title
+        error.status = response.status
+        throw error
+    }
+    return response
+}
+
 export function UserProvider({ children }) {
 
-    const [userInfo, setUserInfo] = useState(null)
-    const [isTokenExpired, setTokenExpired] = useState(false)
-    const navigate = useNavigate()
     const apiFetch = useApi()
+    const authFetch = useAuthFetch()
 
-    async function refreshAccessToken() {
-        const res = await fetch(`${apiBaseUrl}/api/auth/refresh-token`, {
-            method: "POST",
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json'
+    const queryClient = useQueryClient()
+
+    const { data: userInfo, isError, error } = useQuery({
+        queryKey: ['user'],
+        queryFn: () => getUserInfo(authFetch),
+        staleTime: 1000 * 60 * 60 * 24,
+        retry: (failureCount, error) => {
+            if (failureCount >= 3) return false;
+
+            if (!error.status) return true;
+
+            const transientStatuses = [502, 503, 504];
+            if (transientStatuses.includes(error.status)) {
+                return true;
             }
-        })
-        if (res.ok)
-            setTokenExpired(false)
-        else
-            setUserInfo(null) //tokenexpired will be left true
-    }
 
-    async function updateUserInfo() {
-        const res = await fetch(`${apiBaseUrl}/api/users/me`, {
-            method: "GET",
-            credentials: "include",
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-        if (res.ok) {
-            const user = await res.json()
-            setUserInfo(user) //tokenexpired will be leaved as false
+            return false;
         }
-        else if (res.status === 403) {
-            setTokenExpired(true)
-        }
-    }
+    })
 
-    async function handleLogin(userCredentials, setErrorData) {
-        const res = await apiFetch(`${apiBaseUrl}/api/auth/login`, {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include',
-            body: JSON.stringify(userCredentials)
-        })
-        if (res.ok) {
-            const user = await res.json()
-            setUserInfo(user)
-            setTokenExpired(false)
+    const { mutate: register } = useMutation({
+        mutationFn: (authForm) => handleRegister(apiFetch, authForm),
+        onSuccess: (user) => {
+            queryClient.setQueryData(['user'], user)
         }
-        else {
-            setErrorData({password: 'Invalid username or password'})
+    })
+
+    const { mutate: login } = useMutation({
+        mutationFn: (authForm) => handleLogin(apiFetch, authForm),
+        onSuccess: (user) => {
+            queryClient.setQueryData(['user'], user)
         }
-    }
+    })
 
-    async function handleLogout() {
-        await apiFetch(`${apiBaseUrl}/api/auth/logout`, {
-            method: "POST",
-            credentials: "include"
-        })
-        setUserInfo(null)
-        setTokenExpired(true)
-        navigate('/auth/login')
-    }
-
-    useEffect(() => {
-        if (isTokenExpired) {
-            const init = async () => await refreshAccessToken()
-            init()
+    const { mutate: logout } = useMutation({
+        mutationFn: () => handleLogout(apiFetch),
+        onSuccess: () => {
+            queryClient.resetQueries({ queryKey: ['user'], exact: true });
         }
-
-        else if (!userInfo) {
-            const init = async () => await updateUserInfo()
-            init()
-        }
-
-    }, [isTokenExpired])
+    })
 
     return (
-        <UserContext.Provider value={{ userInfo, setUserInfo, isTokenExpired, setTokenExpired, handleLogin, handleLogout }}>
+        <UserContext.Provider value={{ userInfo, login, register, logout }}>
             {children}
         </UserContext.Provider>
     )

@@ -17,7 +17,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -53,16 +52,16 @@ public class OrderController {
     
     @PatchMapping("/items/{orderItemId}/cancel")
     @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<OrderItemResponse> cancelOrderItem(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long orderItemId) {
-        OrderItemResponse orderItemResponse=orderService.cancelOrderItem(userPrincipal.getUser().getId(), orderItemId);
-        return ResponseEntity.ok(orderItemResponse);
+    public ResponseEntity<OrderResponse> cancelOrderItem(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long orderItemId) {
+        OrderResponse orderResponse=orderService.cancelOrderItem(userPrincipal.getUser().getId(), orderItemId);
+        return ResponseEntity.ok(orderResponse);
     }
 
     @PatchMapping("/items/{orderItemId}")
     @PreAuthorize("hasRole('SELLER')")
-    public ResponseEntity<OrderItemResponse> updateOrderItemStatus(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long orderItemId, @RequestBody UpdateOrderStatusRequest req) {
-        OrderItemResponse orderItemResponse = orderService.updateOrderItemStatus(userPrincipal.getUser(), orderItemId, req.orderStatus());
-        return ResponseEntity.ok(orderItemResponse);
+    public ResponseEntity<OrderResponse> updateOrderItemStatus(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long orderItemId, @RequestBody UpdateOrderStatusRequest req) {
+        OrderResponse orderResponse = orderService.updateOrderItemStatus(userPrincipal.getUser().getId(), orderItemId, req.orderStatus());
+        return ResponseEntity.ok(orderResponse);
     }
     
     @GetMapping("/{orderId}")

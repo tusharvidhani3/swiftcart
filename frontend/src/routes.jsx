@@ -8,7 +8,8 @@ import SellerOrders from './components/SellerOrders.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 import SellerProducts from './components/SellerProducts.jsx'
 import { ProductsProvider } from './contexts/ProductsContext.jsx'
-import { ErrorProvider } from './contexts/ErrorContext.jsx'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ToastProvider } from './contexts/ToastContext.jsx'
 
 const Cart = lazy(() => import('./components/Cart.jsx'))
 const ProductDetails = lazy(() => import('./components/ProductDetails.jsx'))
@@ -22,15 +23,19 @@ const OrderDetails = lazy(() => import('./components/OrderDetails.jsx'))
 const CreateProductListing = lazy(() => import('./components/CreateProductListing.jsx'))
 const AddressesProvider = lazy(() => import('./contexts/AddressesContext.jsx').then(module => ({ default: module.AddressesProvider })))
 
+const queryClient = new QueryClient()
+
 const router = createBrowserRouter([
     {
         path: '/',
         element: (
-            <ErrorProvider>
-                <UserProvider>
-                    <App />
-                </UserProvider>
-            </ErrorProvider>
+            <QueryClientProvider client={queryClient}>
+                <ToastProvider>
+                        <UserProvider>
+                            <App />
+                        </UserProvider>
+                </ToastProvider>
+            </QueryClientProvider>
         ),
         children: [
             {
@@ -116,8 +121,8 @@ const router = createBrowserRouter([
                     },
 
                     {
-                        path: 'edit',
-                        element: <AddressForm isEditMode={true} />,
+                        path: ':addressId/edit',
+                        element: <AddressForm />,
                         handle: { mainClass: 'addAddress' }
                     }
                 ]

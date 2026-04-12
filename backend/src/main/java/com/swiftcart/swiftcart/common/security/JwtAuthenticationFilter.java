@@ -5,12 +5,17 @@ import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
@@ -53,18 +58,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // If user is not yet authenticated in this context
         if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserPrincipal userPrincipal = this.context.getBean("userDetailsService", UserDetailsServiceImpl.class).loadUserByUserId(Long.parseLong(userId));
-            if (jwtService.isTokenValid(jwtToken, userPrincipal)) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userPrincipal,
-                        null,
-                        userPrincipal.getAuthorities());
+            UserPrincipal userPrincipal = this.context.getBean("userDetailsService", CustomUserDetailsService.class)
+                    .loadUserByUserId(Long.parseLong(userId));
+            try {
+                if (jwtService.isTokenOwnedByUser(jwtToken, userPrincipal)) {
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userPrincipal,
+                            null,
+                            userPrincipal.getAuthorities());
 
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request));
+                    authToken.setDetails(
+                            new WebAuthenticationDetailsSource().buildDetails(request));
 
-                // Mark user as authenticated
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                    // Mark user as authenticated
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
+            } catch (ExpiredJwtException e) {
+                ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, e.getMessage());
+                pd.setTitle("Token Expired");
+                pd.setProperty("code", "TOKEN_EXPIRED");
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                response.setContentType(MediaType.APPLICATION_PROBLEM_JSON_VALUE);
+                new ObjectMapper().writeValue(response.getOutputStream(), pd);
+                return;
             }
         }
         filterChain.doFilter(request, response);

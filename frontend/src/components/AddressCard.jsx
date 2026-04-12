@@ -5,25 +5,34 @@ import { useContext } from 'react'
 import AddressesContext from '../contexts/AddressesContext'
 import { useAuthFetch } from '../hooks/useAuthFetch'
 import { apiBaseUrl } from '../config'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+
+async function apiDeleteAddress(authFetch, addressId) {
+    await authFetch(`${apiBaseUrl}/api/addresses/${addressId}`, { method: 'DELETE' })
+}
+
+async function apiChangeDefaultAddress(authFetch, addressId) {
+    const res = await authFetch(`${apiBaseUrl}/api/addresses/${addressId}/default`, { method: 'PATCH' })
+    return res.json()
+}
 
 export default function AddressCard({ address, threeDotsMenuOpenId, setThreeDotsMenuOpenId, desktopSelectStyles, setShowAddressSelector }) {
 
-    const { addresses, setAddresses, selectedAddress, setSelectedAddress } = useContext(AddressesContext)
+    const { addresses, selectedAddress, setSelectedAddress } = useContext(AddressesContext)
     const { id, name, addressLine1, addressLine2, pincode, city, state, mobileNumber, addressType, defaultShipping } = address
     const navigate = useNavigate()
-    const { setEditingAddress } = useContext(AddressesContext)
-    const { authFetch } = useAuthFetch()
+    const authFetch = useAuthFetch()
+    const queryClient = useQueryClient()
 
-    async function deleteAddress() {
-        await authFetch(`${apiBaseUrl}/api/addresses/${id}`, { method: 'DELETE' })
-        setAddresses(addresses.filter(address => address.id != id))
-        navigate('/addresses')
-    }
+    const { mutate: deleteAddress } = useMutation({
+        mutationFn: (addressId) => apiDeleteAddress(authFetch, addressId),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['addresses', 'list', id] })
+    })
 
-    async function changeDefaultAddress() {
-        const res = await authFetch(`${apiBaseUrl}/api/addresses/${id}/default`, { method: 'PATCH' })
-        setAddresses(addresses => addresses.map(addressData => ({ ...addressData, defaultShipping: addressData.id === id })))
-    }
+    const { mutate: changeDefaultAddress } = useMutation({
+        mutationFn: (addressId) => apiChangeDefaultAddress(authFetch, addressId),
+        onSuccess: (defaultAddress) => queryClient.setQueryData(['addresses', 'detail', 'default'], defaultAddress)
+    })
 
     return (
         <div className={`${styles.addressCard} ${desktopSelectStyles?.addressCard}`} id={id === selectedAddress?.id ? styles.selected : ''} onClick={selectedAddress ? e => {
@@ -49,12 +58,12 @@ export default function AddressCard({ address, threeDotsMenuOpenId, setThreeDots
                             setEditingAddress(address)
                             navigate('/addresses/edit')
                         }}><SquarePen />Edit</li>
-                        {!selectedAddress && !defaultShipping && <li className={styles.delete} onClick={deleteAddress}>Delete</li>}
-                        {!selectedAddress && !defaultShipping && <li className={styles.setDefault} onClick={changeDefaultAddress}>Set as default</li>}
+                        {!selectedAddress && !defaultShipping && <li className={styles.delete} onClick={() => deleteAddress(id)}>Delete</li>}
+                        {!selectedAddress && !defaultShipping && <li className={styles.setDefault} onClick={() => changeDefaultAddress(id)}>Set as default</li>}
                     </ul>
                 </div>
             </div>
-            {selectedAddress && id === selectedAddress.id && <button className={styles.btnDeliverAddress} onClick={setShowAddressSelector? () => setShowAddressSelector(false) : () => navigate('/checkout')}>Deliver to this address</button>}
+            {selectedAddress && id === selectedAddress.id && <button className={styles.btnDeliverAddress} onClick={setShowAddressSelector ? () => setShowAddressSelector(false) : () => navigate('/checkout')}>Deliver to this address</button>}
         </div>
     )
 }
