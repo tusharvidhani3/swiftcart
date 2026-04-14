@@ -8,10 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -138,13 +135,6 @@ public class AuthController {
             headers.add(HttpHeaders.SET_COOKIE, refreshCookie.toString());
         })
         .build();
-    }
-
-    @GetMapping("me")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<AppUserDto> getAuthenticatedUser(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        AppUserDto userDto = userMapper.toDto(userPrincipal.getUser());
-        return ResponseEntity.ok(userDto);
     }
 
     @PostMapping("refresh-token")

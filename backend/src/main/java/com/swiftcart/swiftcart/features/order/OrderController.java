@@ -29,13 +29,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
-@RequestMapping("/api/orders")
+@RequestMapping("api/orders")
 public class OrderController {
 
     @Autowired
     private OrderService orderService;
 
-    @PostMapping("/checkout")
+    @PostMapping("checkout")
     @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<OrderResponse> createOrder(@RequestBody @Valid PlaceOrderRequest placeOrderRequest, @AuthenticationPrincipal UserPrincipal userPrincipal) throws RazorpayException {
         OrderResponse orderResponse=orderService.createOrder(placeOrderRequest, userPrincipal.getUser().getId());
@@ -50,42 +50,42 @@ public class OrderController {
         return ResponseEntity.ok(assembler.toModel(orders));
     }
     
-    @PatchMapping("/items/{orderItemId}/cancel")
+    @PatchMapping("items/{orderItemId}/cancel")
     @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<OrderResponse> cancelOrderItem(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long orderItemId) {
         OrderResponse orderResponse=orderService.cancelOrderItem(userPrincipal.getUser().getId(), orderItemId);
         return ResponseEntity.ok(orderResponse);
     }
 
-    @PatchMapping("/items/{orderItemId}")
+    @PatchMapping("items/{orderItemId}")
     @PreAuthorize("hasRole('SELLER')")
     public ResponseEntity<OrderResponse> updateOrderItemStatus(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long orderItemId, @RequestBody UpdateOrderStatusRequest req) {
         OrderResponse orderResponse = orderService.updateOrderItemStatus(userPrincipal.getUser().getId(), orderItemId, req.orderStatus());
         return ResponseEntity.ok(orderResponse);
     }
     
-    @GetMapping("/{orderId}")
+    @GetMapping("{orderId}")
     @PreAuthorize("hasAnyRole('CUSTOMER','SELLER','ADMIN')")
     public ResponseEntity<OrderResponse> getOrder(@PathVariable Long orderId, @AuthenticationPrincipal UserPrincipal userPrincipal) {
         OrderResponse orderResponse = orderService.getOrder(orderId, userPrincipal.getUser());
         return ResponseEntity.ok(orderResponse);
     }
 
-    @PostMapping("/checkout/buy-now")
+    @PostMapping("checkout/buy-now")
     @PreAuthorize("hasRole('CUSTOMER')") // Can allow Admin also to place order on user's behalf
     public ResponseEntity<OrderResponse> placeBuyNowOrder(@RequestBody PlaceBuyNowOrderRequest placeBuyNowOrderRequest, @AuthenticationPrincipal UserPrincipal userPrincipal) throws RazorpayException {
         OrderResponse orderResponse = orderService.placeBuyNowOrder(placeBuyNowOrderRequest, userPrincipal.getUser());
         return ResponseEntity.created(URI.create("/orders/"+orderResponse.id())).body(orderResponse);
     }
 
-    @GetMapping("/all")
+    @GetMapping("all")
     @PreAuthorize("hasAnyRole('SELLER','ADMIN')")
     public ResponseEntity<PagedModel<EntityModel<OrderResponseForSeller>>> getAllOrders(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "placedAt") String sortBy, PagedResourcesAssembler<OrderResponseForSeller> assembler) {
         Page<OrderResponseForSeller> orders = orderService.getAllOrders(PageRequest.of(page, size, Sort.by(sortBy).descending()));
         return ResponseEntity.ok(assembler.toModel(orders));
     }
 
-    @PatchMapping("/{orderId}/cancel-full")
+    @PatchMapping("{orderId}/cancel-full")
     @PreAuthorize("hasAnyRole('SELLER','ADMIN')")
     public ResponseEntity<OrderResponse> cancelOrder(@PathVariable Long orderId) {
         OrderResponse orderResponse = orderService.cancelOrder(orderId);

@@ -31,8 +31,10 @@ app:
           google:
             client-id: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID}
             client-secret: ${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET}
-            scope: email,profile,openid
-            redirect-uri: ${APP_BASE_URL:http://localhost:8080}/login/oauth2/code/google
+            scope:
+              - openid
+              - profile
+              - email
   frontend:
     url: ${APP_FRONTEND_URL:http://localhost:5173}
     auth:
@@ -43,6 +45,8 @@ app:
     free-threshold: 999
   product:
       images-dir: ${APP_PRODUCT_IMAGES_DIR:${user.home}/cdn/${spring.application.name}_uploads}
+server:
+  forward-headers-strategy: framework
 logging:
   level:
     org:

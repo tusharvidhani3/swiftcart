@@ -2,7 +2,6 @@ import { createContext } from "react"
 import { apiBaseUrl } from "../config"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useApi } from "../hooks/useApi"
-import { useAuthFetch } from "../hooks/useAuthFetch"
 
 const UserContext = createContext()
 export default UserContext
@@ -43,9 +42,10 @@ async function handleLogin(apiFetch, userCredentials) {
     }
 }
 
-async function getUserInfo(authFetch) {
-    const res = await authFetch(`${apiBaseUrl}/api/users/me`, {
-        method: "GET"
+async function getUserInfo() {
+    const res = await fetch(`${apiBaseUrl}/api/users/me`, {
+        method: "GET",
+        credentials: 'include'
     })
     const response = await res.json()
     if (!res.ok) {
@@ -60,13 +60,12 @@ async function getUserInfo(authFetch) {
 export function UserProvider({ children }) {
 
     const apiFetch = useApi()
-    const authFetch = useAuthFetch()
 
     const queryClient = useQueryClient()
 
     const { data: userInfo, isError, error } = useQuery({
         queryKey: ['user'],
-        queryFn: () => getUserInfo(authFetch),
+        queryFn: () => getUserInfo(),
         staleTime: 1000 * 60 * 60 * 24,
         retry: (failureCount, error) => {
             if (failureCount >= 3) return false;

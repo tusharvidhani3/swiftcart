@@ -3,6 +3,7 @@ package com.swiftcart.swiftcart.common.security;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 import javax.crypto.SecretKey;
@@ -38,8 +39,8 @@ public class JwtService {
                 .compact();
     }
 
-    public String extractUserId(String token) {
-        return extractClaim(token, Claims::getSubject);
+    public Optional<String> extractUserId(String token) {
+        return Optional.ofNullable(extractClaim(token, Claims::getSubject));
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimResolver) {
@@ -53,11 +54,6 @@ public class JwtService {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
-    }
-
-    public boolean isTokenOwnedByUser(String token, UserPrincipal userPrincipal) {
-        String userId = extractUserId(token);
-        return userPrincipal.getUser().getId().toString().equals(userId);
     }
 
     private SecretKey getSignInKey() {

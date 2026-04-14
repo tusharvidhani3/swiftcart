@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 @RestController
-@RequestMapping("/api/addresses")
+@RequestMapping("api/addresses")
 @PreAuthorize("hasRole('CUSTOMER') or hasRole('SELLER')")
 public class AddressController {
 
@@ -41,30 +41,30 @@ public class AddressController {
         return ResponseEntity.status(HttpStatus.CREATED).body(addressService.addAddress(addressDto, userPrincipal.getUser()));
     }
 
-    @GetMapping("/{addressId}")
+    @GetMapping("{addressId}")
     public ResponseEntity<AddressDto> getAddress(@PathVariable Long addressId, @AuthenticationPrincipal UserPrincipal userPrincipal) {
         AddressDto addressDto = addressService.getAddress(addressId, userPrincipal.getUser().getId());
         return ResponseEntity.ok(addressDto);
     }
 
-    @DeleteMapping("/{addressId}")
+    @DeleteMapping("{addressId}")
     public ResponseEntity<Void> deleteAddress(@PathVariable Long addressId, @AuthenticationPrincipal UserPrincipal userPrincipal) {
         addressService.deleteAddress(addressId, userPrincipal.getUser().getId());
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{addressId}")
+    @PutMapping("{addressId}")
     public ResponseEntity<AddressDto> updateAddress(@PathVariable Long addressId, @RequestBody @Valid AddressDto addressDto, @AuthenticationPrincipal UserPrincipal userPrincipal) {
         return ResponseEntity.ok(addressService.updateAddress(addressDto, userPrincipal.getUser()));
     }
 
-    @PatchMapping("/{addressId}/default")
+    @PatchMapping("{addressId}/default")
     @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<AddressDto> changeDefaultAddress(@PathVariable Long addressId, @AuthenticationPrincipal UserPrincipal userPrincipal) {
         return ResponseEntity.ok(addressService.changeDefaultAddress(addressId, userPrincipal.getUser().getId()));
     }
 
-    @GetMapping("/default")
+    @GetMapping("default")
     @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<AddressDto> getDefaultAddress(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         return ResponseEntity.ok(addressService.getDefaultAddressForUser(userPrincipal.getUser().getId()));

@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.swiftcart.swiftcart.common.security.UserPrincipal;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("api/users")
 public class AppUserController {
 
     @Autowired
@@ -29,7 +29,7 @@ public class AppUserController {
     @Autowired
     private AppUserMapper userMapper;
 
-    @GetMapping("/me")
+    @GetMapping("me")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<AppUserDto> getLoggedInUser(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         AppUser user = userPrincipal.getUser();

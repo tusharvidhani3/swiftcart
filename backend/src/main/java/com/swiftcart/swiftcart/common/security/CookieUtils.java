@@ -33,6 +33,7 @@ public class CookieUtils {
         cookie.setHttpOnly(true);
         cookie.setMaxAge(maxAge);
         cookie.setSecure(true);
+        cookie.setAttribute("SameSite", "None");
         response.addCookie(cookie);
     }
 

@@ -1,46 +1,54 @@
 import { useNavigate } from "react-router";
 import { useApi } from "./useApi";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiBaseUrl } from "../config";
+import { QueryClient } from "@tanstack/react-query";
 
+let refreshPromise = null
 async function handleAccessTokenRefresh() {
-    const res = await fetch(`${apiBaseUrl}/api/auth/refresh-token`, {
-        method: "POST",
-        credentials: 'include',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    return res
+    if (refreshPromise) {
+        const res = await refreshPromise
+        if(!res.ok)
+            throw new Error("Refresh failed")
+        return
+    }
+
+    try {
+        refreshPromise = fetch(`${apiBaseUrl}/api/auth/refresh-token`, {
+            method: "POST",
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        const res = await refreshPromise
+        if (!res.ok)
+            throw new Error("Refresh failed")
+    }
+    finally {
+        refreshPromise = null
+    }
 }
+
+const queryClient = new QueryClient()
 
 export function useAuthFetch() {
     const navigate = useNavigate()
     const apiFetch = useApi()
-    const queryClient = useQueryClient()
-
-    const { mutate: refreshAccessToken } = useMutation({
-        mutationFn: handleAccessTokenRefresh,
-        onSuccess: (res) => {
-            if (!res.ok)
-                queryClient.invalidateQueries({ queryKey: ['user'] })
-        }
-    })
 
     async function authFetch(url, options = {}) {
         const res = await apiFetch(url, {
             ...options,
             credentials: 'include'
         })
-        if (res?.status === 401) {
-            const response = res.json()
-            if (response.code === 'TOKEN_EXPIRED') {
-                refreshAccessToken()
-                return await authFetch(url, options)
+        if (res?.status === 401 && !options._retry) {
+            try {
+                await handleAccessTokenRefresh()
+                return await authFetch(url, { ...options, _retry: true })
             }
-            else {
-                queryClient.invalidateQueries(['user'])
-                if(!url.endsWith("/users/me"))
-                    navigate('/auth/login')
+            catch (error) {
+                queryClient.removeQueries({ queryKey: ['user'], exact: true })
+                navigate('/auth/login')
+                return
             }
         }
         return res

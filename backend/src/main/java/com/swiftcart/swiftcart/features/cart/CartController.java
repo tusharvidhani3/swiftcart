@@ -19,7 +19,7 @@ import com.swiftcart.swiftcart.common.security.UserPrincipal;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/carts")
+@RequestMapping("api/carts")
 @PreAuthorize("hasRole('CUSTOMER')")
 public class CartController {
 
@@ -31,36 +31,36 @@ public class CartController {
         return ResponseEntity.ok(cartService.getCartResponse(userPrincipal.getUser().getId()));
     }
     
-    @PostMapping("/items")
+    @PostMapping("items")
     public ResponseEntity<CartResponse> addProductToCart(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestBody @Valid AddToCartRequest addToCartRequest) {
         CartResponse cartResponse=cartService.addProductToCart(userPrincipal.getUser(), addToCartRequest.productId(), addToCartRequest.quantity());
         return ResponseEntity.status(HttpStatus.CREATED).body(cartResponse);
     }
 
-    @PutMapping("/items/{cartItemId}")
+    @PutMapping("items/{cartItemId}")
     public ResponseEntity<CartResponse> updateQty(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long cartItemId, @RequestBody @Valid UpdateCartItemQtyRequest req){
         CartResponse cartResponse = cartService.updateQuantity(userPrincipal.getUser().getId(), cartItemId, req.quantity());
         return ResponseEntity.ok(cartResponse);
     }
 
-    @DeleteMapping("/items/{cartItemId}")
+    @DeleteMapping("items/{cartItemId}")
     public ResponseEntity<CartResponse> removeProductFromCart(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Long cartItemId) {
         CartResponse cartResponse = cartService.removeProductFromCart(userPrincipal.getUser().getId(), cartItemId);
         return ResponseEntity.ok(cartResponse);
     }
 
-    @PostMapping("/checkout/buy-now/product/{productId}")
+    @PostMapping("checkout/buy-now/product/{productId}")
     public ResponseEntity<CartResponse> buyNow(@PathVariable Long productId, @AuthenticationPrincipal UserPrincipal userPrincipal) {
         CartResponse cartResponse = cartService.initiateBuyNow(productId, userPrincipal.getUser());
         return ResponseEntity.ok(cartResponse);
     }
 
-    @GetMapping("/count")
+    @GetMapping("count")
     public ResponseEntity<Integer> getCartQtyCount(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         return ResponseEntity.ok(cartService.getCartQuantityCount(userPrincipal.getUser().getId()));
     }
 
-    @GetMapping("/summary")
+    @GetMapping("summary")
     public ResponseEntity<CartSummary> getCartSummary(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         CartSummary summary =  cartService.getCartSummary(userPrincipal.getUser().getId());
         return ResponseEntity.ok(summary);

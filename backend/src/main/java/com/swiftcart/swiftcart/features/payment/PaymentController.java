@@ -12,13 +12,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 @RestController
-@RequestMapping("/api/payments")
+@RequestMapping("api/payments")
 public class PaymentController {
 
     @Autowired
     PaymentService paymentService;
 
-    @PostMapping("/webhook")
+    @PostMapping("webhook")
     public ResponseEntity<?> handleWebhook(@RequestBody String payload, @RequestHeader("X-Razorpay-Signature") String signature) throws RazorpayException {
         paymentService.verifyPaymentAndConfirmOrder(payload, signature);
         return ResponseEntity.ok().build();

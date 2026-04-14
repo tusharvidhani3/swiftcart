@@ -29,13 +29,13 @@ import org.springframework.web.multipart.MultipartFile;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("api/products")
 public class ProductController {
 
     @Autowired
     private ProductService productService;
     
-    @GetMapping("/{productId}")
+    @GetMapping("{productId}")
     public ResponseEntity<ProductResponse> getProduct(@PathVariable Long productId) {
         ProductResponse productResponse = productService.getProduct(productId);
         return ResponseEntity.ok(productResponse);
@@ -57,7 +57,7 @@ public class ProductController {
         return ResponseEntity.ok(assembler.toModel(products));
     }
 
-    @GetMapping("/{productId}/seller")
+    @GetMapping("{productId}/seller")
     @PreAuthorize("hasRole('SELLER')")
     public ResponseEntity<PagedModel<EntityModel<SellerProductResponse>>> searchProductsForSeller(@RequestParam(defaultValue = "") String keyword, @RequestParam(required = false) List<String> categories, @RequestParam(defaultValue = "0") long minPrice, @RequestParam(defaultValue = "1000000000") long maxPrice, @RequestParam(defaultValue = "asc") String sortOrder, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "100") int size, @RequestParam(defaultValue = "id") String sortBy, PagedResourcesAssembler<SellerProductResponse> assembler) {
         Pageable pageable = PageRequest.of(page, size, sortOrder.equals("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy));
@@ -65,28 +65,28 @@ public class ProductController {
         return ResponseEntity.ok(assembler.toModel(products));
     }
 
-    @GetMapping("/seller")
+    @GetMapping("seller")
     @PreAuthorize("hasRole('SELLER')")
     public ResponseEntity<SellerProductResponse> getProductForSeller(@PathVariable Long productId) {
         SellerProductResponse productResponse = productService.getProductForSeller(productId);
         return ResponseEntity.ok(productResponse);
     }
 
-    @DeleteMapping("/{productId}")
+    @DeleteMapping("{productId}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('SELLER')")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long productId) {
         productService.deleteProduct(productId);
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{productId}")
+    @PutMapping("{productId}")
     @PreAuthorize("hasRole('SELLER')")
     public ResponseEntity<SellerProductResponse> updateProduct(@PathVariable Long productId, @RequestPart(required = false) @Valid ProductRequest productRequest, @RequestPart(required = false) List<MultipartFile> productImages) {
         SellerProductResponse productResponse = productService.updateProduct(productId, productRequest, productImages);
         return ResponseEntity.ok(productResponse);
     }
 
-    @PatchMapping("/{productId}/stock")
+    @PatchMapping("{productId}/stock")
     @PreAuthorize("hasRole('SELLER')")
     public ResponseEntity<SellerProductResponse> updateProductStock(@PathVariable Long productId, @RequestBody @Valid UpdateProductStockRequest req) {
         SellerProductResponse productResponse = productService.updateStock(productId, req.stock());
