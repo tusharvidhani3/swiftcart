@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.swiftcart.swiftcart.common.security.JwtService;
 import com.swiftcart.swiftcart.features.appuser.AppUser;
+import com.swiftcart.swiftcart.features.appuser.AppUserRepository;
 
 @Service
 public class RefreshTokenService {
@@ -22,7 +23,11 @@ public class RefreshTokenService {
     @Autowired
     JwtService jwtService;
 
-    public String generateRefreshToken(AppUser user) {
+    @Autowired
+    private AppUserRepository userRepo;
+
+    public String generateRefreshToken(Long userId) {
+        AppUser user = userRepo.getReferenceById(userId);
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.setUser(user);
         refreshToken.setCreatedAt(Instant.now());
@@ -35,14 +40,14 @@ public class RefreshTokenService {
     public String generateAccessToken(String token) {
         RefreshToken refreshToken = refreshTokenRepo.findByTokenWithUserAndRole(token);
         AppUser user = refreshToken.getUser();
-        return jwtService.generateToken(user.getId(), user.getRole().getName());
+        return jwtService.generateToken(user.getId(), user.getEmail(), user.getMobileNumber(), user.getRole().getName());
     }
 
     public void invalidateRefreshToken(String token) {
         RefreshToken refreshToken = refreshTokenRepo.findByToken(token);
         if(!refreshToken.isRevoked()) {
-        refreshToken.setRevoked(true);
-        refreshTokenRepo.save(refreshToken);
+            refreshToken.setRevoked(true);
+            refreshTokenRepo.save(refreshToken);
         }
     }
 
@@ -50,7 +55,7 @@ public class RefreshTokenService {
         RefreshToken refreshToken = refreshTokenRepo.findByToken(token);
         Instant currentTime = Instant.now();
         if(refreshToken.isRevoked() || currentTime.isAfter(refreshToken.getExpiresAt()))
-        return false;
+            return false;
         return true;
     }
 
@@ -58,8 +63,7 @@ public class RefreshTokenService {
     public String rotateRefreshToken(String token) {
         RefreshToken refreshToken = refreshTokenRepo.findByToken(token);
         refreshToken.setRevoked(true);
-        refreshTokenRepo.save(refreshToken);
-        return generateRefreshToken(refreshToken.getUser());
+        return generateRefreshToken(refreshToken.getUser().getId());
     }
 
     private String generateTokenString() {

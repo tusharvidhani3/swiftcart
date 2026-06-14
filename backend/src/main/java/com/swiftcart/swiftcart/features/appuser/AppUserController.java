@@ -20,26 +20,21 @@ import org.springframework.web.bind.annotation.RestController;
 import com.swiftcart.swiftcart.common.security.UserPrincipal;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("api/users")
 public class AppUserController {
 
     @Autowired
     private AppUserService userService;
 
-    @Autowired
-    private AppUserMapper userMapper;
-
-    @GetMapping("/me")
-    @PreAuthorize("isAuthenticated()")
+    @GetMapping("me")
     public ResponseEntity<AppUserDto> getLoggedInUser(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        AppUser user = userPrincipal.getUser();
-        AppUserDto userDto = userMapper.toDto(user);
+        AppUserDto userDto = new AppUserDto(userPrincipal.getUserId(), null, null, userPrincipal.getMobileNumber(), userPrincipal.getMobileNumber(), userPrincipal.getAuthorities().iterator().next().getAuthority());
         return ResponseEntity.ok(userDto);
     }
 
     @PutMapping
     public ResponseEntity<AppUserDto> updateUserInfo(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestBody AppUserDto userDto) {
-        AppUserDto updatedUserDto = userService.updateUser(userPrincipal.getUser().getId(), userDto);
+        AppUserDto updatedUserDto = userService.updateUser(userPrincipal.getUserId(), userDto);
         return ResponseEntity.ok(updatedUserDto);
     }
 

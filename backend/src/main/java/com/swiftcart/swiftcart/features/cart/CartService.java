@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.swiftcart.swiftcart.common.exception.InsufficientStockException;
 import com.swiftcart.swiftcart.common.exception.ResourceNotFoundException;
 import com.swiftcart.swiftcart.features.appuser.AppUser;
+import com.swiftcart.swiftcart.features.appuser.AppUserRepository;
 import com.swiftcart.swiftcart.features.order.ShippingService;
 import com.swiftcart.swiftcart.features.product.Product;
 import com.swiftcart.swiftcart.features.product.ProductService;
@@ -35,18 +36,21 @@ public class CartService {
     @Autowired
     private CartItemMapper cartItemMapper;
 
+    @Autowired
+    private AppUserRepository userRepo;
+
     @Transactional
-    public CartResponse addProductToCart(AppUser user, Long productId, int quantity) {
-        Optional<Cart> cartOptional = cartRepo.findByUserId(user.getId());
+    public CartResponse addProductToCart(Long userId, Long productId, int quantity) {
+        Optional<Cart> cartOptional = cartRepo.findByUserId(userId);
         Cart cart = null;
         CartItem cartItem = null;
         if (cartOptional.isEmpty()) {
-            cart = createNewCartForUser(user);
+            cart = createNewCartForUser(userId);
             cartItem = createCartItem(cart, productId, quantity);
         }
         else 
         cart = cartOptional.get();
-        Optional<CartItem> cartItemOptional = cartItemRepo.findByCartUserIdAndProductId(user.getId(),
+        Optional<CartItem> cartItemOptional = cartItemRepo.findByCartUserIdAndProductId(userId,
                 productId);
         if (cartItemOptional.isEmpty())
             cartItem = createCartItem(cart, productId, quantity);
@@ -58,7 +62,7 @@ public class CartService {
             cartItem.setQuantity(updatedQty);
             cartItemRepo.save(cartItem);
         }
-        return getCartResponse(user.getId());
+        return getCartResponse(userId);
     }
 
     @Transactional
@@ -99,18 +103,19 @@ public class CartService {
     }
 
     @Transactional
-    private Cart createNewCartForUser(AppUser user) {
+    private Cart createNewCartForUser(Long userId) {
+        AppUser user = userRepo.getReferenceById(userId);
         Cart cart = new Cart();
         cart.setUser(user);
         cart = cartRepo.save(cart);
         return cart;
     }
 
-    public CartResponse initiateBuyNow(Long productId, AppUser user) {
-        CartItem cartItem = cartItemRepo.findByCartUserIdAndProductId(user.getId(),productId)
+    public CartResponse initiateBuyNow(Long productId, Long userId) {
+        CartItem cartItem = cartItemRepo.findByCartUserIdAndProductId(userId, productId)
                 .orElseGet(() -> {
                     CartItem ci = new CartItem();
-                    ci.setCart(cartRepo.findByUserId(user.getId()).orElseGet(() -> createNewCartForUser(user)));
+                    ci.setCart(cartRepo.findByUserId(userId).orElseGet(() -> createNewCartForUser(userId)));
                     Product product = productService.getProductById(productId);
                     if(product.getStock() < 1)
                     throw new InsufficientStockException("Product is out of stock");

@@ -16,6 +16,7 @@ import com.swiftcart.swiftcart.features.address.Address;
 import com.swiftcart.swiftcart.features.address.AddressMapper;
 import com.swiftcart.swiftcart.features.address.AddressService;
 import com.swiftcart.swiftcart.features.appuser.AppUser;
+import com.swiftcart.swiftcart.features.appuser.AppUserRepository;
 import com.swiftcart.swiftcart.features.cart.CartItem;
 import com.swiftcart.swiftcart.features.cart.CartService;
 import com.swiftcart.swiftcart.features.payment.Payment;
@@ -57,6 +58,9 @@ public class OrderService {
     @Autowired
     private ShippingService shippingService;
 
+    @Autowired
+    private AppUserRepository userRepo;
+
     @Transactional
     public OrderResponse createOrder(PlaceOrderRequest placeOrderRequest, Long userId) throws RazorpayException {
         List<CartItem> cartItems = cartService.getCartItemsByUserId(userId);
@@ -79,7 +83,7 @@ public class OrderService {
             orderItem.setOrderItemStatus(placeOrderRequest.prepaid() ? OrderStatus.CREATED : OrderStatus.CONFIRMED);
             orderItem.setDeliveryAt(LocalDateTime.now().plusWeeks(1).withHour(20).withMinute(0).withSecond(0).withNano(0));
             orderItems.add(orderItem);
-            productService.updateStock(ci.getProduct().getId(), -orderItem.getQuantity());
+            productService.updateStock(ci.getProduct().getId(), ci.getProduct().getStock() - orderItem.getQuantity());
             subtotal += ci.getProduct().getPrice() * ci.getQuantity();
         }
         orderItems = orderItemRepo.saveAll(orderItems);
@@ -97,12 +101,13 @@ public class OrderService {
         return orderResponse;
     }
 
-    public OrderResponse getOrder(Long orderId, AppUser user) {
+    public OrderResponse getOrder(Long orderId, Long userId) {
         Order order = orderRepo.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+        AppUser user = userRepo.findById(userId).get();
         String role = user.getRole().getName();
         boolean isAdminOrSeller = role.equals("ROLE_ADMIN") || role.equals("ROLE_SELLER");
-        if (!isAdminOrSeller && !order.getUser().getId().equals(user.getId()))
+        if (!isAdminOrSeller && !order.getUser().getId().equals(userId))
             throw new AccessDeniedException("You are not authorized to access this order");
         List<OrderItem> orderItems = orderItemRepo.findByOrderId(orderId);
         PaymentDto paymentDto = paymentService.getPayment(order.getId());
@@ -136,7 +141,7 @@ public class OrderService {
         if(!order.getUser().getId().equals(userId))
             throw new AccessDeniedException("You are not authorized to access this order");
         if (orderStatus == OrderStatus.CANCELLED) {
-            productService.updateStock(orderItem.getProduct().getId(), orderItem.getQuantity());
+            productService.updateStock(orderItem.getProduct().getId(), orderItem.getProduct().getStock() + orderItem.getQuantity());
         }
         orderItem.setOrderItemStatus(orderStatus);
         orderItem = orderItemRepo.save(orderItem);
@@ -155,7 +160,7 @@ public class OrderService {
             throw new AccessDeniedException("You are not allowed to perform this action");
         if (orderItem.getOrderItemStatus() == OrderStatus.CONFIRMED || orderItem.getOrderItemStatus() == OrderStatus.OUT_FOR_DELIVERY || orderItem.getOrderItemStatus() == OrderStatus.SHIPPED) {
             orderItem.setOrderItemStatus(OrderStatus.CANCELLED);
-            productService.updateStock(orderItem.getProduct().getId(), orderItem.getQuantity());
+            productService.updateStock(orderItem.getProduct().getId(), orderItem.getProduct().getStock() + orderItem.getQuantity());
             orderItem = orderItemRepo.save(orderItem);
         } else {
             throw new BadRequestException("Cannot cancel an order item that is already delivered");
@@ -167,10 +172,10 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderResponse placeBuyNowOrder(PlaceBuyNowOrderRequest placeBuyNowOrderRequest, AppUser user) throws RazorpayException {
+    public OrderResponse placeBuyNowOrder(PlaceBuyNowOrderRequest placeBuyNowOrderRequest, Long userId) throws RazorpayException {
         CartItem cartItem = cartService.getCartItemByCartItemId(placeBuyNowOrderRequest.cartItemId());
         Address shippingAddress = addressService.getAddressById(placeBuyNowOrderRequest.shippingAddressId());
-        if (cartItem.getCart().getUser().getId() != user.getId() || shippingAddress.getUser().getId() != user.getId())
+        if (cartItem.getCart().getUser().getId() != userId || shippingAddress.getUser().getId() != userId)
             throw new AccessDeniedException("Access Denied: Something went wrong");
         Order order = new Order();
         order.setPlacedAt(LocalDateTime.now());
@@ -178,7 +183,7 @@ public class OrderService {
         order.setSubtotal(cartItem.getProduct().getPrice());
         order.setShippingCharge(order.getSubtotal());
         order.setTotalAmount(order.getSubtotal() + order.getShippingCharge());
-        order.setUser(user);
+        order.setUser(userRepo.getReferenceById(userId));
         order = orderRepo.save(order);
         Payment payment = new Payment();
         payment.setPaymentStatus(placeBuyNowOrderRequest.prepaid() ? PaymentStatus.PENDING : PaymentStatus.COD);
@@ -189,7 +194,7 @@ public class OrderService {
         orderItem.setOrderItemStatus(OrderStatus.CREATED);
         orderItem.setDeliveryAt(LocalDateTime.now().plusWeeks(1).withHour(20).withMinute(0).withSecond(0).withNano(0));
         orderItem = orderItemRepo.save(orderItem);
-        productService.updateStock(cartItem.getProduct().getId(), -orderItem.getQuantity());
+        productService.updateStock(cartItem.getProduct().getId(), orderItem.getProduct().getStock() - orderItem.getQuantity());
         PaymentDto paymentDto = null;
         if (placeBuyNowOrderRequest.prepaid())
             paymentDto = paymentService.createOrder(order);
@@ -207,7 +212,7 @@ public class OrderService {
                     || orderItem.getOrderItemStatus() == OrderStatus.OUT_FOR_DELIVERY
                     || orderItem.getOrderItemStatus() == OrderStatus.SHIPPED) {
                 orderItem.setOrderItemStatus(OrderStatus.CANCELLED);
-                productService.updateStock(orderItem.getProduct().getId(), orderItem.getQuantity());
+                productService.updateStock(orderItem.getProduct().getId(), orderItem.getProduct().getStock() + orderItem.getQuantity());
                 orderItem = orderItemRepo.save(orderItem);
             } else {
                 throw new BadRequestException("Cannot cancel order, one or more item(s) delivered");
@@ -217,27 +222,15 @@ public class OrderService {
         return orderMapper.toResponse(order, orderItems, payment);
     }
 
-    // public OrderStats getOrderStats(LocalDate startDate) {
-    //     OrderStatsProjection orderStatsProjection = orderItemRepo.getOrderStats();
-    //     orderMapper.toStats(orderStatsProjection);
-    //     List<DailyOrderStats> dailyOrderStats = orderItemRepo.getDailyOrderStats(startDate.atStartOfDay()).stream()
-    //             .map(dailyOrderStat -> modelMapper.map(dailyOrderStat, DailyOrderStats.class))
-    //             .collect(Collectors.toList());
+    public OrderStats getOrderStats(LocalDate startDate) {
+        OrderStats orderStats = orderItemRepo.getOrderStats();
+        orderMapper.toStats(orderStats);
+        return orderStats;
+    }
 
-    //     // LocalDate today = LocalDate.now();
-    //     // for (LocalDate date = startDate; !date.isAfter(today); date = date.plusDays(1)) {
-    //     //     DailyOrderStatsProjection dbStat = statsMap.get(date);
-
-    //     //     DailyOrderStats stat = new DailyOrderStats();
-    //     //     stat.setDate(date);
-    //     //     stat.setRevenue(dbStat != null ? dbStat.getRevenue() : 0.0);
-    //     //     stat.setOrders(dbStat != null ? dbStat.getOrders() : 0);
-    //     //     stat.setOrderItems(dbStat != null ? dbStat.getOrderItems() : 0);
-
-    //     //     finalStats.add(stat);
-    //     // }
-    //     orderStats.setDailyOrderStats(dailyOrderStats);
-    //     return orderStats;
-    // }
+    public List<DailyOrderStats> getDailyOrderStats(LocalDate startDate) {
+        List<DailyOrderStats> dailyOrderStats = orderItemRepo.getDailyOrderStats(startDate.atStartOfDay());
+        return dailyOrderStats;
+    }
 
 }

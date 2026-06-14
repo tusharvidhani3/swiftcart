@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 @RestController
-@RequestMapping("/api/addresses")
+@RequestMapping("api/addresses")
 @PreAuthorize("hasRole('CUSTOMER') or hasRole('SELLER')")
 public class AddressController {
 
@@ -33,40 +33,40 @@ public class AddressController {
 
     @GetMapping
     public ResponseEntity<List<AddressDto>> getLoggedInUserAddresses(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        return ResponseEntity.ok(addressService.getAddressesForLoggedInUser(userPrincipal.getUser().getId()));
+        return ResponseEntity.ok(addressService.getAddressesForLoggedInUser(userPrincipal.getUserId()));
     }
     
     @PostMapping
     public ResponseEntity<AddressDto> addAddress(@Valid @RequestBody AddressDto addressDto, @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(addressService.addAddress(addressDto, userPrincipal.getUser()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(addressService.addAddress(addressDto, userPrincipal.getUserId()));
     }
 
-    @GetMapping("/{addressId}")
+    @GetMapping("{addressId}")
     public ResponseEntity<AddressDto> getAddress(@PathVariable Long addressId, @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        AddressDto addressDto = addressService.getAddress(addressId, userPrincipal.getUser().getId());
+        AddressDto addressDto = addressService.getAddress(addressId, userPrincipal.getUserId());
         return ResponseEntity.ok(addressDto);
     }
 
-    @DeleteMapping("/{addressId}")
+    @DeleteMapping("{addressId}")
     public ResponseEntity<Void> deleteAddress(@PathVariable Long addressId, @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        addressService.deleteAddress(addressId, userPrincipal.getUser().getId());
+        addressService.deleteAddress(addressId, userPrincipal.getUserId());
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{addressId}")
-    public ResponseEntity<AddressDto> updateAddress(@PathVariable Long addressId, @RequestBody @Valid AddressDto addressDto, @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        return ResponseEntity.ok(addressService.updateAddress(addressDto, userPrincipal.getUser()));
+    @PutMapping()
+    public ResponseEntity<AddressDto> updateAddress(@RequestBody @Valid AddressDto addressDto, @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return ResponseEntity.ok(addressService.updateAddress(addressDto, userPrincipal.getUserId()));
     }
 
-    @PatchMapping("/{addressId}/default")
+    @PatchMapping("{addressId}/default")
     @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<AddressDto> changeDefaultAddress(@PathVariable Long addressId, @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        return ResponseEntity.ok(addressService.changeDefaultAddress(addressId, userPrincipal.getUser().getId()));
+        return ResponseEntity.ok(addressService.changeDefaultAddress(addressId, userPrincipal.getUserId()));
     }
 
-    @GetMapping("/default")
+    @GetMapping("default")
     @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<AddressDto> getDefaultAddress(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        return ResponseEntity.ok(addressService.getDefaultAddressForUser(userPrincipal.getUser().getId()));
+        return ResponseEntity.ok(addressService.getDefaultAddressForUser(userPrincipal.getUserId()));
     }
 }

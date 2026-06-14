@@ -1,9 +1,7 @@
 package com.swiftcart.swiftcart.common.security;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
+import java.util.UUID;
 
 import javax.crypto.SecretKey;
 
@@ -26,38 +24,25 @@ public class JwtService {
     @Value("${app.security.auth.access-token.expiration-minutes}")
     private long expiration;
 
-    public String generateToken(Long userId, String role) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("role", role);
+    public String generateToken(Long userId, String email, String mobileNumber, String role) {
         return Jwts.builder()
-                .claims(claims)
+                .id(UUID.randomUUID().toString())
                 .subject(userId.toString())
+                .claim("email", email)
+                .claim("mobileNumber", mobileNumber)
+                .claim("role", role)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiration * 60 * 1000))
                 .signWith(getSignInKey())
                 .compact();
     }
 
-    public String extractUserId(String token) {
-        return extractClaim(token, Claims::getSubject);
-    }
-
-    private <T> T extractClaim(String token, Function<Claims, T> claimResolver) {
-        final Claims claims = extractAllClaims(token);
-        return claimResolver.apply(claims);
-    }
-
-    private Claims extractAllClaims(String token) {
+    public Claims extractAllClaims(String token) {
         return Jwts.parser()
                 .verifyWith(getSignInKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
-    }
-
-    public boolean isTokenOwnedByUser(String token, UserPrincipal userPrincipal) {
-        String userId = extractUserId(token);
-        return userPrincipal.getUser().getId().toString().equals(userId);
     }
 
     private SecretKey getSignInKey() {

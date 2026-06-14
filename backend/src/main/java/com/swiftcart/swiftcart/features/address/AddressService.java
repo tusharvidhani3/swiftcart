@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.swiftcart.swiftcart.common.exception.ResourceNotFoundException;
-import com.swiftcart.swiftcart.features.appuser.AppUser;
+import com.swiftcart.swiftcart.features.appuser.AppUserRepository;
 
 @Service
 public class AddressService {
@@ -20,11 +20,14 @@ public class AddressService {
     @Autowired
     private AddressMapper addressMapper;
 
+    @Autowired
+    private AppUserRepository userRepo;
+
     @Transactional
-    public AddressDto addAddress(AddressDto addressDto, AppUser user) {
+    public AddressDto addAddress(AddressDto addressDto, Long userId) {
         Address address=addressMapper.toEntity(addressDto);
-        address.setUser(user);
-        if(addressRepo.countByUserId(user.getId()) == 0)
+        address.setUser(userRepo.getReferenceById(userId));
+        if(addressRepo.countByUserId(userId) == 0)
         address.setDefaultShipping(true);
         address=addressRepo.save(address);
         return addressMapper.toDto(address);
@@ -55,12 +58,12 @@ public class AddressService {
     }
 
     @Transactional
-    public AddressDto updateAddress(AddressDto addressDto, AppUser user) {
+    public AddressDto updateAddress(AddressDto addressDto, Long userId) {
         Address address = addressMapper.toEntity(addressDto);
         Address oldAddress = addressRepo.findById(addressDto.id()).get();
-        if (!oldAddress.getUser().getId().equals(user.getId()))
+        if (!oldAddress.getUser().getId().equals(userId))
             throw new AccessDeniedException("Unauthorized access to this address");
-        address.setUser(user);
+        address.setUser(userRepo.getReferenceById(userId));
         address.setDefaultShipping(oldAddress.getDefaultShipping());
         address = addressRepo.save(address);
         return addressMapper.toDto(address);

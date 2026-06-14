@@ -5,12 +5,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.swiftcart.swiftcart.common.security.UserPrincipal;
 import com.swiftcart.swiftcart.features.auth.AuthRequest;
 
 @Service
@@ -34,16 +33,16 @@ public class AppUserService {
     @Transactional
     public void register(AuthRequest registerRequest) {
         AppUser user = userMapper.toEntity(registerRequest);
-        Role role=roleRepo.findByName("ROLE_CUSTOMER");
+        Role role = roleRepo.findByName("ROLE_CUSTOMER");
         user.setRole(role);
         user.setPassword(encoder.encode(registerRequest.password()));
         userRepo.save(user);
     }
 
-    public UserPrincipal authenticate(AuthRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.email(), loginRequest.password()));
-        UserPrincipal userPrincipal = (UserPrincipal)authentication.getPrincipal();
-        return userPrincipal;
+    public AppUserDto authenticate(AuthRequest loginRequest) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.email(), loginRequest.password()));
+        AppUser user = userRepo.findByEmail(loginRequest.email()).orElseThrow(() -> new UsernameNotFoundException("User does not exists with this email"));
+        return userMapper.toDto(user);
     }
 
     @Transactional

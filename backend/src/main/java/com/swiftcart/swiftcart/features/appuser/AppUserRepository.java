@@ -22,4 +22,6 @@ public interface AppUserRepository extends JpaRepository<AppUser,Integer> {
 
     Optional<AppUser> findById(Long id);
 
+    AppUser getReferenceById(Long userId);
+
 }
