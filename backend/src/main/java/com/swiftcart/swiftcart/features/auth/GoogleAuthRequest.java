@@ -1,5 +1,3 @@
 package com.swiftcart.swiftcart.features.auth;
 
-public enum AuthProvider {
-    GOOGLE
-}
+public record GoogleAuthRequest(String token) {}

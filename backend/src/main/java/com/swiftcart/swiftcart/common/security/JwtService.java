@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import javax.crypto.SecretKey;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
@@ -14,15 +13,13 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class JwtService {
 
-    @Value("${app.security.auth.access-token.secret-key}")
-    private String secretKey;
-
-    @Value("${app.security.auth.access-token.expiration-minutes}")
-    private long expiration;
+    private final SecurityProperties securityProperties;
 
     public String generateToken(Long userId, String email, String mobileNumber, String role) {
         return Jwts.builder()
@@ -32,7 +29,7 @@ public class JwtService {
                 .claim("mobileNumber", mobileNumber)
                 .claim("role", role)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expiration * 60 * 1000))
+                .expiration(new Date(System.currentTimeMillis() + securityProperties.auth().accessToken().expirationMinutes() * 60 * 1000))
                 .signWith(getSignInKey())
                 .compact();
     }
@@ -46,7 +43,7 @@ public class JwtService {
     }
 
     private SecretKey getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        byte[] keyBytes = Decoders.BASE64.decode(securityProperties.auth().accessToken().secretKey());
         return Keys.hmacShaKeyFor(keyBytes);
     }
 

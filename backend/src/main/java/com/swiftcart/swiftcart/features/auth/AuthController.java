@@ -2,8 +2,6 @@ package com.swiftcart.swiftcart.features.auth;
 
 import java.time.Duration;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -15,45 +13,36 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.swiftcart.swiftcart.common.security.JwtService;
+import com.swiftcart.swiftcart.common.security.SecurityProperties;
 import com.swiftcart.swiftcart.features.appuser.AppUserDto;
-import com.swiftcart.swiftcart.features.appuser.AppUserMapper;
 import com.swiftcart.swiftcart.features.appuser.AppUserService;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("api/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
-    @Autowired
-    private AppUserService userService;
+    private final AppUserService userService;
 
-    @Autowired
-    private JwtService jwtService;
+    private final JwtService jwtService;
 
-    @Autowired
-    private RefreshTokenService tokenService;
+    private final RefreshTokenService tokenService;
 
-    @Autowired
-    private AppUserMapper userMapper;
-
-    @Value("${app.security.auth.access-token.expiration-minutes}")
-    private long accessTokenExpirationMinutes;
-
-    @Value("${app.security.auth.refresh-token.expiration-days}")
-    private long refreshTokenExpirationDays;
+    private final SecurityProperties securityProperties;
 
     @PostMapping("register")
     public ResponseEntity<AppUserDto> register(@RequestBody @Valid AuthRequest authRequest) {
-        userService.register(authRequest);
-        AppUserDto userDto = userService.authenticate(authRequest);
+        AppUserDto userDto = userService.register(authRequest);
         String jwt = jwtService.generateToken(userDto.id(), userDto.email(), userDto.mobileNumber(), userDto.role());
         String refreshToken = tokenService.generateRefreshToken(userDto.id());
         ResponseCookie accessCookie = ResponseCookie.from("access_token", jwt)
             .httpOnly(true)
             .secure(true)
             .path("/")
-            .maxAge(Duration.ofMinutes(accessTokenExpirationMinutes))
+            .maxAge(Duration.ofMinutes(securityProperties.auth().accessToken().expirationMinutes()))
             .sameSite("None")
             .build();
 
@@ -61,7 +50,7 @@ public class AuthController {
             .httpOnly(true)
             .secure(true)
             .path("/api/auth")
-            .maxAge(Duration.ofDays(refreshTokenExpirationDays))
+            .maxAge(Duration.ofDays(securityProperties.auth().refreshToken().expirationDays()))
             .sameSite("None")
             .build();
 
@@ -82,7 +71,7 @@ public class AuthController {
             .httpOnly(true)
             .secure(true)
             .path("/")
-            .maxAge(Duration.ofMinutes(accessTokenExpirationMinutes))
+            .maxAge(Duration.ofMinutes(securityProperties.auth().accessToken().expirationMinutes()))
             .sameSite("None")
             .build();
 
@@ -90,7 +79,36 @@ public class AuthController {
             .httpOnly(true)
             .secure(true)
             .path("/api/auth")
-            .maxAge(Duration.ofDays(refreshTokenExpirationDays))
+            .maxAge(Duration.ofDays(securityProperties.auth().refreshToken().expirationDays()))
+            .sameSite("None")
+            .build();
+
+        return ResponseEntity.ok()
+            .headers(headers -> {
+                headers.add(HttpHeaders.SET_COOKIE, accessCookie.toString());
+                headers.add(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+            })
+            .body(userDto);
+    }
+
+    @PostMapping("google")
+    public ResponseEntity<AppUserDto> googleAuth(@RequestBody GoogleAuthRequest googleAuthRequest) {
+        AppUserDto userDto = userService.authenticateWithGoogle(googleAuthRequest.token());
+        String jwt = jwtService.generateToken(userDto.id(), userDto.email(), userDto.mobileNumber(), userDto.role());
+        String refreshToken = tokenService.generateRefreshToken(userDto.id());
+        ResponseCookie accessCookie = ResponseCookie.from("access_token", jwt)
+            .httpOnly(true)
+            .secure(true)
+            .path("/")
+            .maxAge(Duration.ofMinutes(securityProperties.auth().accessToken().expirationMinutes()))
+            .sameSite("None")
+            .build();
+
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken)
+            .httpOnly(true)
+            .secure(true)
+            .path("/api/auth")
+            .maxAge(Duration.ofDays(securityProperties.auth().refreshToken().expirationDays()))
             .sameSite("None")
             .build();
 
@@ -113,7 +131,7 @@ public class AuthController {
             .httpOnly(true)
             .secure(true)
             .path("/")
-            .maxAge(Duration.ofMinutes(accessTokenExpirationMinutes))
+            .maxAge(Duration.ofMinutes(securityProperties.auth().accessToken().expirationMinutes()))
             .sameSite("None")
             .build();
         
@@ -121,7 +139,7 @@ public class AuthController {
             .httpOnly(true)
             .secure(true)
             .path("/api/auth")
-            .maxAge(Duration.ofDays(refreshTokenExpirationDays))
+            .maxAge(Duration.ofDays(securityProperties.auth().refreshToken().expirationDays()))
             .sameSite("None")
             .build();
         return ResponseEntity.ok()
