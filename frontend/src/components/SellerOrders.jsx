@@ -1,27 +1,19 @@
 import { useContext, useState } from 'react'
 import styles from '../styles/SellerOrders.module.css'
-import { useAuthFetch } from '../hooks/useAuthFetch'
-import { apiBaseUrl } from '../config'
 import SellerOrderCard from './SellerOrderCard'
 import UIContext from '../contexts/UIContext'
 import { useQuery } from '@tanstack/react-query'
-
-async function getOrders(authFetch, page) {
-    const res = await authFetch(`${apiBaseUrl}/api/orders/all?page=${page}`, {
-        method: 'GET'
-    })
-    return await res.json()
-}
+import SellerOrdersSkeleton from './SellerOrdersSkeleton'
+import { api } from '@/api/client'
 
 export default function SellerOrders() {
 
-    const authFetch = useAuthFetch()
     const { isMobile } = useContext(UIContext)
     const [page, setPage] = useState(0)
 
     const { data: ordersPagedModel, isLoading } = useQuery({
         queryKey: ['orders', 'list', page],
-        queryFn: () => getOrders(authFetch, page),
+        queryFn: () => api.get(`/orders/all?page=${page}`),
         staleTime: 1000 * 60 * 5
     })
 

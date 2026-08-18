@@ -1,30 +1,21 @@
 import { useParams } from 'react-router'
 import styles from '../styles/OrderDetails.module.css'
-import { useAuthFetch } from '../hooks/useAuthFetch'
 import OrderItemDetailsCard from './OrderItemDetailsCard'
 import useMediaQuery from '../hooks/useMediaQuery'
-import { apiBaseUrl } from '../config'
 import razorpayLogo from '../assets/icons/razorpay-logo.svg'
 import { formatPaiseToRupees } from '../utils/currency'
 import { Loader2 } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
-
-async function getOrder(authFetch, orderId) {
-    const res = await authFetch(`${apiBaseUrl}/api/orders/${orderId}`, {
-        method: 'GET',
-    })
-    return await res.json()
-}
+import { api } from '@/api/client'
 
 export default function OrderDetails() {
 
     const { orderId } = useParams()
-    const authFetch = useAuthFetch()
     const isDesktop = useMediaQuery('(min-width: 1080px)')
 
     const { data: order, isLoading, isError, error } = useQuery({
         queryKey: ['orders', orderId],
-        queryFn: () => getOrder(authFetch, orderId),
+        queryFn: () => api.get(`/orders/${orderId}`),
         staleTime: 1000 * 60 * 5,
         enabled: !!orderId
     })

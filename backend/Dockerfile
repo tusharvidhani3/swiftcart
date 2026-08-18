@@ -1,5 +1,5 @@
 # Stage 1: Build the JAR
-FROM --platform=$BUILDPLATFORM maven:3.9.14-eclipse-temurin-25 AS build
+FROM --platform=$BUILDPLATFORM maven:3.9.16-eclipse-temurin-26 AS build
 WORKDIR /build
 COPY pom.xml ./
 RUN --mount=type=cache,target=/root/.m2 \
@@ -9,7 +9,7 @@ RUN --mount=type=cache,target=/root/.m2 \
     mvn clean package -Pprod -DskipTests -B
 
 # Stage 2: Run the application
-FROM eclipse-temurin:25-jre
+FROM eclipse-temurin:26-jre
 WORKDIR /app
 COPY --from=build /build/target/*.jar app.jar
 EXPOSE 8080

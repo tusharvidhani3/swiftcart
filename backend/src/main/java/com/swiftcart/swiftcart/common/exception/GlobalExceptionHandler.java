@@ -2,6 +2,7 @@ package com.swiftcart.swiftcart.common.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -12,9 +13,9 @@ import com.razorpay.RazorpayException;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(AuthenticationException.class)
-    public ProblemDetail handleInvalidCredentials(AuthenticationException ex) {
+    public ProblemDetail handleAuthenticationException(AuthenticationException ex) {
         ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ex.getMessage());
-        pd.setTitle("Authentication Failure");
+        pd.setTitle("Unauthorized");
         return pd;
     }
 
@@ -48,6 +49,13 @@ public class GlobalExceptionHandler {
     public ProblemDetail handleRazorpayException(RazorpayException ex) {
         ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_GATEWAY, ex.getMessage());
         pd.setTitle("Payment Gateway Unavailable");
+        return pd;
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ProblemDetail handleAccessDenied(AccessDeniedException ex) {
+        ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.getMessage());
+        pd.setTitle("Access Denied");
         return pd;
     }
 

@@ -1,6 +1,5 @@
 package com.swiftcart.swiftcart.features.appuser;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -17,23 +16,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.swiftcart.swiftcart.common.security.UserPrincipal;
+import com.swiftcart.swiftcart.common.security.AppUserDetails;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("api/users")
+@RequiredArgsConstructor
 public class AppUserController {
 
-    @Autowired
-    private AppUserService userService;
+    private final AppUserService userService;
 
     @GetMapping("me")
-    public ResponseEntity<AppUserDto> getLoggedInUser(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+    public ResponseEntity<AppUserDto> getLoggedInUser(@AuthenticationPrincipal AppUserDetails userPrincipal) {
         AppUserDto userDto = new AppUserDto(userPrincipal.getUserId(), null, null, userPrincipal.getMobileNumber(), userPrincipal.getMobileNumber(), userPrincipal.getAuthorities().iterator().next().getAuthority());
         return ResponseEntity.ok(userDto);
     }
 
     @PutMapping
-    public ResponseEntity<AppUserDto> updateUserInfo(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestBody AppUserDto userDto) {
+    public ResponseEntity<AppUserDto> updateUserInfo(@AuthenticationPrincipal AppUserDetails userPrincipal, @RequestBody AppUserDto userDto) {
         AppUserDto updatedUserDto = userService.updateUser(userPrincipal.getUserId(), userDto);
         return ResponseEntity.ok(updatedUserDto);
     }

@@ -41,4 +41,9 @@ public class AppUser {
 
     @ManyToOne
     private Role role;
+
+    private boolean isEmailVerified;
+
+    @Column(unique = true)
+    private String firebaseUid;
 }

@@ -13,6 +13,6 @@ public interface OrderMapper {
 
     OrderResponseForSeller toResponseForSeller(Order order, List<OrderItem> items, PaymentDto payment);
 
-    OrderStats toStats(OrderStatsProjection orderStatsProjection);
+    OrderStats toStats(OrderStats orderStats);
 
 }

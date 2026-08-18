@@ -1,3 +1,4 @@
+import OrderItemCardSkeleton from "./OrderItemCardSkeleton";
 import { Skeleton } from "./ui/skeleton";
 
 export default function OrderCardSkeleton() {
@@ -9,7 +10,7 @@ export default function OrderCardSkeleton() {
                 <Skeleton className="" />
                 <Skeleton className="" />
             </div>
-            <div className={styles.orderItemsContainer}>
+            <div className='flex flex-col'>
                 {new Array(10).fill(null).map((_, i) => <OrderItemCardSkeleton key={i} />)}
             </div>
         </div>

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,26 +17,23 @@ import com.swiftcart.swiftcart.features.order.ShippingService;
 import com.swiftcart.swiftcart.features.product.Product;
 import com.swiftcart.swiftcart.features.product.ProductService;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class CartService {
 
-    @Autowired
-    private CartItemRepository cartItemRepo;
+    private final CartItemRepository cartItemRepo;
 
-    @Autowired
-    private CartRepository cartRepo;
+    private final CartRepository cartRepo;
 
-    @Autowired
-    private ProductService productService;
+    private final ProductService productService;
 
-    @Autowired
-    private ShippingService shippingService;
+    private final ShippingService shippingService;
 
-    @Autowired
-    private CartItemMapper cartItemMapper;
+    private final CartItemMapper cartItemMapper;
 
-    @Autowired
-    private AppUserRepository userRepo;
+    private final AppUserRepository userRepo;
 
     @Transactional
     public CartResponse addProductToCart(Long userId, Long productId, int quantity) {

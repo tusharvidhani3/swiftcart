@@ -7,7 +7,7 @@ spring:
       max-request-size: 15MB
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
     open-in-view: false
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:dev}
@@ -19,6 +19,7 @@ spring:
     redis:
       host: ${SPRING_DATA_REDIS_HOST:localhost}
       port: ${SPRING_DATA_REDIS_PORT:6379}
+      password: ${SPRING_DATA_REDIS_PASSWORD:}
   cache:
     type: redis
 app:
@@ -29,7 +30,7 @@ app:
           client-id: ${APP_SECURITY_AUTH_PROVIDER_GOOGLE_CLIENT_ID}
       access-token:
         expiration-minutes: 15
-        secret-key: ${APP_SECURITY_AUTH_ACCESS_TOKEN_SECRET_KEY:devSecretKey123}
+        secret-key: ${APP_SECURITY_AUTH_ACCESS_TOKEN_SECRET_KEY}
       refresh-token:
         expiration-days: 30
     cors:
@@ -40,16 +41,16 @@ app:
     flat-rate: 70
     free-threshold: 999
   product:
-      images-dir: ${APP_PRODUCT_IMAGES_DIR:${user.home}/cdn/${spring.application.name}_uploads}
+      images-dir: ${APP_PRODUCT_IMAGES_DIR:/app/uploads}
 server:
   forward-headers-strategy: framework
 logging:
   level:
     org:
       springframework:
-        security: TRACE
+        security: ${LOGGING_LEVEL_SPRING_SECURITY:TRACE}
 management:
   endpoints:
     web:
       exposure:
-        include: '*'
+        include: 'health,info,metrics'

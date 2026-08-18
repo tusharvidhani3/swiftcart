@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
@@ -28,38 +27,31 @@ import com.swiftcart.swiftcart.common.exception.BadRequestException;
 import com.swiftcart.swiftcart.common.exception.ResourceNotFoundException;
 import com.swiftcart.swiftcart.features.product.ProductService;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class OrderService {
 
-    @Autowired
-    private OrderItemRepository orderItemRepo;
+    private final OrderItemRepository orderItemRepo;
 
-    @Autowired
-    private OrderRepository orderRepo;
+    private final OrderRepository orderRepo;
 
-    @Autowired
-    private ProductService productService;
+    private final ProductService productService;
 
-    @Autowired
-    private CartService cartService;
+    private final CartService cartService;
 
-    @Autowired
-    private AddressService addressService;
+    private final AddressService addressService;
 
-    @Autowired
-    private PaymentService paymentService;
+    private final PaymentService paymentService;
 
-    @Autowired
-    private AddressMapper addressMapper;
+    private final AddressMapper addressMapper;
 
-    @Autowired
-    private OrderMapper orderMapper;
+    private final OrderMapper orderMapper;
 
-    @Autowired
-    private ShippingService shippingService;
+    private final ShippingService shippingService;
 
-    @Autowired
-    private AppUserRepository userRepo;
+    private final AppUserRepository userRepo;
 
     @Transactional
     public OrderResponse createOrder(PlaceOrderRequest placeOrderRequest, Long userId) throws RazorpayException {

@@ -3,7 +3,6 @@ package com.swiftcart.swiftcart.features.address;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,17 +10,17 @@ import org.springframework.transaction.annotation.Transactional;
 import com.swiftcart.swiftcart.common.exception.ResourceNotFoundException;
 import com.swiftcart.swiftcart.features.appuser.AppUserRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class AddressService {
 
-    @Autowired
-    private AddressRepository addressRepo;
+    private final AddressRepository addressRepo;
 
-    @Autowired
-    private AddressMapper addressMapper;
+    private final AddressMapper addressMapper;
 
-    @Autowired
-    private AppUserRepository userRepo;
+    private final AppUserRepository userRepo;
 
     @Transactional
     public AddressDto addAddress(AddressDto addressDto, Long userId) {

@@ -1,55 +1,35 @@
 import styles from '../styles/Cart.module.css'
 import { CirclePlus, CircleMinus } from 'lucide-react'
-import { useContext } from 'react'
-import ToastContext from '../contexts/ToastContext'
 import { useNavigate } from 'react-router'
-import { useAuthFetch } from '../hooks/useAuthFetch'
-import { apiBaseUrl } from '../config'
 import { formatPaiseToRupees } from '../utils/currency'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-
-async function apiRemoveCartItem(authFetch, cartItemId) {
-    const res = await authFetch(`${apiBaseUrl}/api/carts/items/${cartItemId}`, {
-        method: "DELETE",
-    })
-    return await res.json()
-}
-
-async function apiChangeQty(authFetch, cartItemId, newQuantity ) {
-    const res = await authFetch(`${apiBaseUrl}/api/carts/items/${cartItemId}`, {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ "quantity": newQuantity })
-    })
-    if (res.status === 409) {
-        const error = new Error()
-        error.status = 409
-        throw error
-    }
-    return await res.json()
-}
+import { Button } from './ui/button'
+import { toast } from 'sonner'
+import { api } from '@/api/client'
 
 export default function CartItem({ id, product, quantity }) {
 
-    const { showToast } = useContext(ToastContext)
     const navigate = useNavigate()
-    const authFetch = useAuthFetch()
 
     const queryClient = useQueryClient()
 
     const { mutate: removeCartItem } = useMutation({
-        mutationFn: (cartItemId) => apiRemoveCartItem(authFetch, cartItemId),
-        onSuccess: (cart) => queryClient.setQueryData(['cart'], cart)
+        mutationFn: (cartItemId) => api.delete(`/carts/items/${cartItemId}`),
+        onSuccess: (cart) => {
+            queryClient.invalidateQueries({ queryKey: ['cart', 'summary'] })
+            queryClient.setQueryData(['cart'], cart)
+        }
     })
 
     const { mutate: changeQty } = useMutation({
-        mutationFn: ({ cartItemId, newQuantity }) => apiChangeQty(authFetch, cartItemId, newQuantity),
-        onSuccess: (cart) => queryClient.setQueryData(['cart'], cart),
+        mutationFn: ({ cartItemId, newQuantity }) => api.patch(`/carts/items/${cartItemId}`, { quantity: newQuantity }),
+        onSuccess: (cart) => {
+            queryClient.invalidateQueries({ queryKey: ['cart', 'summary'] })
+            queryClient.setQueryData(['cart'], cart)
+        },
         onError: (error) => {
-            if (error.status)
-                showToast("Cannot add more items. Stock limit reached")
+            if (error.status === 409)
+                toast.warning("Stock limit reached")
         }
     })
 
@@ -66,7 +46,7 @@ export default function CartItem({ id, product, quantity }) {
                 <button className={styles.btnQty} onClick={() => changeQty({cartItemId: id, newQuantity: quantity + 1})}><CirclePlus /></button>
                 <span className={styles.qty}>{quantity}</span>
                 <button className={`${styles.btnQty} ${quantity == 1 ? styles.grayedOut : ""}`} onClick={() => changeQty({cartItemId: id, newQuantity: quantity - 1})}><CircleMinus /></button>
-                <button className={styles.btnRemove} onClick={() => removeCartItem(id)}>Remove</button>
+                <Button variant='outline' className='border' onClick={() => removeCartItem(id)}>Remove</Button>
             </div>
         </div>
     )

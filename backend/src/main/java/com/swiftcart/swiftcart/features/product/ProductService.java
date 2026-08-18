@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,23 +14,21 @@ import com.swiftcart.swiftcart.common.exception.InsufficientStockException;
 import com.swiftcart.swiftcart.common.exception.ResourceNotFoundException;
 import com.swiftcart.swiftcart.common.storage.StorageService;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class ProductService {
 
-    @Autowired
-    private StorageService storageService;
+    private final StorageService storageService;
 
-    @Value("${app.product.images-dir}")
-    private String uploadDir;
+    private final ProductProperties productProperties;
 
-    @Autowired
-    private ProductRepository productRepo;
+    private final ProductRepository productRepo;
 
-    @Autowired
-    private ProductImageRepository productImageRepo;
+    private final ProductImageRepository productImageRepo;
 
-    @Autowired
-    private ProductMapper productMapper;
+    private final ProductMapper productMapper;
 
     @Transactional
     public SellerProductResponse createProduct(ProductRequest productRequest, List<MultipartFile> productImages) {
@@ -45,7 +41,7 @@ public class ProductService {
         product.setDescription(productRequest.description());
         List<ProductImage> images = new ArrayList<>();
         productImages.stream().forEach(productImage -> {
-            String fullPath = storageService.store(productImage, uploadDir);
+            String fullPath = storageService.store(productImage, productProperties.imagesDir());
             int relativeStartIndex = fullPath.indexOf("uploads/");
             String relativePath = fullPath.substring(relativeStartIndex);
             ProductImage image = new ProductImage();
@@ -81,7 +77,7 @@ public class ProductService {
             productImageRepo.deleteByProductId(productId);
             List<ProductImage> images = new ArrayList<>();
             productImages.stream().forEach(productImage -> {
-                String fullPath = storageService.store(productImage, uploadDir);
+                String fullPath = storageService.store(productImage, productProperties.imagesDir());
                 int relativeStartIndex = fullPath.indexOf("uploads/");
                 String relativePath = fullPath.substring(relativeStartIndex);
                 ProductImage image = new ProductImage();

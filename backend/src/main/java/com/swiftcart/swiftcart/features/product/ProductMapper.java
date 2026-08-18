@@ -8,16 +8,14 @@ import org.mapstruct.MappingTarget;
 public interface ProductMapper {
     
     @Mapping(source = "images", target = "imageUrls")
+    @Mapping(target = "isOutOfStock", expression = "java(product.getStock() == 0)")
     ProductResponse toResponse(Product product);
 
     default String toImageUrl(ProductImage image) {
         return image != null ? image.getImageUrl() : null;
     }
 
-    default boolean toOutOfStock(Integer stock) {
-        return stock == 0;
-    }
-
+    @Mapping(target = "images", ignore = true)
     void update(ProductRequest productRequest, @MappingTarget Product existingProduct);
 
     @Mapping(source = "images", target = "imageUrls")

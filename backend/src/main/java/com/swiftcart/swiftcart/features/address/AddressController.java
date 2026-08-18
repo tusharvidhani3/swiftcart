@@ -3,13 +3,13 @@ package com.swiftcart.swiftcart.features.address;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.swiftcart.swiftcart.common.security.UserPrincipal;
+import com.swiftcart.swiftcart.common.security.AppUserDetails;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,47 +26,47 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController
 @RequestMapping("api/addresses")
 @PreAuthorize("hasRole('CUSTOMER') or hasRole('SELLER')")
+@RequiredArgsConstructor
 public class AddressController {
 
-    @Autowired
-    private AddressService addressService;
+    private final AddressService addressService;
 
     @GetMapping
-    public ResponseEntity<List<AddressDto>> getLoggedInUserAddresses(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+    public ResponseEntity<List<AddressDto>> getLoggedInUserAddresses(@AuthenticationPrincipal AppUserDetails userPrincipal) {
         return ResponseEntity.ok(addressService.getAddressesForLoggedInUser(userPrincipal.getUserId()));
     }
     
     @PostMapping
-    public ResponseEntity<AddressDto> addAddress(@Valid @RequestBody AddressDto addressDto, @AuthenticationPrincipal UserPrincipal userPrincipal) {
+    public ResponseEntity<AddressDto> addAddress(@Valid @RequestBody AddressDto addressDto, @AuthenticationPrincipal AppUserDetails userPrincipal) {
         return ResponseEntity.status(HttpStatus.CREATED).body(addressService.addAddress(addressDto, userPrincipal.getUserId()));
     }
 
     @GetMapping("{addressId}")
-    public ResponseEntity<AddressDto> getAddress(@PathVariable Long addressId, @AuthenticationPrincipal UserPrincipal userPrincipal) {
+    public ResponseEntity<AddressDto> getAddress(@PathVariable Long addressId, @AuthenticationPrincipal AppUserDetails userPrincipal) {
         AddressDto addressDto = addressService.getAddress(addressId, userPrincipal.getUserId());
         return ResponseEntity.ok(addressDto);
     }
 
     @DeleteMapping("{addressId}")
-    public ResponseEntity<Void> deleteAddress(@PathVariable Long addressId, @AuthenticationPrincipal UserPrincipal userPrincipal) {
+    public ResponseEntity<Void> deleteAddress(@PathVariable Long addressId, @AuthenticationPrincipal AppUserDetails userPrincipal) {
         addressService.deleteAddress(addressId, userPrincipal.getUserId());
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping()
-    public ResponseEntity<AddressDto> updateAddress(@RequestBody @Valid AddressDto addressDto, @AuthenticationPrincipal UserPrincipal userPrincipal) {
+    public ResponseEntity<AddressDto> updateAddress(@RequestBody @Valid AddressDto addressDto, @AuthenticationPrincipal AppUserDetails userPrincipal) {
         return ResponseEntity.ok(addressService.updateAddress(addressDto, userPrincipal.getUserId()));
     }
 
     @PatchMapping("{addressId}/default")
     @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<AddressDto> changeDefaultAddress(@PathVariable Long addressId, @AuthenticationPrincipal UserPrincipal userPrincipal) {
+    public ResponseEntity<AddressDto> changeDefaultAddress(@PathVariable Long addressId, @AuthenticationPrincipal AppUserDetails userPrincipal) {
         return ResponseEntity.ok(addressService.changeDefaultAddress(addressId, userPrincipal.getUserId()));
     }
 
     @GetMapping("default")
     @PreAuthorize("hasRole('CUSTOMER')")
-    public ResponseEntity<AddressDto> getDefaultAddress(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+    public ResponseEntity<AddressDto> getDefaultAddress(@AuthenticationPrincipal AppUserDetails userPrincipal) {
         return ResponseEntity.ok(addressService.getDefaultAddressForUser(userPrincipal.getUserId()));
     }
 }

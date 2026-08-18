@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.razorpay.RazorpayClient;
@@ -16,28 +14,24 @@ import com.swiftcart.swiftcart.features.order.OrderItem;
 import com.swiftcart.swiftcart.features.order.OrderItemRepository;
 import com.swiftcart.swiftcart.features.order.OrderStatus;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class PaymentService {
 
-    @Value("${RAZORPAY_KEY_ID}")
-    private String keyId;
+    private final RazorpayProperties razorpayProperties;
 
-    @Value("${RAZORPAY_KEY_SECRET}")
-    private String keySecret;
+    private final PaymentMapper paymentMapper;
 
-    @Autowired
-    private PaymentMapper paymentMapper;
+    private final PaymentRepository paymentRepo;
 
-    @Autowired
-    private PaymentRepository paymentRepo;
-
-    @Autowired
-    private OrderItemRepository orderItemRepo;
+    private final OrderItemRepository orderItemRepo;
 
     public PaymentDto createOrder(Order order) throws RazorpayException {
-        RazorpayClient razorpay = new RazorpayClient(keyId, keySecret);
+        RazorpayClient razorpay = new RazorpayClient(razorpayProperties.keyId(), razorpayProperties.keySecret());
         JSONObject orderRequest = new JSONObject();
-        orderRequest.put("amount", order.getTotalAmount()*100);
+        orderRequest.put("amount", order.getTotalAmount());
         orderRequest.put("currency", "INR");
         orderRequest.put("receipt", "txn_" + System.currentTimeMillis());
         com.razorpay.Order paymentOrder = razorpay.orders.create(orderRequest);

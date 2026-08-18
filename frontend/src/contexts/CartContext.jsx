@@ -1,60 +1,33 @@
 import { createContext, useContext } from "react";
 import UserContext from "./UserContext";
-import { useAuthFetch } from "../hooks/useAuthFetch";
-import { apiBaseUrl } from "../config";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import ToastContext from "./ToastContext";
+import { toast } from "sonner";
+import { api } from "@/api/client";
 
 const CartContext = createContext()
 export default CartContext
 
-async function apiAddToCart(authFetch, productId) {
-    const res = await authFetch(`${apiBaseUrl}/api/carts/items`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ productId: productId, quantity: 1 })
-    })
-    const response = await res.json()
-    if(!res.ok) {
-        const error = new Error()
-        error.status = response.status
-        error.message = response.title
-        throw error
-    }
-    return response
-}
-
-async function getCart(authFetch) {
-    const res = await authFetch(`${apiBaseUrl}/api/carts`, {
-        method: "GET"
-    })
-    return await res.json()
-}
-
 export function CartProvider({ children }) {
 
-    const { userInfo } = useContext(UserContext)
-    const authFetch = useAuthFetch()
-    const { showToast } = useContext(ToastContext)
+    const { user } = useContext(UserContext)
 
     const { data: cart } = useQuery({
         queryKey: ['cart'],
-        queryFn: () => getCart(authFetch),
+        queryFn: () => api.get('/carts'),
         staleTime: 1000 * 60 * 5,
-        enabled: !!userInfo
+        enabled: !!user
     })
 
     const queryClient = useQueryClient()
 
     const { mutate: addToCart } = useMutation({
-        mutationFn: (productId) => apiAddToCart(authFetch, productId),
+        mutationFn: (productId) => api.post(`/carts/items`, { productId: productId, quantity: 1 }),
         onSuccess: (updatedCart) => {
+            queryClient.invalidateQueries({ queryKey: ['cart', 'summary'] })
             queryClient.setQueryData(['cart'], updatedCart)
-            showToast("Product added to cart")
+            toast.success("Product added to cart")
         },
-        onError: error => showToast(error.message || 'Failed to add product to cart')
+        onError: error => toast.error(error.response?.data?.message || 'Failed to add product to cart')
     })
 
     return (

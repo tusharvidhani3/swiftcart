@@ -3,7 +3,7 @@
     border: none;
     width: fit-content;
     height: 36px;
-    background-color: #FF9800;
+    background-color: var(--accent-color);
     display: flex;
     align-items: center;
     font-size: 16px;
@@ -72,15 +72,18 @@
     position: absolute;
     justify-content: center;
     align-items: center;
-    background-color: #FF9800;
+    background-color: var(--accent-color);
     color: black;
     display: none;
     border-radius: 50%;
-    width: 16px;
-    height: 16px;
+    aspect-ratio: 1 / 1;
+    max-width: 22px;
+    min-width: 18px;
     left: 12px;
-    top: 2px;
+    top: -4px;
     padding: 1px;
+    font-weight: bold;
+    font-size: 12px;
 }
 
 .loggedIn .cartCount {

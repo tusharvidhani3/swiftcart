@@ -5,7 +5,6 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,17 +13,17 @@ import com.swiftcart.swiftcart.common.security.JwtService;
 import com.swiftcart.swiftcart.features.appuser.AppUser;
 import com.swiftcart.swiftcart.features.appuser.AppUserRepository;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class RefreshTokenService {
 
-    @Autowired
-    RefreshTokenRepository refreshTokenRepo;
+    final RefreshTokenRepository refreshTokenRepo;
 
-    @Autowired
-    JwtService jwtService;
+    final JwtService jwtService;
 
-    @Autowired
-    private AppUserRepository userRepo;
+    private final AppUserRepository userRepo;
 
     public String generateRefreshToken(Long userId) {
         AppUser user = userRepo.getReferenceById(userId);
@@ -38,23 +37,22 @@ public class RefreshTokenService {
     }
 
     public String generateAccessToken(String token) {
-        RefreshToken refreshToken = refreshTokenRepo.findByTokenWithUserAndRole(token);
+        RefreshToken refreshToken = refreshTokenRepo.findByToken(token);
         AppUser user = refreshToken.getUser();
         return jwtService.generateToken(user.getId(), user.getEmail(), user.getMobileNumber(), user.getRole().getName());
     }
 
+    @Transactional
     public void invalidateRefreshToken(String token) {
         RefreshToken refreshToken = refreshTokenRepo.findByToken(token);
-        if(!refreshToken.isRevoked()) {
+        if(refreshToken != null && !refreshToken.isRevoked())
             refreshToken.setRevoked(true);
-            refreshTokenRepo.save(refreshToken);
-        }
     }
 
     public boolean isValid(String token) {
         RefreshToken refreshToken = refreshTokenRepo.findByToken(token);
         Instant currentTime = Instant.now();
-        if(refreshToken.isRevoked() || currentTime.isAfter(refreshToken.getExpiresAt()))
+        if(refreshToken == null || refreshToken.isRevoked() || currentTime.isAfter(refreshToken.getExpiresAt()))
             return false;
         return true;
     }

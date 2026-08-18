@@ -1,80 +1,24 @@
 import { createContext } from "react"
-import { apiBaseUrl } from "../config"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { useApi } from "../hooks/useApi"
-import { useAuthFetch } from "../hooks/useAuthFetch"
+import { useQuery } from "@tanstack/react-query"
+import { api } from "../api/client"
 
 const UserContext = createContext()
 export default UserContext
 
-async function handleRegister(apiFetch, authForm) {
-    const res = await apiFetch(`${apiBaseUrl}/api/auth/register`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(authForm)
-    })
-    return await res.json()
-}
-
-async function handleLogout(apiFetch) {
-    await apiFetch(`${apiBaseUrl}/api/auth/logout`, {
-        method: "POST",
-        credentials: "include"
-    })
-}
-
-async function handleLogin(apiFetch, userCredentials) {
-    const res = await apiFetch(`${apiBaseUrl}/api/auth/login`, {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        credentials: 'include',
-        body: JSON.stringify(userCredentials)
-    })
-    if (res.ok)
-        return await res.json()
-    else if (res.status === 401) {
-        const error = new Error()
-        error.status = 401
-        throw error
-    }
-}
-
-async function getUserInfo(authFetch) {
-    const res = await authFetch(`${apiBaseUrl}/api/users/me`, {
-        method: "GET"
-    })
-    const response = await res.json()
-    if (!res.ok) {
-        const error = new Error()
-        error.message = response.title
-        error.status = response.status
-        throw error
-    }
-    return response
-}
-
 export function UserProvider({ children }) {
 
-    const apiFetch = useApi()
-    const authFetch = useAuthFetch()
-
-    const queryClient = useQueryClient()
-
-    const { data: userInfo, isError, error } = useQuery({
+    const { data: user, isLoading: isUserLoading, isError, error } = useQuery({
         queryKey: ['user'],
-        queryFn: () => getUserInfo(authFetch),
-        staleTime: 1000 * 60 * 60 * 24,
+        queryFn: () => api.get('/users/me'),
+        staleTime: Infinity,
+        refetchOnWindowFocus: false,
         retry: (failureCount, error) => {
             if (failureCount >= 3) return false;
 
-            if (!error.status) return true;
+            if (!error.response?.status) return true;
 
             const transientStatuses = [502, 503, 504];
-            if (transientStatuses.includes(error.status)) {
+            if (transientStatuses.includes(error.response?.status)) {
                 return true;
             }
 
@@ -82,29 +26,8 @@ export function UserProvider({ children }) {
         }
     })
 
-    const { mutate: register } = useMutation({
-        mutationFn: (authForm) => handleRegister(apiFetch, authForm),
-        onSuccess: (user) => {
-            queryClient.setQueryData(['user'], user)
-        }
-    })
-
-    const { mutate: login } = useMutation({
-        mutationFn: (authForm) => handleLogin(apiFetch, authForm),
-        onSuccess: (user) => {
-            queryClient.setQueryData(['user'], user)
-        }
-    })
-
-    const { mutate: logout } = useMutation({
-        mutationFn: () => handleLogout(apiFetch),
-        onSuccess: () => {
-            queryClient.resetQueries({ queryKey: ['user'], exact: true });
-        }
-    })
-
     return (
-        <UserContext.Provider value={{ userInfo, login, register, logout }}>
+        <UserContext.Provider value={{ user, isUserLoading }}>
             {children}
         </UserContext.Provider>
     )

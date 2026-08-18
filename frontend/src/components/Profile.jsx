@@ -1,31 +1,21 @@
 import { useContext, useEffect, useState } from "react";
 import styles from "../styles/Profile.module.css";
 import UserContext from "../contexts/UserContext";
-import { useAuthFetch } from "../hooks/useAuthFetch";
-import { apiBaseUrl } from "../config";
-import ToastContext from '../contexts/ToastContext'
 import { Loader2 } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { api } from "@/api/client";
 
-async function apiUpdateProfile(authFetch, profileForm) {
+async function apiUpdateProfile(profileForm) {
     const profileFormData = new FormData(profileForm)
-    const res = await authFetch(`${apiBaseUrl}/api/users`, {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(Object.fromEntries(profileFormData.entries()))
-    })
-    return await res.json()
+    return api.put(`/users`, Object.fromEntries(profileFormData.entries()))
 }
 
 export default function Profile() {
 
-    const { userInfo } = useContext(UserContext)
+    const { user } = useContext(UserContext)
     const [modifiedUserInfo, setModifiedUserInfo] = useState({})
-    const authFetch = useAuthFetch()
     const [errorData, setErrorData] = useState({})
-    const { showToast } = useContext(ToastContext)
     const validationConfig = {
         mobileNumber: [{ required: true, message: 'Mobile number cannot be empty' }, { pattern: /^[6789]{1}[0-9]{9}$/, message: 'Please enter a valid 10-digit mobile number' }],
         email: [{ pattern: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, message: 'Invalid email' }],
@@ -34,13 +24,13 @@ export default function Profile() {
     }
 
     useEffect(() => {
-        if (userInfo) {
-            setModifiedUserInfo(userInfo)
+        if (user) {
+            setModifiedUserInfo(user)
         }
-    }, [userInfo])
+    }, [user])
 
     useEffect(() => {
-        const unmodified = Object.keys(modifiedUserInfo).every(key => modifiedUserInfo[key] === userInfo[key])
+        const unmodified = Object.keys(modifiedUserInfo).every(key => modifiedUserInfo[key] === user[key])
         if (unmodified)
             setFormModified(false)
     }, [modifiedUserInfo])
@@ -50,10 +40,10 @@ export default function Profile() {
     const queryClient = useQueryClient()
 
     const { mutate: updateProfile } = useMutation({
-        mutationFn: (profile) => apiUpdateProfile(authFetch, profile),
+        mutationFn: (profile) => apiUpdateProfile(profile),
         onSuccess: (updatedUser) => { 
             queryClient.setQueryData(['user'], updatedUser)
-            showToast('Profile updated successfully')
+            toast.success('Profile updated successfully')
         }
     })
 
@@ -126,7 +116,7 @@ export default function Profile() {
                     <input type="text" id="firstName" name="firstName" value={modifiedUserInfo.firstName} onChange={e => {
                         setModifiedUserInfo({ ...modifiedUserInfo, firstName: e.target.value })
                         revokeError(e.target.name)
-                        if (e.target.value !== userInfo.firstName)
+                        if (e.target.value !== user.firstName)
                             setFormModified(true)
                     }} onBlur={e => validateFormField(e.target.name)} />
                     <div className={styles.error}>{errorData.firstName}</div>
@@ -136,7 +126,7 @@ export default function Profile() {
                     <input type="text" id="lastName" name="lastName" value={modifiedUserInfo.lastName} onChange={e => {
                         setModifiedUserInfo({ ...modifiedUserInfo, lastName: e.target.value })
                         revokeError(e.target.name)
-                        if (e.target.value !== userInfo.lastName)
+                        if (e.target.value !== user.lastName)
                             setFormModified(true)
                     }} onBlur={e => validateFormField(e.target.name)} />
                     <div className={styles.error}>{errorData.lastName}</div>
@@ -147,7 +137,7 @@ export default function Profile() {
                 <input type="email" id="email" name="email" autoComplete="email" value={modifiedUserInfo.email} onChange={e => {
                     setModifiedUserInfo({ ...modifiedUserInfo, email: e.target.value })
                     revokeError(e.target.name)
-                    if (e.target.value !== userInfo.email)
+                    if (e.target.value !== user.email)
                         setFormModified(true)
                 }} onBlur={e => validateFormField(e.target.name)} />
                 <div className={styles.error}>{errorData.email}</div>

@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 public record DailyOrderStats(
     LocalDate date,
-    long revenue,
-    long orderItems,
-    long orders
+    Long revenue,
+    Long orders,
+    Long orderItems
 ) {}

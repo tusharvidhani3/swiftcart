@@ -3,7 +3,7 @@ import styles from '../styles/OrderDetails.module.css'
 import { generateStatus } from './OrderItemCard'
 import { formatPaiseToRupees } from '../utils/currency'
 
-export default function OrderItemDetailsCard({ id, product, orderItemStatus, deliveryAt, quantity, setOrders }) {
+export default function OrderItemDetailsCard({ id, product, orderItemStatus, deliveryAt, quantity }) {
 
     const navigate = useNavigate()
 
@@ -16,7 +16,7 @@ export default function OrderItemDetailsCard({ id, product, orderItemStatus, del
                     <span className={styles.productQty}>{product.quantity}</span>
                     <div className={styles.productInfo}>
                         <div className={styles.productTitle}>{product.name}</div>
-                        <p className={styles.itemTotal}>₹{(formatPaiseToRupees(product.price) * quantity)}</p>
+                        <p className={styles.itemTotal}>{(formatPaiseToRupees(product.price * quantity))}</p>
                         <p className={styles.status}></p>
                     </div>
                 </div>

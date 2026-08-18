@@ -4,116 +4,81 @@ import razorpayLogo from '../assets/icons/razorpay-logo.svg'
 import { useContext, useEffect, useState } from "react"
 import AddressesContext from "../contexts/AddressesContext"
 import { useNavigate, useSearchParams } from "react-router"
-import { useAuthFetch } from "../hooks/useAuthFetch"
 import useMediaQuery from "../hooks/useMediaQuery"
 import ManageAddresses from "./ManageAddresses"
-import { apiBaseUrl } from "../config"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { Loader2 } from "lucide-react"
-
-async function apiPlaceOrder(authFetch, isPrepaid, selectedAddressId) {
-    const res = await authFetch(`${apiBaseUrl}/api/orders/checkout`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            prepaid: isPrepaid,
-            shippingAddressId: selectedAddressId
-        })
-    })
-    return await res.json()
-}
-
-async function apiPlaceBuyNowOrder(authFetch, cartItemId, selectedAddressId, isPrepaid) {
-    const res = await authFetch(`${apiBaseUrl}/api/orders/checkout/buy-now`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            cartItemId: cartItemId,
-            shippingAddressId: selectedAddressId,
-            prepaid: isPrepaid
-        })
-    })
-    return await res.json()
-}
-
-async function getCartSummary(authFetch) {
-    const res = await authFetch(`${apiBaseUrl}/api/carts/summary`, {
-        method: 'GET'
-    })
-    return await res.json()
-}
-
-async function getDefaultAddress(authFetch) {
-    const res = await authFetch(`${apiBaseUrl}/api/addresses/default`, {
-        method: 'GET'
-    })
-    const response = await res.json()
-    console.log(response)
-    if (res.ok)
-        return response
-    else if (response.status === 404) {
-        const error = new Error()
-        error.status = 404
-        throw error
-    }
-}
+import useRazorpay from "../hooks/useRazorpay"
+import { api } from "@/api/client"
 
 export default function Checkout() {
 
-    const { selectedAddress, setSelectedAddress } = useContext(AddressesContext)
+    const { selectedAddressId, setSelectedAddressId } = useContext(AddressesContext)
     const [isPrepaid, setPrepaid] = useState(true)
     const navigate = useNavigate()
-    const authFetch = useAuthFetch()
-    const [ searchParams ] = useSearchParams()
+    const [searchParams] = useSearchParams()
     const isBuyNow = searchParams.get('source') === 'buy_now'
     const [showAddressSelector, setShowAddressSelector] = useState(false)
     const isMobile = useMediaQuery('(max-width: 767px)')
+    const handlePayment = useRazorpay()
 
     const { data: defaultAddress, isError: isDefaultAddressUnavailable, error: defaultAddressError } = useQuery({
         queryKey: ['addresses', 'detail', 'default'],
-        queryFn: () => getDefaultAddress(authFetch),
+        queryFn: () => api.get('/api/addresses/default'),
         staleTime: 1000 * 60 * 5,
-        retry: 1,
-        enabled: !selectedAddress
+        retry: false,
+        enabled: !selectedAddressId,
+        onSuccess: (defAddress) => setSelectedAddressId(defAddress.id)
     })
 
     const { data: cartSummary, isLoading: isCartSummaryLoading } = useQuery({
         queryKey: ['cart', 'summary'],
-        queryFn: () => getCartSummary(authFetch),
+        queryFn: () => api.get(`/carts/summary`),
         staleTime: 1000 * 60 * 5
     })
 
-    console.log(cartSummary)
+    useEffect(() => {
+        if (cartSummary && !cartSummary.items.length) {
+            navigate('/cart');
+        }
+    }, [cartSummary])
+
+    const { data: selectedAddress } = useQuery({
+        queryKey: ['addresses', selectedAddressId],
+        queryFn: () => api.get(`/api/addresses/${selectedAddressId}`),
+        staleTime: 1000 * 60 * 5,
+        enabled: !!selectedAddressId
+    })
 
     useEffect(() => {
-        if(isDefaultAddressUnavailable && defaultAddressError.status === 404)
+        if (isDefaultAddressUnavailable && defaultAddressError.status === 404)
             navigate('/addresses/select')
     }, [isDefaultAddressUnavailable])
-
-    useEffect(() => setSelectedAddress(defaultAddress), [defaultAddress])
 
     const queryClient = useQueryClient()
 
     const { mutate: placeOrder } = useMutation({
-        mutationFn: ({ isPrepaid, selectedAddressId }) => apiPlaceOrder(authFetch, isPrepaid, selectedAddressId),
-        onSuccess: (order) => {
+        mutationFn: ({ isPrepaid, selectedAddressId }) => api.post(`/orders/checkout`, { prepaid: isPrepaid, shippingAddressId: selectedAddressId }),
+        onSuccess: (orderResponse) => {
             queryClient.invalidateQueries({ queryKey: ['cart'] })
-            queryClient.setQueryData(['orders', 'list', order.id], order)
-        }
+            queryClient.setQueryData(['orders', 'list', orderResponse.id], orderResponse)
+            if(isPrepaid) {
+                handlePayment(orderResponse)
+            }
+        },
+        onError: (error) => console.log(error)
     })
 
     const { mutate: placeBuyNowOrder } = useMutation({
-        mutationFn: ({ cartItemId, selectedAddressId, isPrepaid }) => apiPlaceBuyNowOrder(authFetch, cartItemId, selectedAddressId, isPrepaid),
-        onSuccess: (order) => {
-            queryClient.setQueryData(['orders', 'list', order.id], order)
-        }
+        mutationFn: ({ cartItemId, selectedAddressId, isPrepaid }) => api.post(`/orders/checkout/buy-now`, { cartItemId: cartItemId, shippingAddressId: selectedAddressId, prepaid: isPrepaid }),
+        onSuccess: (orderResponse) => {
+            queryClient.setQueryData(['orders', 'list', orderResponse.id], orderResponse)
+            if(isPrepaid) {
+                handlePayment(orderResponse)
+            }
+        },
+        onError: (error) => console.log(error)
     })
-
-    console.log(cartSummary)
 
     return isCartSummaryLoading ? <Loader2 className="animate-spin" /> : (
         <>
@@ -134,7 +99,7 @@ export default function Checkout() {
                     <ManageAddresses isSelectMode={true} setShowAddressSelector={setShowAddressSelector} />
                 </div>}
             </section>
-            <PriceDetails nextBtnClick={isBuyNow ? placeBuyNowOrder(authFetch, cartSummary?.items[0]?.id, selectedAddress.id, isPrepaid) : placeOrder(authFetch, isPrepaid, selectedAddress.id)} cart={cartSummary} isCheckoutMode={true} isCod={!isPrepaid} />
+            <PriceDetails nextBtnClick={() => isBuyNow ? placeBuyNowOrder({ cartItemId: cartSummary.items[0].id, selectedAddressId, isPrepaid }) : placeOrder({ isPrepaid, selectedAddressId })} cart={cartSummary} isCheckoutMode={true} isCod={!isPrepaid} />
             <section className={styles.paymentMethod}>
                 <h2>Payment Method</h2>
                 <form id={styles.paymentForm}>

@@ -1,34 +1,19 @@
 import styles from '../styles/SellerOrders.module.css'
 import razorpayLogo from '../assets/icons/razorpay-logo.svg'
-import { useAuthFetch } from '../hooks/useAuthFetch'
-import { apiBaseUrl } from '../config'
 import { Link } from 'react-router'
 import { useContext, useState } from 'react'
 import UIContext from '../contexts/UIContext'
 import { useMutation } from '@tanstack/react-query'
-
-async function apiCancelOrder(authFetch, orderId) {
-    const res = await authFetch(`${apiBaseUrl}/api/orders/items/${orderId}`, {
-        method: 'PATCH',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            orderStatus: 'CANCELLED_BY_SELLER'
-        })
-    })
-    return await res.json()
-}
+import { api } from '@/api/client'
 
 export default function SellerOrderCard({ orderId, placedAt, shippingAddress, totalAmount, orderItems, payment }) {
 
     const orderDate = new Date(placedAt)
-    const authFetch = useAuthFetch()
     const { isMobile } = useContext(UIContext)
     const [threeDotsMenuOpen, setThreeDotsMenuOpen] = useState(false)
 
     const { mutate: cancelOrder } = useMutation({
-        mutationFn: (orderId) => apiCancelOrder(authFetch, orderId),
+        mutationFn: (orderId) => api.patch(`/orders/items/${orderId}`, { orderStatus: 'CANCELLED_BY_SELLER' }),
         onSuccess: apiCancelOrder
     })
 

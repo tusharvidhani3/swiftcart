@@ -1,8 +1,8 @@
 import '../styles/GoogleLoginButton.css'
 
-export default function GoogleLoginButton({ width }) {
+export default function GoogleLoginButton({ classes, onClick }) {
     return (
-        <button className={`gsi-material-button ${width}`}>
+        <button type='button' className={`gsi-material-button ${classes}`} onClick={onClick}>
             <div className="gsi-material-button-state"></div>
             <div className="gsi-material-button-content-wrapper">
                 <div className="gsi-material-button-icon">

@@ -1,5 +1,4 @@
 import { useContext } from "react";
-import { ToastProvider } from "../contexts/ToastContext";
 import SellerHeader from "./SellerHeader";
 import UIContext from "../contexts/UIContext";
 import { Outlet } from "react-router";
@@ -11,7 +10,7 @@ export default function SellerApp({ mainClass }) {
     const { isMobile } = useContext(UIContext)
 
     return (
-        <ToastProvider>
+        <>
             {isMobile && <SellerHeader />}
             <div className='sellerApp'>
                 <SideMenu isSideMenuOpen={isSideMenuOpen} setSideMenuOpen={setSideMenuOpen} />
@@ -20,6 +19,6 @@ export default function SellerApp({ mainClass }) {
                     <Outlet />
                 </main>
             </div>
-        </ToastProvider>
+        </>
     )
 }

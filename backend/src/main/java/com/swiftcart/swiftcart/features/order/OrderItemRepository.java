@@ -7,35 +7,36 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
-@Repository
 public interface OrderItemRepository extends JpaRepository<OrderItem, Integer> {
 
     Optional<OrderItem> findById(Long id);
+
     List<OrderItem> findByOrderId(Long orderId);
 
     @Query("""
-                SELECT
+                SELECT new com.swiftcart.swiftcart.features.order.OrderStats(
                     SUM(CASE WHEN oi.orderItemStatus = 'CONFIRMED' THEN oi.quantity ELSE 0 END) AS confirmedOrderItems,
                     SUM(CASE WHEN oi.orderItemStatus = 'SHIPPED' THEN oi.quantity ELSE 0 END) AS shippedOrderItems,
                     SUM(CASE WHEN oi.orderItemStatus = 'DELIVERED' THEN oi.quantity ELSE 0 END) AS deliveredOrderItems,
                     SUM(CASE WHEN oi.orderItemStatus = 'RETURNED' THEN oi.quantity ELSE 0 END) AS returnedOrderItems,
-                    SUM(CASE WHEN FUNCTION(DATE, oi.order.placedAt) = CURRENT_DATE THEN oi.product.price * oi.quantity ELSE 0 END) AS revenueToday
+                    SUM(CASE WHEN oi.order.placedAt = CURRENT_DATE THEN oi.product.price * oi.quantity ELSE 0 END) AS revenueToday
+                )
                 FROM OrderItem oi
             """)
-    OrderStatsProjection getOrderStats();
+    OrderStats getOrderStats();
 
     @Query("""
-                SELECT
-                    DATE(oi.order.placedAt) AS date,
-                    SUM(oi.product.price * oi.quantity) AS revenue,
-                    COUNT(DISTINCT oi.order.id) AS orders,
-                    SUM(oi.quantity) AS orderItems
+                SELECT new com.swiftcart.swiftcart.features.order.DailyOrderStats(
+                    CAST(oi.order.placedAt AS LocalDate),
+                    SUM(oi.product.price * oi.quantity),
+                    COUNT(DISTINCT oi.order.id),
+                    SUM(oi.quantity)
+                )
                 FROM OrderItem oi
-                WHERE oi.order.placedAt >= :startDate
-                GROUP BY DATE(oi.order.placedAt)
-                ORDER BY DATE(oi.order.placedAt)
+                WHERE oi.order.placedAt >= :start
+                GROUP BY CAST(oi.order.placedAt AS date)
+                ORDER BY CAST(oi.order.placedAt AS date)
             """)
-    List<DailyOrderStatsProjection> getDailyOrderStats(@Param("startDate") LocalDateTime startDate);
+    List<DailyOrderStats> getDailyOrderStats(@Param("start") LocalDateTime start);
 }

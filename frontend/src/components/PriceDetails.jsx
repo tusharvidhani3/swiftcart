@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router'
 import styles from '../styles/PriceDetails.module.css'
-import PaymentButton from './PaymentButton'
 import { formatPaiseToRupees } from '../utils/currency'
+import { Button } from './ui/button'
 
 export default function PriceDetails({ nextBtnClick, cart, isCheckoutMode, isCod }) {
 
@@ -26,7 +26,7 @@ export default function PriceDetails({ nextBtnClick, cart, isCheckoutMode, isCod
                 {isCheckoutMode ? (isCod ? <button className={styles.btnCheckout} onClick={async () => {
                     const orderResponse = await nextBtnClick()
                     navigate(`/orders/${orderResponse.id}`)
-                    }}>Place Order</button> : <PaymentButton createOrder={nextBtnClick} amount={totalAmount*100} />) : <button className={styles.btnCheckout} onClick={nextBtnClick}>Proceed to Checkout</button>}
+                    }}>Place Order</button> : <Button className={styles.btnCheckout} onClick={nextBtnClick}>Pay Online</Button>) : <button className={styles.btnCheckout} onClick={nextBtnClick}>Proceed to Checkout</button>}
             </div>
         </section>
     )

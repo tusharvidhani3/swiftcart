@@ -1,29 +1,20 @@
 import { useNavigate } from 'react-router'
 import { CirclePlus, Search, Loader2 } from 'lucide-react'
-import { useAuthFetch } from '../hooks/useAuthFetch'
 import styles from '../styles/SellerProducts.module.css'
-import { apiBaseUrl } from '../config'
 import { useState } from 'react'
 import SellerProductCard from './SellerProductCard'
 import { useQuery } from '@tanstack/react-query'
-
-async function getProducts(authFetch, keyword) {
-    const res = await authFetch(`${apiBaseUrl}/api/products/seller?${keyword ? '?keyword=' + keyword : ''}`, {
-        method: 'GET',
-    })
-    return await res.json()
-}
+import { api } from '@/api/client'
 
 export default function SellerProducts() {
 
     const [keyword, setKeyword] = useState("")
-    const authFetch = useAuthFetch()
     const navigate = useNavigate()
     const [threeDotsMenuOpen, setThreeDotsMenuOpen] = useState(null)
 
     const { data: productsPagedModel, isLoading } = useQuery({
         queryKey: ['products',],
-        queryFn: () => getProducts(authFetch, keyword),
+        queryFn: () => api.get(`/products/seller?${keyword ? '?keyword=' + keyword : ''}`),
         staleTime: 1000 * 60 * 5
     })
 

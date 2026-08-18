@@ -3,7 +3,6 @@ package com.swiftcart.swiftcart.common.security;
 import java.io.IOException;
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -17,15 +16,15 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JwtService jwtService;
+    private final JwtService jwtService;
 
-    @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -45,7 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String email = claims.get("email", String.class);
         String mobileNumber = claims.get("mobileNumber", String.class);
         String role = claims.get("role", String.class);
-        UserPrincipal userPrincipal = new UserPrincipal(userId, email, mobileNumber, Set.of(new SimpleGrantedAuthority(role)));
+        AppUserDetails userPrincipal = new AppUserDetails(userId, email, mobileNumber, Set.of(new SimpleGrantedAuthority(role)));
 
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userPrincipal, null,
                 userPrincipal.getAuthorities());

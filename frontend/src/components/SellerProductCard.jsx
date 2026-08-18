@@ -1,42 +1,23 @@
 import { useContext, useState } from 'react'
-import { apiBaseUrl } from '../config'
-import { useAuthFetch } from '../hooks/useAuthFetch'
 import styles from '../styles/SellerProducts.module.css'
 import ProductsContext from '../contexts/ProductsContext'
 import { useNavigate } from 'react-router'
 import { formatPaiseToRupees } from '../utils/currency'
 import { EllipsisVertical } from 'lucide-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-
-async function apiUpdateStock(authFetch, newStock) {
-    const res = await authFetch(`${apiBaseUrl}/api/products/${productId}`, {
-        method: 'PATCH',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            stock: newStock
-        })
-    })
-    return await res.json()
-}
+import { api } from '@/api/client'
 
 async function apiUpdateProduct(updatedProduct) {
     const formData = new FormData()
     formData.append("productRequest", new Blob(
         [JSON.stringify(updatedProduct)], { type: "application/json" }
     ))
-    const res = await authFetch(`${apiBaseUrl}/api/products/${productId}`, {
-        method: 'PUT',
-        body: formData
-    })
-    return await res.json()
+    return api.put(`/products/${productId}`, formData)
 }
 
 export default function SellerProductCard({ product, threeDotsMenuOpen, setThreeDotsMenuOpen }) {
 
     const { productId, name, imageUrls, mrp } = product
-    const authFetch = useAuthFetch()
     const { setEditingProduct } = useContext(ProductsContext)
     const navigate = useNavigate()
     const [stock, setStock] = useState(product.stock)
@@ -44,14 +25,14 @@ export default function SellerProductCard({ product, threeDotsMenuOpen, setThree
 
     const queryClient = useQueryClient()
     const { mutate: updateStock } = useMutation({
-        mutationFn: (stock) => apiUpdateStock(authFetch, stock),
+        mutationFn: (stock) => api.patch(`/products/${productId}`, { stock: stock }),
         onSuccess: (product) => {
             queryClient.setQueryData(['products', productId], product)
         }
     })
 
     const { mutate: updateProduct } = useMutation({
-        mutationFn: (product) => apiUpdateProduct(authFetch, product),
+        mutationFn: (product) => apiUpdateProduct(product),
         onSuccess: (product) => queryClient.setQueryData(['products', productId], product)
     })
 

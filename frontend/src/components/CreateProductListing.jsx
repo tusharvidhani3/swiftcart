@@ -1,16 +1,18 @@
 import { useContext, useEffect, useState } from 'react';
 import styles from '../styles/CreateProductListing.module.css'
-import ToastContext from '../contexts/ToastContext';
 import { useNavigate } from 'react-router';
-import { useAuthFetch } from '../hooks/useAuthFetch';
 import { CirclePlus, CircleX, Upload } from 'lucide-react'
-import { apiBaseUrl } from '../config';
 import ProductsContext from '../contexts/ProductsContext';
+import { toast } from 'sonner';
+import { useMutation } from '@tanstack/react-query';
+import { api } from '@/api/client';
+
+async function apiCreateProduct(productForm) {
+    return api.post(`/products`, { formData })
+}
 
 export default function CreateProductListing({ isEditMode }) {
 
-    const { showToast } = useContext(ToastContext)
-    const authFetch = useAuthFetch()
     const navigate = useNavigate()
     const { editingProduct } = useContext(ProductsContext)
     const [selectedFiles, setSelectedFiles] = useState([])
@@ -59,7 +61,7 @@ export default function CreateProductListing({ isEditMode }) {
             const updatedFiles = [...selectedFiles]
             let i = selectedFiles.length
             while (i < selectedFiles.length + files.length && i < 9) {
-                updatedFiles[i] = files[i-selectedFiles.length]
+                updatedFiles[i] = files[i - selectedFiles.length]
                 i++
             }
             if (previews.length + files.length > 9) {
@@ -77,7 +79,15 @@ export default function CreateProductListing({ isEditMode }) {
         })
     }
 
-    async function createProduct() {
+    // const { mutate: createProduct } = useMutation({
+    //     mutationFn: (productForm) => apiCreateProduct(productForm),
+    //     onSuccess: () => {
+    //         toast.success("Product listed successfully")
+    //         navigate('/seller/products')
+    //     }
+    // })
+
+    function createProduct() {
         if (isEditMode) {
             const formData = new FormData()
             // productData.deletedImageIds = 
@@ -94,13 +104,8 @@ export default function CreateProductListing({ isEditMode }) {
             for (let i = 0; i < selectedFiles.length; i++) {
                 formData.append("productImages", selectedFiles[i]);
             }
-            const res = authFetch(`${apiBaseUrl}/api/products`, {
-                method: "POST",
-                body: formData
-            })
-            const productResponse = await res.json()
-            showToast("Product listed successfully")
-            navigate('/seller/products')
+
+            createProductMutate(productForm)
         }
     }
 
@@ -153,7 +158,7 @@ export default function CreateProductListing({ isEditMode }) {
     }
 
     function validateFormField(field) {
-        const error = {...errorData}
+        const error = { ...errorData }
         validationConfig[field].some(rule => {
             if (rule.required && !productData[field]) {
                 error[field] = rule.message
@@ -177,8 +182,9 @@ export default function CreateProductListing({ isEditMode }) {
     function revokeError(field) {
         if (errorData[field]) {
             setErrorData(errorData => {
-                delete errorData[field]
-                return { ...errorData }
+                const newErrorData = { ...errorData }
+                delete newErrorData[field]
+                return { ...newErrorData }
             })
         }
     }
@@ -211,7 +217,7 @@ export default function CreateProductListing({ isEditMode }) {
                         <input type="text" id="product-title" name="name" value={productData.name} onChange={e => {
                             setProductData(productData => ({ ...productData, name: e.target.value }))
                             revokeError(e.target.name)
-                            }} onBlur={e => validateFormField(e.target.name)} />
+                        }} onBlur={e => validateFormField(e.target.name)} />
                         <div className={styles.error}>{errorData.name}</div>
                     </div>
                 </div>
@@ -221,7 +227,7 @@ export default function CreateProductListing({ isEditMode }) {
                         <textarea type="text" id="description" name="description" value={productData.description} onChange={e => {
                             setProductData(productData => ({ ...productData, description: e.target.value }))
                             revokeError(e.target.name)
-                            }} onBlur={e => validateFormField(e.target.name)} />
+                        }} onBlur={e => validateFormField(e.target.name)} />
                         <div className={styles.error}>{errorData.description}</div>
                     </div>
                 </div>
@@ -231,7 +237,7 @@ export default function CreateProductListing({ isEditMode }) {
                         <input type="number" id="price" name="price" value={productData.price} onChange={e => {
                             setProductData(productData => ({ ...productData, price: e.target.value }))
                             revokeError(e.target.name)
-                            }} onBlur={e => validateFormField(e.target.name)} />
+                        }} onBlur={e => validateFormField(e.target.name)} />
                         <div className={styles.error}>{errorData.price}</div>
                     </div>
                 </div>
@@ -241,7 +247,7 @@ export default function CreateProductListing({ isEditMode }) {
                         <input type="number" id="mrp" name="mrp" value={productData.mrp} onChange={e => {
                             setProductData(productData => ({ ...productData, mrp: e.target.value }))
                             revokeError(e.target.name)
-                            }} onBlur={e => validateFormField(e.target.name)} />
+                        }} onBlur={e => validateFormField(e.target.name)} />
                         <div className={styles.error}>{errorData.mrp}</div>
                     </div>
                 </div>
@@ -251,7 +257,7 @@ export default function CreateProductListing({ isEditMode }) {
                         <input type="text" id="category" name="category" value={productData.category} onChange={e => {
                             setProductData(productData => ({ ...productData, category: e.target.value }))
                             revokeError(e.target.name)
-                            }} onBlur={e => validateFormField(e.target.name)} />
+                        }} onBlur={e => validateFormField(e.target.name)} />
                         <div className={styles.error}>{errorData.category}</div>
                     </div>
                 </div>
@@ -261,7 +267,7 @@ export default function CreateProductListing({ isEditMode }) {
                         <input type="number" id="stock" name="stock" value={productData.stock} onChange={e => {
                             setProductData(productData => ({ ...productData, stock: e.target.value }))
                             revokeError(e.target.name)
-                            }} onBlur={e => validateFormField(e.target.name)} />
+                        }} onBlur={e => validateFormField(e.target.name)} />
                         <div className={styles.error}>{errorData.stock}</div>
                     </div>
                 </div>

@@ -2,8 +2,6 @@ package com.swiftcart.swiftcart.common.security;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -23,9 +21,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.swiftcart.swiftcart.common.security.oauth2.CustomOidcUserService;
-import com.swiftcart.swiftcart.common.security.oauth2.OAuth2LoginFailureHandler;
-import com.swiftcart.swiftcart.common.security.oauth2.OAuth2LoginSuccessHandler;
+import lombok.RequiredArgsConstructor;
 
 import static org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter.Directive.COOKIES;
 import static org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter.Directive.STORAGE;
@@ -33,38 +29,33 @@ import static org.springframework.security.web.header.writers.ClearSiteDataHeade
 @EnableWebSecurity
 @Configuration
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    @Autowired
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
-    @Autowired
-    private CustomAccessDeniedHandler customAccessDeniedHandler;
+    private final AppAccessDeniedHandler accessDeniedHandler;
 
-    @Autowired
-    private JwtLogoutHandler jwtLogoutHandler;
+    private final JwtLogoutHandler jwtLogoutHandler;
 
-    @Autowired
-    private JwtLogoutSuccessHandler jwtLogoutSuccessHandler;
+    private final JwtLogoutSuccessHandler jwtLogoutSuccessHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
         .csrf(csrf -> csrf.disable())
-        .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint).accessDeniedHandler(customAccessDeniedHandler))
+        .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint).accessDeniedHandler(accessDeniedHandler))
         .authorizeHttpRequests(authorize -> authorize
-            .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/refresh-token", "/oauth2/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/health").permitAll()
+            .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/refresh-token", "/api/auth/google", "/api/auth/verify-email", "/error").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
             .requestMatchers("/api/admin/**").hasRole("ADMIN")
             .anyRequest().authenticated()
         )
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .oauth2Login(oauth2 -> oauth2.userInfoEndpoint(userInfo -> userInfo.oidcUserService(customOidcUserService))
-            .successHandler(oAuth2LoginSuccessHandler)
-            .failureHandler(oAuth2LoginFailureHandler))
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
         .httpBasic(httpBasic -> httpBasic.disable())
         .logout(logout -> logout
@@ -77,13 +68,12 @@ public class SecurityConfig {
         .build();
     }
 
-    @Value("${app.security.cors.allowed-origins}")
-    private String[] allowedOrigins;
+    private final SecurityProperties securityProperties;
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of(allowedOrigins));
+        configuration.setAllowedOrigins(List.of(securityProperties.cors().allowedOrigins()));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

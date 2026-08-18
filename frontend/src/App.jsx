@@ -1,27 +1,24 @@
 import './App.css'
-import { useMatches } from 'react-router'
-import CustomerApp from './components/CustomerApp'
-import SellerApp from './components/SellerApp';
-import { Suspense, useContext } from 'react';
-import UserContext from './contexts/UserContext';
+import { Suspense } from 'react';
 import { UIProvider } from './contexts/UIContext';
 import { Loader2 } from 'lucide-react';
+import { queryClient } from './api/client';
+import AppContent from './components/AppContent';
+import { UserProvider } from './contexts/UserContext';
+import { QueryClientProvider } from '@tanstack/react-query';
 
 function App() {
 
-  const { userInfo } = useContext(UserContext)
-  const matches = useMatches();
-  const mainClassKey = matches.find(m => m.handle?.mainClass)?.handle.mainClass || '';
-  const mainClass = `${mainClassKey && mainClassKey}`;
-
   return (
-      <Suspense fallback={<div className='flex h-full w-full items-center justify-center'><Loader2 className='animate-spin' /></div>}>
-        <UIProvider>
-          {
-            userInfo?.role === 'ROLE_SELLER' ? <SellerApp mainClass={mainClass} /> : <CustomerApp mainClass={mainClass} />
-          }
-        </UIProvider>
-      </Suspense>
+      <UIProvider>
+        <QueryClientProvider client={queryClient}>
+          <UserProvider>
+            <Suspense fallback={<div className='flex h-full w-full items-center justify-center'><Loader2 className='animate-spin' /></div>}>
+              <AppContent />
+            </Suspense>
+          </UserProvider>
+        </QueryClientProvider>
+      </UIProvider>
   )
 }
 

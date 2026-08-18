@@ -1,3 +1,11 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+.authForm {
+  @apply justify-center min-h-[550px] flex-row pb-4 gap-0
+}
+
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -11,31 +19,6 @@
 
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-#toast {
-  display: flex;
-  position: fixed;
-  left: 50%;
-  transform: translate(-50%);
-  bottom: 100px;
-  margin-inline: auto;
-  width: fit-content;
-  height: 32px;
-  border-radius: 16px;
-  background-color: gray;
-  color: white;
-  align-items: center;
-  justify-content: center;
-  padding: 8px;
-  visibility: hidden;
-  transition: opacity .5s ease-in-out;
-  opacity: 0;
-}
-
-#toast.show {
-  visibility: visible;
-  opacity: 1;
 }
 
 .no-scroll {
@@ -152,6 +135,7 @@ nav {
   padding-inline: 12px;
   justify-content: center;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .sellerOrders, .sellerProducts {

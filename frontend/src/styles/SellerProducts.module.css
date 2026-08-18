@@ -129,7 +129,7 @@
 }
 
 .btnUpdate {
-    background-color: #FF9800;
+    background-color: var(--accent-color);
     cursor: pointer;
     /* width: max-content; */
 }

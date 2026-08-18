@@ -1,14 +1,19 @@
-import { createContext, useState } from "react"
+import { createContext, useEffect, useState } from "react"
 
 const AddressesContext = createContext()
 export default AddressesContext
 
 export function AddressesProvider({ children }) {
 
-    const [selectedAddress, setSelectedAddress] = useState(null)
+    const [selectedAddressId, setSelectedAddressId] = useState(localStorage.getItem('selectedAddressId'))
+
+    useEffect(() => {
+        if(selectedAddressId)
+            localStorage.setItem('selectedAddressId', selectedAddressId)
+    }, [selectedAddressId])
 
     return (
-        <AddressesContext.Provider value={{ selectedAddress, setSelectedAddress }}>
+        <AddressesContext.Provider value={{ selectedAddressId, setSelectedAddressId }}>
             {children}
         </AddressesContext.Provider>
     )

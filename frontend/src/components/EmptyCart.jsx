@@ -7,9 +7,9 @@ import UserContext from '../contexts/UserContext'
 
 export default function EmptyCart() {
 
-    const { userInfo } = useContext(UserContext)
+    const { user } = useContext(UserContext)
 
-    return userInfo?(
+    return user?(
         <div className={styles.emptyCart}>
             <img src={emptyCart} alt="Empty Cart" />
             <h2>Your cart is empty!</h2>

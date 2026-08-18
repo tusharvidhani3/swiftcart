@@ -1,15 +1,12 @@
 import App from './App.jsx'
 import Home from './components/Home.jsx'
 import { createBrowserRouter, Outlet } from 'react-router'
-import { UserProvider } from './contexts/UserContext.jsx'
 import { lazy } from 'react'
 import SellerDashboard from './components/SellerDashboard.jsx'
 import SellerOrders from './components/SellerOrders.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 import SellerProducts from './components/SellerProducts.jsx'
 import { ProductsProvider } from './contexts/ProductsContext.jsx'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ToastProvider } from './contexts/ToastContext.jsx'
 
 const Cart = lazy(() => import('./components/Cart.jsx'))
 const ProductDetails = lazy(() => import('./components/ProductDetails.jsx'))
@@ -23,20 +20,10 @@ const OrderDetails = lazy(() => import('./components/OrderDetails.jsx'))
 const CreateProductListing = lazy(() => import('./components/CreateProductListing.jsx'))
 const AddressesProvider = lazy(() => import('./contexts/AddressesContext.jsx').then(module => ({ default: module.AddressesProvider })))
 
-const queryClient = new QueryClient()
-
 const router = createBrowserRouter([
     {
         path: '/',
-        element: (
-            <QueryClientProvider client={queryClient}>
-                <ToastProvider>
-                        <UserProvider>
-                            <App />
-                        </UserProvider>
-                </ToastProvider>
-            </QueryClientProvider>
-        ),
+        element: <App />,
         children: [
             {
                 index: true,

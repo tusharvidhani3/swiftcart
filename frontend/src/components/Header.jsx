@@ -8,7 +8,7 @@ import CartContext from "../contexts/CartContext";
 
 function Header({ setSideMenuOpen }) {
 
-    const { userInfo, logout } = useContext(UserContext)
+    const { user, logout } = useContext(UserContext)
     const navigate = useNavigate()
     const [searchParams, setSearchParams] = useSearchParams()
     const keyword = searchParams.get('k') || ""
@@ -41,11 +41,11 @@ function Header({ setSideMenuOpen }) {
                 <input type="search" name="keyword" placeholder="Search for products" value={currKeyword} onChange={e => setCurrKeyword(e.target.value)} />
                 <button><Search /></button>
             </form>
-            <div className={`${styles.headerRight} ${userInfo ? styles.loggedIn : ''}`}>
-                {!location.pathname.startsWith('/auth') && <div className={`${styles.profile} ${userInfo && showProfileDropDown ? styles.show : ''}`} onMouseEnter={userInfo ? () => setShowProfileDropDown(true) : undefined} onMouseLeave={userInfo ? () => setShowProfileDropDown(false) : undefined}>
-                    <button className={styles.btnProfile} onClick={userInfo ? undefined : () => navigate('/auth/login')}>
+            <div className={`${styles.headerRight} ${user ? styles.loggedIn : ''}`}>
+                {!location.pathname.startsWith('/auth') && <div className={`${styles.profile} ${user && showProfileDropDown ? styles.show : ''}`} onMouseEnter={user ? () => setShowProfileDropDown(true) : undefined} onMouseLeave={user ? () => setShowProfileDropDown(false) : undefined}>
+                    <button className={styles.btnProfile} onClick={user ? undefined : () => navigate('/auth/login')}>
                         <User />
-                        <span>{userInfo ? userInfo.firstName || 'User' : "Login"}</span><ChevronDown className={styles.dropDownArrow} />
+                        <span>{user ? user.firstName || 'User' : "Login"}</span><ChevronDown className={styles.dropDownArrow} />
                     </button>
                     <ul className={styles.dropDownMenu} onClick={() => setShowProfileDropDown(false)}>
                         <li className={styles.myProfile}><Link to="/profile"><CircleUser />My Profile</Link></li>

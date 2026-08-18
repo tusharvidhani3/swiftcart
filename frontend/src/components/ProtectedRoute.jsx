@@ -5,13 +5,13 @@ import ErrorMessage from "./ErrorMessage"
 
 const ProtectedRoute = ({ allowedRoles, element }) => {
 
-    const { userInfo } = useContext(UserContext)
+    const { user } = useContext(UserContext)
     const location = useLocation()
 
-    if(!userInfo) {
+    if(!user) {
         return <Navigate to={`/auth/login?redirectTo=${location.pathname}`} replace />
     }
-    else if(!allowedRoles.includes(userInfo.role))
+    else if(!allowedRoles.includes(user.role))
         return <ErrorMessage type='forbidden' />
     if(element)
         return element

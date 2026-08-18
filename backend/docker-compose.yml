@@ -15,10 +15,7 @@ services:
     image: valkey/valkey:alpine
     ports:
       - "127.0.0.1:6379:6379"
-    volumes:
-      - valkey-data:/data:Z
-    command: ["valkey-server", "--protected-mode", "no"]
+    command: ["valkey-server", "--protected-mode", "no", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
 
 volumes:
   postgres_data:
-  valkey-data:
